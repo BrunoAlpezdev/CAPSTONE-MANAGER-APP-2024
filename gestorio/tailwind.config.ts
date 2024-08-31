@@ -8,6 +8,13 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        Naranjo: '#F05B29',
+        Gris: '#313031',
+        Blanco: '#F4F4F4',
+        Amarillo: '#FFD54F',
+        Verde: '#009688'
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
