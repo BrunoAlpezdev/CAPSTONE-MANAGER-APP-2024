@@ -1,4 +1,6 @@
 # Custom Dictionary Words
+gestorio
 Haikei
 SAVANNA
 SAVANNALOGO
+tseslint
