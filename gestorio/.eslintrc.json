@@ -1,3 +1,20 @@
 {
-  "extends": "next/core-web-vitals"
+	"parser": "@typescript-eslint/parser",
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:react-hooks/recommended",
+		"plugin:react/jsx-runtime",
+		"next"
+	],
+	"plugins": ["react", "@typescript-eslint"],
+	"rules": {
+		"react/react-in-jsx-scope": "off",
+		"no-unused-vars": "warn"
+	},
+	"settings": {
+		"react": {
+			"version": "detect"
+		}
+	}
 }
