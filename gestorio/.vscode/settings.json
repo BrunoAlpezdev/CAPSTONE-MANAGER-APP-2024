@@ -1,5 +1,5 @@
 {
-	"cSpell.words": ["gestorio", "SAVANNALOGO"],
+	"cSpell.words": ["esnext", "gestorio", "SAVANNALOGO"],
 	"editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
 	"editor.formatOnType": false, // required
 	"editor.formatOnPaste": true, // optional
