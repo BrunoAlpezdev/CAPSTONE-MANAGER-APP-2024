@@ -22,17 +22,24 @@ export default function Home() {
 						alt='Vercel Logo'
 						width={500}
 						height={100}
+						className='bg-Gris'
 					/>
 				</div>
 
-				<form onSubmit={handleSubmit} className='flex flex-col gap-4'>
-					<label className='text-xl'>Usuario</label>
-					<input className='bg-Verde h-9 px-2 rounded-md' type='email' />
+				<form onSubmit={handleSubmit} className='bg-Gris flex flex-col gap-4'>
+					<label className='bg-Gris text-Blanco text-xl'>Usuario</label>
+					<input
+						className='bg-Verde text-Blanco h-9 px-2 rounded-md'
+						type='email'
+					/>
 
-					<label className='text-xl'>Contraseña</label>
-					<input className='bg-Verde h-9 px-2 rounded-md' type='password' />
+					<label className='bg-Gris text-Blanco text-xl'>Contraseña</label>
+					<input
+						className='bg-Verde text-Blanco h-9 px-2 rounded-md'
+						type='password'
+					/>
 
-					<button className='self-center text-2xl bg-Naranjo rounded-lg w-fit px-12 py-2 mt-8 transition hover:scale-105 hover:bg-Naranjo/90'>
+					<button className='self-center text-2xl text-Blanco bg-Naranjo rounded-lg w-fit px-12 py-2 mt-8 transition hover:scale-105 hover:bg-Naranjo/90'>
 						Iniciar Sesión
 					</button>
 				</form>

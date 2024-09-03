@@ -1,24 +1,32 @@
 :root {
-    --foreground-rgb: #313131;
-    --background: #F4F4F4;
+	--foreground-rgb: #f4f4f4;
+	--background: #313031;
+	--Brand-Naranjo: #f05b29;
+	--Brand-Gris: #313031;
+	--Brand-Blanco: #f4f4f4;
+	--Brand-Amarillo: #ffd54f;
+	--Brand-Verde: #009688;
 }
 
-
-
-* {
-    color: var(--foreground-rgb);
-    background: var(--background);
-}
-
-.fondo{
-    background-image: url('/background.svg');
-    background-repeat: no-repeat;
-    background-position: bottom;
-    background-size: 100%;
+main {
+	color: #313131;
+	background: #f4f4f4;
 }
 
 body {
-    min-height: 100dvh;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
+	min-height: 100dvh;
+	display: grid;
+	grid-template-rows: auto 1fr auto;
+}
+
+.dashboard-container {
+	background-color: rgba(49, 48, 49, 0.05);
+	padding: 0.75rem;
+	border-radius: 0.375rem /* 6px */;
+	border-width: 1px;
+	border-color: rgb(255 213 79 / 0.4);
+}
+
+.box-shadow {
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
