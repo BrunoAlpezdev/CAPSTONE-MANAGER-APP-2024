@@ -13,9 +13,7 @@ export default function HomePage() {
 					<DashboardItem title='Ultimas Ventas' />
 					<DashboardItem title='Ultimas Compras' />
 					<DashboardItem title='Ganancias Mensuales' />
-					<DashboardItem title='Ultimas Ventas' />
-					<DashboardItem title='Ultimas Compras' />
-					<DashboardItem title='Ganancias Mensuales' />
+					<DashboardItem title='Calendario' />
 					<DashboardItem title='Calendario' />
 				</section>
 			</section>

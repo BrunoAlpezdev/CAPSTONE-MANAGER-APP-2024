@@ -51,3 +51,24 @@ hr.rounded {
 	border-top: 8px solid #95ccff;
 	border-radius: 5px;
 }
+
+.no-drag {
+	-webkit-user-drag: none; /* Para navegadores basados en WebKit (como Safari) */
+	pointer-events: none; /* Opcional: Desactiva otros eventos del ratón */
+}
+
+.shadow-right {
+	box-shadow: 6px 0 6px rgba(49, 48, 49, 0.3);
+}
+
+.shadow-bottom {
+	z-index: 2;
+	box-shadow: 0 6px 6px rgba(49, 48, 49, 0.3);
+}
+
+.fondo {
+	background-image: url('/menu-background.svg');
+	background-repeat: no-repeat;
+	background-position: bottom;
+	background-size: 100%;
+}
