@@ -17,6 +17,7 @@
         └── Database2.0.pdf
         └── edt.jpg
         └── Mockups.docx
+        └── ...
     └── 📁public
         └── background.svg
         └── block.svg
@@ -28,6 +29,7 @@
         └── reportes.svg
         └── SAVANNALOGOpng.png
         └── user.svg
+        └── ...
     └── 📁src
         └── 📁app
             └── 📁(system)
@@ -43,6 +45,7 @@
             └── favicon.ico
             └── layout.tsx
             └── page.tsx
+            └── ...
     └── .eslintrc.json
     └── .gitignore
     └── .prettierrc
