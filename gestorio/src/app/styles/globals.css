@@ -3,8 +3,6 @@
 @tailwind utilities;
 
 :root {
-	--foreground-rgb: #f4f4f4;
-	--background: #313031;
 	--Brand-Naranjo: #f05b29;
 	--Brand-Gris: #313031;
 	--Brand-Blanco: #f4f4f4;
