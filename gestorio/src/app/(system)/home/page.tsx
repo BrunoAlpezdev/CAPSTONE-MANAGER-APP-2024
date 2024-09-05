@@ -1,5 +1,5 @@
-import DashboardItem from '@/app/components/dashboard-item.component'
-import Menu from '../../components/menu.component'
+import DashboardItem from '@components/dashboard-item.component'
+import Menu from '@components/menu.component'
 
 export default function HomePage() {
 	return (

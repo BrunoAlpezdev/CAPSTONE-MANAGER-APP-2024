@@ -8,7 +8,9 @@ export default function Menu() {
 		<div className='w-fit h-full bg-Gris/90 text-Blanco px-6 py-8 font-normal shadow-right z-auto fondo'>
 			<section className='flex flex-col gap-12'>
 				<AnimateContent>
-					<Link href='/' className='flex flex-row gap-2 items-center w-48'>
+					<Link
+						href='/SistemaDeVentas'
+						className='flex flex-row gap-2 items-center w-48'>
 						<Image
 							src={'/POS.svg'}
 							alt='Logo de Savanna'

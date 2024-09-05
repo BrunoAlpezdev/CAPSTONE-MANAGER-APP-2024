@@ -13,12 +13,6 @@ main {
 	background: #f4f4f4;
 }
 
-body {
-	min-height: 100dvh;
-	display: grid;
-	grid-template-rows: auto 1fr auto;
-}
-
 .dashboard-container {
 	background-color: rgba(49, 48, 49, 0.05);
 
@@ -46,6 +40,16 @@ hr.solid {
 	border-top: 3px solid #95ccff;
 }
 
+/* Solid border */
+.border-l-solid {
+	border-left: 2px solid #313031;
+	padding-left: 0.3rem;
+}
+.border-r-solid {
+	border-right: 2px solid #313031;
+	padding-right: 0.3rem;
+}
+
 /* Rounded border */
 hr.rounded {
 	border-top: 8px solid #95ccff;
@@ -71,4 +75,22 @@ hr.rounded {
 	background-repeat: no-repeat;
 	background-position: bottom;
 	background-size: 100%;
+}
+
+.scrollbar-modifier::-webkit-scrollbar {
+	width: 8px; /* Ancho del scrollbar */
+}
+
+.scrollbar-modifier::-webkit-scrollbar-track {
+	background: #f1f1f1; /* Color de fondo del track */
+}
+
+.scrollbar-modifier::-webkit-scrollbar-thumb {
+	background-color: #888; /* Color del "pulgar" (thumb) */
+	border-radius: 10px; /* Redondear las esquinas */
+	border: 2px solid #f1f1f1; /* Espacio alrededor del thumb */
+}
+
+.scrollbar-modifier::-webkit-scrollbar-thumb:hover {
+	background: #555; /* Color cuando se pasa el ratón por encima */
 }
