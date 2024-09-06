@@ -5,6 +5,7 @@
 		"lucide",
 		"mockproduct",
 		"Nescafé",
+		"nextui",
 		"SAVANNALOGO"
 	],
 	"editor.defaultFormatter": "rvest.vs-code-prettier-eslint",

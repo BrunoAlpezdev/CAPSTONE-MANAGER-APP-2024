@@ -4,10 +4,12 @@ import Footer from '@components/footer.component'
 import Image from 'next/image'
 import Product from '@/app/components/POS/product.component'
 import { RecentProduct } from '@/app/components/POS/recent-product.component'
-import { CreditCard, Banknote } from 'lucide-react'
+import { CreditCard, Banknote, Ban, Bookmark } from 'lucide-react'
 import { useMenu } from '@/app/hooks/useMenu'
 import ToggleMenu from '@/app/components/POS/toggle-menu.component'
 import { useState } from 'react'
+import { User, Building2, HandCoins } from 'lucide-react'
+import { Switch } from '@nextui-org/switch'
 
 type PaymentMethod = {
 	name: string
@@ -47,6 +49,7 @@ function PaymentMethodSelector({
 export default function POS() {
 	const { isMenuOpen, toggleMenu } = useMenu()
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Efectivo')
+	const [isSelected, setIsSelected] = useState(true)
 
 	const togglePaymentMethod = (method: string) => {
 		setSelectedPaymentMethod(method)
@@ -142,15 +145,38 @@ export default function POS() {
 				</main>
 				{/* Footer */}
 				{/* TODO: Terminar Footer */}
-				<footer className='bg-Gris/90 p-4 flex justify-between items-center'>
-					<div className='flex space-x-2'>
-						<button>Cancelar</button>
-						<button>Dejar Pendiente</button>
-						<button className='bg-orange-500 text-white'>Boleta/Factura</button>
-					</div>
-					<div className='flex items-center'>
-						<span className='mr-4'>Total $</span>
-						<button className='bg-orange-500 text-white'>Pagar 31.300</button>
+				<footer className='bg-Gris/90 p-4 flex items-center'>
+					<div className='flex text-md bg-Verde/70 rounded-lg py-2 px-4 w-[73.9dvw] justify-between'>
+						<div className='flex items-center gap-4'>
+							<button className='bg-Verde/70 p-2 rounded-md border flex flex-row gap-2'>
+								<Ban />
+								Cancelar
+							</button>
+							<button className='bg-Verde/70 p-2 rounded-md border flex flex-row gap-2'>
+								<Bookmark />
+								Dejar Pendiente
+							</button>
+							<Switch
+								isSelected={isSelected}
+								onValueChange={setIsSelected}
+								defaultSelected
+								size='lg'
+								color='success'
+								startContent={<User />}
+								endContent={<Building2 />}>
+								<p className=' text-default-300'>
+									{isSelected ? 'Boleta' : 'Factura'}
+								</p>
+							</Switch>
+						</div>
+						<div className='flex flex-row gap-3 items-center'>
+							<button className='bg-Naranjo text-white border p-2 rounded-lg flex flex-row gap-2'>
+								<HandCoins />
+								Pagar
+							</button>
+							<span>Total $</span>
+							<strong className='bg-Verde/70 p-2 rounded-lg'>10.000</strong>
+						</div>
 					</div>
 				</footer>
 				<Footer />
