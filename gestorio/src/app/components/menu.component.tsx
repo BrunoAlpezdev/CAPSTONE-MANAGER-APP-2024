@@ -1,7 +1,7 @@
 'use client'
-import Image from 'next/image'
 import Link from 'next/link'
 import AnimateContent from './animated-content.component'
+import { Package, CreditCard, Truck, BarChart } from 'lucide-react'
 
 export default function Menu() {
 	return (
@@ -11,37 +11,19 @@ export default function Menu() {
 					<Link
 						href='/SistemaDeVentas'
 						className='flex flex-row gap-2 items-center w-48'>
-						<Image
-							src={'/POS.svg'}
-							alt='Logo de Savanna'
-							width={30}
-							height={30}
-							className='cursor-pointer pointer-events-none'
-						/>
+						<CreditCard />
 						<p>Sistema de Ventas</p>
 					</Link>
 				</AnimateContent>
 				<AnimateContent>
 					<Link href='/' className='flex flex-row gap-2 items-center'>
-						<Image
-							src={'/inventario.svg'}
-							alt='Logo de Savanna'
-							width={30}
-							height={100}
-							className='cursor-pointer pointer-events-none'
-						/>
+						<Package />
 						<p>Inventario</p>
 					</Link>
 				</AnimateContent>
 				<AnimateContent>
 					<Link href='/' className='flex flex-row gap-2 items-center'>
-						<Image
-							src={'/proveedores.svg'}
-							alt='Logo de Savanna'
-							width={30}
-							height={100}
-							className='cursor-pointer pointer-events-none'
-						/>
+						<Truck />
 						<p>Proveedores</p>
 					</Link>
 				</AnimateContent>
@@ -49,13 +31,7 @@ export default function Menu() {
 					<Link
 						href='/'
 						className='flex flex-row gap-2 items-center cursor-pointer select-none '>
-						<Image
-							src={'/reportes.svg'}
-							alt='Logo de Savanna'
-							width={30}
-							height={100}
-							className='cursor-pointer pointer-events-none'
-						/>
+						<BarChart />
 						<p>Reportes</p>
 					</Link>
 				</AnimateContent>

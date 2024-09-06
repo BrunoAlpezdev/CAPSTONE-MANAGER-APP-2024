@@ -6,14 +6,10 @@ export const useMenu = () => {
 	const toggleMenu = () => {
 		setIsMenuOpen(!isMenuOpen)
 	}
-	const toggleMenuLeave = () => {
-		setIsMenuOpen(false)
-	}
 
 	return {
 		isMenuOpen,
-		toggleMenu,
-		toggleMenuLeave
+		toggleMenu
 	}
 }
 

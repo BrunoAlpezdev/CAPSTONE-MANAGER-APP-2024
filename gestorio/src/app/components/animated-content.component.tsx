@@ -4,6 +4,7 @@ type Props = {
 	children: React.ReactNode
 	disableHoverEffect?: boolean
 	disablePressedEffect?: boolean
+	className?: string
 }
 export default function AnimateContent(props: Props) {
 	const [isPressed, setIsPressed] = useState(false)
@@ -11,6 +12,7 @@ export default function AnimateContent(props: Props) {
 
 	return (
 		<div
+			className={props.className}
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseDown={() => {
 				setIsHovered(false)

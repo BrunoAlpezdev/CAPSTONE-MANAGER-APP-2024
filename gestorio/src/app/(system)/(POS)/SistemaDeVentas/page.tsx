@@ -2,20 +2,58 @@
 
 import Footer from '@components/footer.component'
 import Image from 'next/image'
-import Product from '@components/product.component'
-import { RecentProduct } from '@/app/components/recent-product.component'
+import Product from '@/app/components/POS/product.component'
+import { RecentProduct } from '@/app/components/POS/recent-product.component'
+import { CreditCard, Banknote } from 'lucide-react'
+import { useMenu } from '@/app/hooks/useMenu'
+import ToggleMenu from '@/app/components/POS/toggle-menu.component'
 import { useState } from 'react'
-import { X, Home, Package, Truck, BarChart } from 'lucide-react'
-import Link from 'next/link'
+
+type PaymentMethod = {
+	name: string
+	icon: React.ReactNode
+}
+
+const paymentMethods: PaymentMethod[] = [
+	{ name: 'Efectivo', icon: <Banknote className='mr-2' /> },
+	{ name: 'Débito', icon: <CreditCard className='mr-2' /> },
+	{ name: 'Crédito', icon: <CreditCard className='mr-2' /> }
+]
+
+function PaymentMethodSelector({
+	selectedMethod,
+	onSelectMethod
+}: {
+	selectedMethod: string
+	onSelectMethod: (method: string) => void
+}) {
+	return (
+		<div className='flex gap-2'>
+			{paymentMethods.map((method) => (
+				<button
+					key={method.name}
+					className={`flex w-full justify-center items-center bg-Naranjo/90 p-2 rounded-md transition-all hover:scale-105 ${
+						selectedMethod === method.name ? 'bg-orange-500 text-white' : ''
+					}`}
+					onClick={() => onSelectMethod(method.name)}>
+					{method.icon}
+					{method.name}
+				</button>
+			))}
+		</div>
+	)
+}
 
 export default function POS() {
-	const [isMenuOpen, setIsMenuOpen] = useState(false)
+	const { isMenuOpen, toggleMenu } = useMenu()
+	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Efectivo')
 
-	const toggleMenu = () => {
-		setIsMenuOpen(!isMenuOpen)
+	const togglePaymentMethod = (method: string) => {
+		setSelectedPaymentMethod(method)
 	}
+
 	return (
-		<div className='relative'>
+		<div className='relative transition-all'>
 			{/* Overlay translucido (transparencia oscura del menú) */}
 			{isMenuOpen && (
 				<div
@@ -25,48 +63,8 @@ export default function POS() {
 				/>
 			)}
 
-			{/* Menú Sidebar */}
-			<div
-				className={`fixed left-0 top-0 h-full w-64 bg-Gris/75 backdrop-blur-sm p-4 z-50 transform transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-				<button className='absolute top-4 right-4' onClick={toggleMenu}>
-					<X className='h-6 w-6' />
-					<span className='sr-only'>Close menu</span>
-				</button>
-				<nav className='flex flex-col gap-3 mt-16 transition-all'>
-					<Link
-						href='/home'
-						className='w-full grid grid-cols-3 items-center gap-3 transition-all hover:bg-Blanco/20 p-2 rounded-lg'>
-						<div className='place-self-center col-span-1'>
-							<Home />
-						</div>
-						<span className='place-content-start col-span-2'>Dashboard</span>
-					</Link>
-					<Link
-						href='/Inventario'
-						className='w-full grid grid-cols-3 items-center gap-3 transition-all hover:bg-Blanco/20 p-2 rounded-lg'>
-						<div className='place-self-center col-span-1'>
-							<Package />
-						</div>
-						<span className='place-content-start col-span-2'>Inventario</span>
-					</Link>
-					<Link
-						href='/Proveedores'
-						className='w-full grid grid-cols-3 items-center gap-3 transition-all hover:bg-Blanco/20 p-2 rounded-lg'>
-						<div className='place-self-center col-span-1'>
-							<Truck />
-						</div>
-						<span className='place-content-start col-span-2'>Proveedores</span>
-					</Link>
-					<Link
-						href='/Reportes'
-						className='w-full grid grid-cols-3 items-center gap-3 transition-all hover:bg-Blanco/20 p-2 rounded-lg'>
-						<div className='place-self-center col-span-1'>
-							<BarChart />
-						</div>
-						<span className='place-content-start col-span-2'>Reportes</span>
-					</Link>
-				</nav>
-			</div>
+			<ToggleMenu isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
+
 			{/* Main POS */}
 			<div className='flex flex-col h-screen text-white'>
 				<header className='flex justify-between items-center h-16 px-3'>
@@ -83,7 +81,14 @@ export default function POS() {
 				<main className='flex-1 flex overflow-hidden'>
 					{/* TODO: Hacer funcional los productos con los mocks */}
 					{/* Lista de Productos */}
-					<div className='flex-1 flex flex-col gap-2 p-4 overflow-y-auto'>
+					<div className='flex-1 flex flex-col gap-2 p-4 overflow-y-auto scrollbar-modifier'>
+						<Product />
+						<Product />
+						<Product />
+						<Product />
+						<Product />
+						<Product />
+						<Product />
 						<Product />
 						<Product />
 						<Product />
@@ -101,7 +106,7 @@ export default function POS() {
 							<input
 								type='text'
 								placeholder='Ingrese manualmente o escanee código de barras'
-								className='border-none outline-none shadow-none bg-transparent bg-Verde text-Blanco placeholder-Blanco w-full ml-2'
+								className='border-none outline-none shadow-none bg-transparent bg-Verde text-Blanco placeholder-Blanco w-full ml-2 text-sm'
 							/>
 						</section>
 						<section className='flex flex-row items-center w-fit px-2 py-1 text-sm bg-Verde rounded-full text-Blanco gap-1'>
@@ -116,7 +121,8 @@ export default function POS() {
 
 						{/* TODO: Hacer funcional los productos recientes con los mocks */}
 						{/* Productos Recientes */}
-						<div className='flex-1 overflow-y-auto mb-4'>
+						<div className='flex-1 overflow-y-auto mb-4 scrollbar-modifier pr-2'>
+							<RecentProduct />
 							<RecentProduct />
 							<RecentProduct />
 							<RecentProduct />
@@ -125,14 +131,12 @@ export default function POS() {
 						{/* TODO: Mejorar la sección de pagos */}
 						{/* Método de pago */}
 						<div>
-							<h2 className='mb-2'>Método de pago</h2>
-							<div className='space-y-2'>
-								{['Efectivo', 'Débito', 'Crédito'].map((method, index) => (
-									<button key={index} className='w-full justify-start'>
-										{method}
-									</button>
-								))}
-							</div>
+							<h2 className='mb-2 h-fit'>Método de pago</h2>
+
+							<PaymentMethodSelector
+								selectedMethod={selectedPaymentMethod}
+								onSelectMethod={togglePaymentMethod}
+							/>
 						</div>
 					</div>
 				</main>

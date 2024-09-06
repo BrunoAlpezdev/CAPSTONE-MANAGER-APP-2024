@@ -1,9 +1,10 @@
 import Image from 'next/image'
+import { ShoppingCart } from 'lucide-react'
 
 export function RecentProduct() {
 	return (
 		<>
-			<div className='mb-4 bg-Verde/60 text-white p-2 rounded-md shadow-xl'>
+			<div className='mb-4 bg-Verde/60 text-white p-2 rounded-md shadow-xl border'>
 				<div className='flex items-center'>
 					<div className='w-10 h-10 bg-Verde/60 rounded'>
 						<Image
@@ -22,8 +23,8 @@ export function RecentProduct() {
 						<div className='text-sm'>Stock: 24</div>
 					</div>
 					<div className='flex'>
-						<button className='bg-Verde text-white'>
-							<Image src='/plus.svg' alt='Agregar' width={20} height={20} />
+						<button className='bg-Verde text-white rounded-md p-2 border'>
+							<ShoppingCart />
 						</button>
 					</div>
 				</div>

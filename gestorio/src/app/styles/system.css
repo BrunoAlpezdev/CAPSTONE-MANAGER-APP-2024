@@ -15,7 +15,6 @@ main {
 
 .dashboard-container {
 	background-color: rgba(49, 48, 49, 0.05);
-
 	border-radius: 0.375rem /* 6px */;
 	border-width: 1px;
 	border-color: rgb(255 213 79 / 0.4);
@@ -82,15 +81,15 @@ hr.rounded {
 }
 
 .scrollbar-modifier::-webkit-scrollbar-track {
-	background: #f1f1f1; /* Color de fondo del track */
+	background: var(--Brand-Gris); /* Color de fondo del track */
 }
 
 .scrollbar-modifier::-webkit-scrollbar-thumb {
-	background-color: #888; /* Color del "pulgar" (thumb) */
+	background-color: #88888800; /* Color del "pulgar" (thumb) */
 	border-radius: 10px; /* Redondear las esquinas */
-	border: 2px solid #f1f1f1; /* Espacio alrededor del thumb */
+	border: 1px solid #f1f1f1; /* Espacio alrededor del thumb */
 }
 
 .scrollbar-modifier::-webkit-scrollbar-thumb:hover {
-	background: #555; /* Color cuando se pasa el ratón por encima */
+	background: var(--Brand-Verde); /* Color cuando se pasa el ratón por encima */
 }

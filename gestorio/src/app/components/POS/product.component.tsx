@@ -56,7 +56,7 @@ export default function Product() {
 						<input
 							type='numeric'
 							className='w-12 h-8 text-center bg-Verde/40 text-Gris/100 rounded-lg'
-							value={1}
+							defaultValue={1}
 						/>
 					</div>
 					<button>
