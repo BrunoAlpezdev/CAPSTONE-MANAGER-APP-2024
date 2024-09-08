@@ -5,6 +5,9 @@
 - En el proyecto utilizamos [pnpm], por lo tanto con "pnpm i" o "pnpm install" se descargarán las dependencias
 - En el caso de dar errores extraños o de imprevisto, tener en cuenta el lintern "ESLint" que tenemos configurado en el proyecto, este a veces se bugea por motivos que se escapan de nuestro poder, es mas que nada por conflictos con el linter de nextJS
 
+# Reuniones y Bitacora
+- https://www.notion.so/Fecha-02-de-septiembre-Cuarta-reunion-30d93d03318f4c6b9d5f669bd4b96d18?pvs=4
+
 # Estructura de Proyecto
 ```
 └── 📁gestorio
