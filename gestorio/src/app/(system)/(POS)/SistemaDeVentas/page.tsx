@@ -1,16 +1,28 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
-import Footer from '@components/footer.component'
-import Image from 'next/image'
-import Product from '@/app/components/POS/product.component'
-import { RecentProduct } from '@/app/components/POS/recent-product.component'
-import { CreditCard, Banknote, Ban, Bookmark } from 'lucide-react'
-import { useMenu } from '@/app/hooks/useMenu'
-import ToggleMenu from '@/app/components/POS/toggle-menu.component'
-import { useState } from 'react'
-import { User, Building2, HandCoins } from 'lucide-react'
+import {
+	ProductList,
+	ToggleMenu,
+	Product,
+	Footer,
+	RecentProduct
+} from '@/components/index'
+import { useMenu } from '@/hooks/useMenu'
+import { SaleProduct } from '@/types/SaleProduct'
 import { Switch } from '@nextui-org/switch'
-
+import {
+	Ban,
+	Banknote,
+	Bookmark,
+	Building2,
+	CreditCard,
+	HandCoins,
+	User
+} from 'lucide-react'
+import Image from 'next/image'
+import { useState } from 'react'
 type PaymentMethod = {
 	name: string
 	icon: React.ReactNode
@@ -47,12 +59,97 @@ function PaymentMethodSelector({
 }
 
 export default function POS() {
+	/* Menú lateral */
 	const { isMenuOpen, toggleMenu } = useMenu()
-	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Efectivo')
+	/* Switch de Boleta o Factura */
 	const [isSelected, setIsSelected] = useState(true)
+	/* Método de pago */
+	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Efectivo')
+	const [isPaymentOpen, setIsPaymentOpen] = useState(false)
+	/* Temporal del sidebar y cambio */
+	const [barcode, setBarcode] = useState('')
+	const [clientChangeValue, setClientChangeValue] = useState(0)
+	const [cashAmount, setCashAmount] = useState(0)
+	/* Sale/Carrito */
+	const [saleItems, setSaleItems] = useState<SaleProduct[]>([])
+	const [sidebarItems, setSidebarItems] = useState<SaleProduct[]>([
+		{
+			id: 1,
+			name: 'El Toro Rojo',
+			variant: 'Tamaño L',
+			price: 1700,
+			stock: 24,
+			quantity: 0
+		},
+		{
+			id: 2,
+			name: 'Energizante X',
+			variant: 'Tamaño M',
+			price: 1500,
+			stock: 30,
+			quantity: 0
+		}
+	])
+
+	const setDefaultSale = () => {
+		setSaleItems([])
+		setIsPaymentOpen(false)
+		setClientChangeValue(0)
+	}
+
+	const addToSale = (product: SaleProduct) => {
+		const existingItem = saleItems.find((item) => item.id === product.id)
+		if (existingItem) {
+			setSaleItems(
+				saleItems.map((item) =>
+					item.id === product.id
+						? { ...item, quantity: item.quantity + 1 }
+						: item
+				)
+			)
+		} else {
+			setSaleItems([...saleItems, { ...product, quantity: 1 }])
+		}
+	}
+
+	const updateQuantity = (id: number, newQuantity: number) => {
+		if (newQuantity === 0) {
+			setSaleItems(saleItems.filter((item) => item.id !== id))
+		} else {
+			setSaleItems(
+				saleItems.map((item) =>
+					item.id === id ? { ...item, quantity: newQuantity } : item
+				)
+			)
+		}
+	}
+
+	const totalAmount = saleItems.reduce(
+		(sum, item) => sum + item.price * item.quantity,
+		0
+	)
 
 	const togglePaymentMethod = (method: string) => {
 		setSelectedPaymentMethod(method)
+	}
+
+	const handlePayment = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault()
+		if (selectedPaymentMethod === 'Efectivo') {
+			console.log(
+				`Pago de ${totalAmount} con ${selectedPaymentMethod}. Cliente paga ${cashAmount} , vuelto: ${clientChangeValue}`
+			)
+			setDefaultSale()
+		} else {
+			console.log(
+				`Pago de ${totalAmount} con ${selectedPaymentMethod}, número de comprobante: ${e.currentTarget.comprobante.value}`
+			)
+			setDefaultSale()
+		}
+	}
+
+	const handleProductAdded = (barcode: string) => {
+		console.log(barcode)
 	}
 
 	return (
@@ -85,16 +182,18 @@ export default function POS() {
 					{/* TODO: Hacer funcional los productos con los mocks */}
 					{/* Lista de Productos */}
 					<div className='flex-1 flex flex-col gap-2 p-4 overflow-y-auto scrollbar-modifier'>
-						<Product />
-						<Product />
-						<Product />
-						<Product />
-						<Product />
-						<Product />
-						<Product />
-						<Product />
-						<Product />
-						<Product />
+						{saleItems.map((item) => (
+							<Product
+								key={item.id}
+								id={item.id}
+								name={item.name}
+								variant={item.variant}
+								price={item.price}
+								quantity={item.quantity}
+								onUpdateQuantity={updateQuantity}
+								stock={item.stock}
+							/>
+						))}
 					</div>
 					{/* Sidebar */}
 					<div className='flex flex-col gap-2 w-1/4 bg-Gris/90 p-4 text-Blanco'>
@@ -106,11 +205,19 @@ export default function POS() {
 								src='/barcode.svg'
 								alt='icono de código de barras'
 							/>
-							<input
-								type='text'
-								placeholder='Ingrese manualmente o escanee código de barras'
-								className='border-none outline-none shadow-none bg-transparent bg-Verde text-Blanco placeholder-Blanco w-full ml-2 text-sm'
-							/>
+							<form
+								className='flex flex-row w-full'
+								onSubmit={(e) => {
+									e.preventDefault()
+									handleProductAdded(barcode)
+								}}>
+								<input
+									type='text'
+									onChange={(e) => setBarcode(e.target.value)}
+									placeholder='Ingrese manualmente o escanee código de barras'
+									className='border-none outline-none shadow-none bg-transparent bg-Verde text-Blanco placeholder-Blanco w-full ml-2 text-sm'
+								/>
+							</form>
 						</section>
 						<section className='flex flex-row items-center w-fit px-2 py-1 text-sm bg-Verde rounded-full text-Blanco gap-1'>
 							<Image
@@ -125,22 +232,70 @@ export default function POS() {
 						{/* TODO: Hacer funcional los productos recientes con los mocks */}
 						{/* Productos Recientes */}
 						<div className='flex-1 overflow-y-auto mb-4 scrollbar-modifier pr-2'>
-							<RecentProduct />
-							<RecentProduct />
-							<RecentProduct />
-							<RecentProduct />
+							{sidebarItems.map((product) => (
+								<RecentProduct
+									key={product.id}
+									id={product.id}
+									name={product.name}
+									variant={product.variant}
+									price={product.price}
+									stock={product.stock}
+									onAddToSale={addToSale}
+								/>
+							))}
 						</div>
 
 						{/* TODO: Mejorar la sección de pagos */}
 						{/* Método de pago */}
-						<div>
-							<h2 className='mb-2 h-fit'>Método de pago</h2>
+						{isPaymentOpen && (
+							<div>
+								<h2 className='mb-2 h-fit'>Método de pago</h2>
 
-							<PaymentMethodSelector
-								selectedMethod={selectedPaymentMethod}
-								onSelectMethod={togglePaymentMethod}
-							/>
-						</div>
+								<PaymentMethodSelector
+									selectedMethod={selectedPaymentMethod}
+									onSelectMethod={togglePaymentMethod}
+								/>
+								{selectedPaymentMethod === 'Crédito' ||
+								selectedPaymentMethod === 'Débito' ? (
+									<form
+										className='flex flex-col'
+										onSubmit={(e) => handlePayment(e)}>
+										<label htmlFor='comprobante'>Número de comprobante</label>
+										<input id='comprobante' className='default-input' />
+										<button
+											type='submit'
+											className='mt-2 bg-Verde/70 p-2 rounded-lg'>
+											Confirmar
+										</button>
+									</form>
+								) : (
+									<form
+										className='flex flex-col'
+										onSubmit={(e) => handlePayment(e)}>
+										<label htmlFor='montoPagado'>Monto Pagado</label>
+										<input
+											id='montoPagado'
+											type='number'
+											className='default-input'
+											onChange={(e) => {
+												setCashAmount(Number(e.target.value))
+												setClientChangeValue(
+													totalAmount - Number(e.target.value)
+												)
+											}}
+										/>
+
+										<label>Vuelto: {clientChangeValue.toFixed(2)}</label>
+
+										<button
+											type='submit'
+											className='mt-2 bg-Verde/70 p-2 rounded-lg'>
+											Confirmar
+										</button>
+									</form>
+								)}
+							</div>
+						)}
 					</div>
 				</main>
 				{/* Footer */}
@@ -170,12 +325,16 @@ export default function POS() {
 							</Switch>
 						</div>
 						<div className='flex flex-row gap-3 items-center'>
-							<button className='bg-Naranjo text-white border p-2 rounded-lg flex flex-row gap-2'>
+							<button
+								className='bg-Naranjo text-white border p-2 rounded-lg flex flex-row gap-2'
+								onClick={() => setIsPaymentOpen(!isPaymentOpen)}>
 								<HandCoins />
 								Pagar
 							</button>
 							<span>Total $</span>
-							<strong className='bg-Verde/70 p-2 rounded-lg'>10.000</strong>
+							<strong className='bg-Verde/70 p-2 rounded-lg'>
+								{totalAmount.toFixed(0)}
+							</strong>
 						</div>
 					</div>
 				</footer>

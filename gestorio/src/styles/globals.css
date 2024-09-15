@@ -21,3 +21,9 @@ body {
 	background-position: bottom;
 	background-size: 100%;
 }
+
+@layer base {
+	.default-input {
+		@apply border-none rounded-lg py-1 px-2 bg-Gris;
+	}
+}

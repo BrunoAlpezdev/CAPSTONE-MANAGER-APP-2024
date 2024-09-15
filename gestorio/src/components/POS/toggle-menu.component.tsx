@@ -7,10 +7,7 @@ type ToggleMenuProps = {
 }
 
 /* El div contenedor de este menú DEBE ser relativo */
-export default function ToggleMenu({
-	isMenuOpen,
-	toggleMenu
-}: ToggleMenuProps) {
+export function ToggleMenu({ isMenuOpen, toggleMenu }: ToggleMenuProps) {
 	return (
 		<div
 			className={`fixed left-0 top-0 h-full w-64 bg-Gris/75 backdrop-blur-sm p-4 z-50 transform transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>

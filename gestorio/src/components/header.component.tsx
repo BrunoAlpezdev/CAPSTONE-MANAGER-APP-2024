@@ -2,9 +2,9 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import AnimateContent from './animated-content.component'
+import { AnimateContent } from '@components/index'
 
-export default function Header() {
+export function Header() {
 	return (
 		<header
 			className={`flex justify-between items-center bg-Gris text-Blanco h-24 px-6 shadow-bottom `}>
