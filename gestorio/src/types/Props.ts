@@ -1,22 +1,22 @@
 /* eslint-disable no-unused-vars */
-export type ProductoProps = {
-	id: number
+export interface ProductoProps {
+	id: string
 	name: string
 	variant: string
 	price: number
 	stock: number
 	quantity: number
-	onUpdateQuantity: (id: number, newQuantity: number) => void
+	onUpdateQuantity: (id: string, newQuantity: number) => void
 }
 
-export type RecentProductProps = {
-	id: number
+export interface RecentProductProps {
+	id: string
 	name: string
 	variant: string
 	price: number
 	stock: number
 	onAddToSale: (product: {
-		id: number
+		id: string
 		name: string
 		variant: string
 		price: number

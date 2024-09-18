@@ -4,7 +4,7 @@ import { SaleProduct } from '@/types/SaleProduct'
 
 type ProductListProps = {
 	saleItems: SaleProduct[]
-	updateQuantity: (id: number, newQuantity: number) => void
+	updateQuantity: (id: string, newQuantity: number) => void
 }
 
 export function ProductList({ saleItems, updateQuantity }: ProductListProps) {

@@ -17,7 +17,13 @@ import { useState } from 'react'
 
 export default function POS() {
 	const { isMenuOpen, toggleMenu } = useMenu()
-	const { saleItems, addToSale, updateQuantity, totalAmount } = useSale()
+	const {
+		saleItems,
+		addToSale,
+		addToSaleByBarcode,
+		updateQuantity,
+		totalAmount
+	} = useSale()
 	const {
 		isPaymentOpen,
 		setIsPaymentOpen,
@@ -59,6 +65,7 @@ export default function POS() {
 					{/* Sidebar */}
 					<Sidebar
 						addToSale={addToSale}
+						addToSaleByBarcode={addToSaleByBarcode}
 						isPaymentOpen={isPaymentOpen}
 						selectedPaymentMethod={selectedPaymentMethod}
 						togglePaymentMethod={togglePaymentMethod}

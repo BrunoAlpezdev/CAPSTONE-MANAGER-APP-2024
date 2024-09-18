@@ -9,13 +9,14 @@ export function Header() {
 		<header
 			className={`flex justify-between items-center bg-Gris text-Blanco h-24 px-6 shadow-bottom `}>
 			<section>
-				<Link href='/home'>
+				<Link href='/home' className='w-fit h-fit'>
 					<Image
 						src='/SAVANNALOGOpng.png'
 						alt='Logo de Savanna'
-						width={200}
-						height={40}
-						className='cursor-pointer aspect-video w-auto h-auto pointer-events-none'
+						id='logo'
+						width={300}
+						height={47}
+						className='cursor-pointer max-w-full max-h-full pointer-events-none'
 					/>
 				</Link>
 			</section>
@@ -24,7 +25,7 @@ export function Header() {
 					<button className='flex flex-row gap-2 justify-center items-center'>
 						<Image
 							src={'/User.jpeg'}
-							alt='Logo de Savanna'
+							alt='Logo de User'
 							width={30}
 							height={30}
 							className='cursor-pointer rounded-full aspect-square pointer-events-none'

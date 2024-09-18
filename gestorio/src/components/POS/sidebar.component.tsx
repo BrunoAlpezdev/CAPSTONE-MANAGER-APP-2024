@@ -2,13 +2,14 @@
 /* eslint-disable no-unused-vars */
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { RecentProduct, PaymentMethodSelector } from '@/components/index'
 import { SaleProduct } from '@/types/SaleProduct'
 
 type SidebarProps = {
 	addToSale: (product: SaleProduct) => void
+	addToSaleByBarcode: (barcode: string) => void
 	isPaymentOpen: boolean
 	selectedPaymentMethod: string
 	togglePaymentMethod: (method: string) => void
@@ -18,6 +19,7 @@ type SidebarProps = {
 
 export function Sidebar({
 	addToSale,
+	addToSaleByBarcode,
 	isPaymentOpen,
 	selectedPaymentMethod,
 	togglePaymentMethod,
@@ -25,16 +27,16 @@ export function Sidebar({
 	totalAmount
 }: SidebarProps) {
 	const [barcode, setBarcode] = useState('')
-	const [cashAmount, setCashAmount] = useState(0)
 	const [clientChangeValue, setClientChangeValue] = useState(0)
 
 	const handleProductAdded = (barcode: string) => {
-		console.log(barcode)
+		addToSaleByBarcode(barcode)
+		setBarcode('')
 	}
 
 	const [sidebarItems] = useState<SaleProduct[]>([
 		{
-			id: 1,
+			id: '1',
 			name: 'El Toro Rojo',
 			variant: 'Tamaño L',
 			price: 1700,
@@ -42,7 +44,7 @@ export function Sidebar({
 			quantity: 0
 		},
 		{
-			id: 2,
+			id: '2',
 			name: 'Energizante X',
 			variant: 'Tamaño M',
 			price: 1500,
@@ -50,6 +52,34 @@ export function Sidebar({
 			quantity: 0
 		}
 	])
+
+	const [inputFocus, setInputFocus] = useState(false)
+
+	useEffect(() => {
+		const handleKeyPress = (e: KeyboardEvent) => {
+			// Ignorar la tecla "Enter"
+			if (e.key === 'Enter') {
+				handleProductAdded(barcode) // Procesar el código de barras cuando se presione Enter
+				setBarcode('') // Limpiar el valor del código de barras
+				e.preventDefault() // Evitar que el "enter" haga un comportamiento por defecto
+				return
+			}
+
+			// Asegúrate de que no se esté escribiendo en otro input
+			if (!inputFocus) {
+				// Concatenar el valor de la tecla presionada al código de barras
+				setBarcode((prevBarcode) => prevBarcode + e.key)
+			}
+		}
+
+		// Escuchar el evento keypress en todo el documento
+		document.addEventListener('keypress', handleKeyPress)
+
+		// Limpiar el evento al desmontar el componente
+		return () => {
+			document.removeEventListener('keypress', handleKeyPress)
+		}
+	}, [barcode, inputFocus])
 
 	return (
 		<div className='flex flex-col gap-2 w-1/4 bg-Gris/90 p-4 text-Blanco'>
@@ -71,6 +101,9 @@ export function Sidebar({
 						onChange={(e) => setBarcode(e.target.value)}
 						placeholder='Ingrese manualmente o escanee código de barras'
 						className='border-none outline-none shadow-none bg-transparent bg-Verde text-Blanco placeholder-Blanco w-full ml-2 text-sm'
+						value={barcode}
+						onFocus={() => setInputFocus(true)}
+						onBlur={() => setInputFocus(false)}
 					/>
 				</form>
 			</section>
@@ -123,7 +156,6 @@ export function Sidebar({
 								type='number'
 								className='default-input'
 								onChange={(e) => {
-									setCashAmount(Number(e.target.value))
 									setClientChangeValue(totalAmount - Number(e.target.value))
 								}}
 							/>

@@ -1,8 +1,30 @@
 import { useState } from 'react'
 import { SaleProduct } from '@/types/SaleProduct'
+import { products } from '@/mocks/products'
 
 export function useSale() {
 	const [saleItems, setSaleItems] = useState<SaleProduct[]>([])
+
+	const addToSaleByBarcode = (barcode: string) => {
+		// Aquí se debería hacer una petición a la API para obtener el producto
+		// con el código de barras especificado
+		const product = products.find((product) => product.id === barcode)
+
+		if (!product) {
+			console.error('Producto no encontrado')
+			return
+		}
+		const productToADD: SaleProduct = {
+			id: product.id,
+			imgSrc: product.imgSrc,
+			name: product.name,
+			variant: product.variant,
+			price: product.pricePerUnit,
+			stock: product.stock,
+			quantity: 1
+		}
+		addToSale({ ...productToADD })
+	}
 
 	const addToSale = (product: SaleProduct) => {
 		const existingItem = saleItems.find((item) => item.id === product.id)
@@ -19,7 +41,7 @@ export function useSale() {
 		}
 	}
 
-	const updateQuantity = (id: number, newQuantity: number) => {
+	const updateQuantity = (id: string, newQuantity: number) => {
 		if (newQuantity === 0) {
 			setSaleItems(saleItems.filter((item) => item.id !== id))
 		} else {
@@ -36,5 +58,11 @@ export function useSale() {
 		0
 	)
 
-	return { saleItems, addToSale, updateQuantity, totalAmount }
+	return {
+		saleItems,
+		addToSale,
+		addToSaleByBarcode,
+		updateQuantity,
+		totalAmount
+	}
 }

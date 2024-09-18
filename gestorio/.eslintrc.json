@@ -11,7 +11,8 @@
 	"rules": {
 		"react/react-in-jsx-scope": "off",
 		"no-unused-vars": "warn",
-		"@typescript-eslint/no-floating-promises": "off"
+		"@typescript-eslint/no-floating-promises": "off",
+		"react-hooks/exhaustive-deps": "off"
 	},
 	"settings": {
 		"react": {

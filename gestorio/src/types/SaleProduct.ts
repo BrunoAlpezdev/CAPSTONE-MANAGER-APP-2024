@@ -1,5 +1,6 @@
-export type SaleProduct = {
-	id: number
+export interface SaleProduct {
+	id: string
+	imgSrc?: string
 	name: string
 	variant: string
 	price: number
