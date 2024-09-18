@@ -1,6 +1,14 @@
 import Image from 'next/image'
+import { ProductoProps } from '@/types/Props'
 
-export default function Product() {
+export function Product({
+	id,
+	name,
+	variant,
+	price,
+	quantity,
+	onUpdateQuantity
+}: ProductoProps) {
 	return (
 		<div className='flex items-center justify-between bg-Verde/40 w-full h-24 rounded-xl'>
 			<div className='flex items-center justify-center w-fit h-full bg-Verde/40 p-4 rounded-xl'>
@@ -34,12 +42,10 @@ export default function Product() {
 					</thead>
 					<tbody className='divide-y divide-gray-200 text-Gris'>
 						<tr>
-							<td className='whitespace-nowrap text-s font-medium '>
-								El toro rojo
-							</td>
-							<td className=' whitespace-nowrap text-s '>Tamaño L</td>
-							<td className=' whitespace-nowrap text-s '>1700</td>
-							<td className=' whitespace-nowrap text-s '>5100</td>
+							<td className='whitespace-nowrap text-s font-medium '>{name}</td>
+							<td className=' whitespace-nowrap text-s '>{variant}</td>
+							<td className=' whitespace-nowrap text-s '>{price}</td>
+							<td className=' whitespace-nowrap text-s '>{price * quantity}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -49,17 +55,20 @@ export default function Product() {
 			<div className='flex items-center justify-center h-full bg-Verde/40 p-4 rounded-xl'>
 				{/* minus, plus and a counter */}
 				<div className='flex items-center justify-center gap-x-2'>
-					<button>
+					<button onClick={() => onUpdateQuantity(id, quantity - 1)}>
 						<Image src='/minus.svg' alt='alt' width={30} height={30} />
 					</button>
 					<div className='flex '>
 						<input
 							type='numeric'
 							className='w-12 h-8 text-center bg-Verde/40 text-Gris/100 rounded-lg'
-							defaultValue={1}
+							value={quantity}
+							onChange={(e) =>
+								onUpdateQuantity(id, Math.max(0, parseInt(e.target.value) || 0))
+							}
 						/>
 					</div>
-					<button>
+					<button onClick={() => onUpdateQuantity(id, quantity + 1)}>
 						<Image src='/plus.svg' alt='alt' width={30} height={30} />
 					</button>
 				</div>

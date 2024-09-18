@@ -10,7 +10,7 @@
 	--Brand-Verde: #009688;
 }
 
-body {
+.body-style {
 	color: #f4f4f4;
 	background: #313031;
 }
@@ -20,4 +20,10 @@ body {
 	background-repeat: no-repeat;
 	background-position: bottom;
 	background-size: 100%;
+}
+
+@layer base {
+	.default-input {
+		@apply border-none rounded-lg py-1 px-2 bg-Gris;
+	}
 }

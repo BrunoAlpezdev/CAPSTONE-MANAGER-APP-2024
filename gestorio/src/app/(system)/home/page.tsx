@@ -1,5 +1,4 @@
-import DashboardItem from '@components/dashboard-item.component'
-import Menu from '@components/menu.component'
+import { DashboardItem, Menu } from '@components/index'
 
 export default function HomePage() {
 	return (
