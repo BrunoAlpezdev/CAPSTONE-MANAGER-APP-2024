@@ -14,12 +14,13 @@ export function useSale() {
 			console.error('Producto no encontrado')
 			return
 		}
+
 		const productToADD: SaleProduct = {
 			id: product.id,
 			imgSrc: product.imgSrc,
 			name: product.name,
 			variant: product.variant,
-			price: product.pricePerUnit,
+			price: product.price,
 			stock: product.stock,
 			quantity: 1
 		}
