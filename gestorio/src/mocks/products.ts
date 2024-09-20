@@ -5,7 +5,7 @@ export const products = [
 		name: 'El Toro Rojo',
 		variant: 'L',
 		stock: 24,
-		pricePerUnit: 1700
+		price: 1700
 	},
 	{
 		id: '687051872024',
@@ -13,7 +13,7 @@ export const products = [
 		name: 'Pan Pansito',
 		variant: 'chiquito',
 		stock: 24,
-		pricePerUnit: 300
+		price: 300
 	},
 	{
 		id: '7802820442229',
@@ -21,7 +21,7 @@ export const products = [
 		name: 'Café Nescafé',
 		variant: 'Venti',
 		stock: 24,
-		pricePerUnit: 2300
+		price: 2300
 	},
 	{
 		id: 'UF15Y0662',
@@ -29,7 +29,7 @@ export const products = [
 		name: 'Leche Entera',
 		variant: 'L',
 		stock: 24,
-		pricePerUnit: 1200
+		price: 1200
 	},
 	{
 		id: 'UF19M4032',
@@ -37,7 +37,7 @@ export const products = [
 		name: 'Arroz Integral',
 		variant: 'L',
 		stock: 24,
-		pricePerUnit: 1500
+		price: 1500
 	},
 	{
 		id: 'UF18H1468',
@@ -45,7 +45,7 @@ export const products = [
 		name: 'Aceite de Oliva',
 		variant: 'L',
 		stock: 24,
-		pricePerUnit: 3500
+		price: 3500
 	},
 	{
 		id: 'UF17L7177',
@@ -53,7 +53,7 @@ export const products = [
 		name: 'Huevos (Docena)',
 		variant: 'L',
 		stock: 24,
-		pricePerUnit: 2000
+		price: 2000
 	},
 	{
 		id: 'UF15D6617',
@@ -61,7 +61,7 @@ export const products = [
 		name: 'Queso Fresco',
 		variant: 'L',
 		stock: 24,
-		pricePerUnit: 2800
+		price: 2800
 	},
 	{
 		id: 'UF17J2572',
@@ -69,7 +69,7 @@ export const products = [
 		name: 'Manzanas (Kg)',
 		variant: 'L',
 		stock: 24,
-		pricePerUnit: 1800
+		price: 1800
 	},
 	{
 		id: 'UF10W0503',
@@ -77,6 +77,6 @@ export const products = [
 		name: 'Pasta Integral',
 		variant: 'L',
 		stock: 24,
-		pricePerUnit: 1000
+		price: 1000
 	}
 ]
