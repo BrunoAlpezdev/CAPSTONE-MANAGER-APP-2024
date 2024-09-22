@@ -1,7 +1,15 @@
 import Image from 'next/image'
 import { ShoppingCart } from 'lucide-react'
+import { RecentProductProps } from '@/types/Props'
 
-export function RecentProduct() {
+export function RecentProduct({
+	id,
+	name,
+	variant,
+	price,
+	stock,
+	onAddToSale
+}: RecentProductProps) {
 	return (
 		<>
 			<div className='mb-4 bg-Verde/60 text-white p-2 rounded-md shadow-xl border'>
@@ -15,15 +23,19 @@ export function RecentProduct() {
 						/>
 					</div>
 					<div className='pl-6 flex-1'>
-						<div>El Toro Rojo</div>
-						<div className='text-sm'>Tamaño L</div>
+						<div>{name}</div>
+						<div className='text-sm'>{variant}</div>
 					</div>
 					<div className='pr-6'>
-						<div>1700</div>
-						<div className='text-sm'>Stock: 24</div>
+						<div>{price}</div>
+						<div className='text-sm'>{stock}</div>
 					</div>
 					<div className='flex'>
-						<button className='bg-Verde text-white rounded-md p-2 border'>
+						<button
+							className='bg-Verde text-white rounded-md p-2 border'
+							onClick={() =>
+								onAddToSale({ id, name, variant, price, stock, quantity: 0 })
+							}>
 							<ShoppingCart />
 						</button>
 					</div>

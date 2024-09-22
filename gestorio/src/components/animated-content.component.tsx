@@ -1,3 +1,4 @@
+'use client'
 import { useState } from 'react'
 
 type Props = {
@@ -6,7 +7,7 @@ type Props = {
 	disablePressedEffect?: boolean
 	className?: string
 }
-export default function AnimateContent(props: Props) {
+export function AnimateContent(props: Props) {
 	const [isPressed, setIsPressed] = useState(false)
 	const [isHovered, setIsHovered] = useState(false)
 

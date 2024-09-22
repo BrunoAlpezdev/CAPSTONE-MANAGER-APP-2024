@@ -69,7 +69,7 @@ hr.rounded {
 	box-shadow: 0 6px 6px rgba(49, 48, 49, 0.3);
 }
 
-.fondo {
+.main-fondo {
 	background-image: url('/menu-background.svg');
 	background-repeat: no-repeat;
 	background-position: bottom;

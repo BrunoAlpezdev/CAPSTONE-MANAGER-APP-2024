@@ -1,11 +1,11 @@
 'use client'
 import Link from 'next/link'
-import AnimateContent from './animated-content.component'
+import { AnimateContent } from '@components/index'
 import { Package, CreditCard, Truck, BarChart } from 'lucide-react'
 
-export default function Menu() {
+export function Menu() {
 	return (
-		<div className='w-fit h-full bg-Gris/90 text-Blanco px-6 py-8 font-normal shadow-right z-auto fondo'>
+		<div className='w-fit h-full bg-Gris/90 text-Blanco px-6 py-8 font-normal shadow-right z-auto main-fondo'>
 			<section className='flex flex-col gap-12'>
 				<AnimateContent>
 					<Link

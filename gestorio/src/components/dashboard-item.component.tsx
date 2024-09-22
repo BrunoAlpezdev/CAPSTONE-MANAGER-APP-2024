@@ -4,7 +4,7 @@ type props = {
 	title: string
 }
 
-export default function DashboardItem(props: props) {
+export function DashboardItem(props: props) {
 	return (
 		<div className='dashboard-container box-shadow flex-grow'>
 			<section className='flex flex-row px-4 mt-2 gap-2'>

@@ -20,14 +20,12 @@
 		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./src/*"],
-			"@components/*": ["./src/app/components/*"],
-			"@styles/*": [".src/app/styles/*"],
-			"@utils/*": [".src/app/utils/*"],
-			"@hooks/*": [".src/app/hooks/*"],
-			"@services/*": [".src/app/services/*"],
-			"@contexts/*": [".src/app/contexts/*"],
-			"@pages/*": [".src/pages/*"],
-			"@layouts/*": [".src/layouts/*"],
+			"@components/*": ["./src/components/*"],
+			"@styles/*": [".src/styles/*"],
+			"@utils/*": [".src/utils/*"],
+			"@hooks/*": [".src/hooks/*"],
+			"@services/*": [".src/services/*"],
+			"@contexts/*": [".src/contexts/*"],
 			"@types/*": [".src/types/*"],
 			"@public/*": [".public/*"]
 		}
