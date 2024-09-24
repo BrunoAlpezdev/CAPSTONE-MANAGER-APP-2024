@@ -13,12 +13,16 @@
     "@nextui-org/switch": "^2.0.33",
     "@nextui-org/system": "^2.2.5",
     "@nextui-org/theme": "^2.2.9",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
     "firebase": "10.13.1",
     "framer-motion": "^11.5.4",
     "lucide-react": "^0.438.0",
     "next": "14.2.7",
     "react": "^18",
     "react-dom": "^18",
+    "tailwind-merge": "^2.5.2",
+    "tailwindcss-animate": "^1.0.7",
     "zustand": "5.0.0-rc.2"
   },
   "devDependencies": {

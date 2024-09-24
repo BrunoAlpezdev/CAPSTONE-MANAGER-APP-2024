@@ -27,6 +27,7 @@
 			"@services/*": [".src/services/*"],
 			"@contexts/*": [".src/contexts/*"],
 			"@types/*": [".src/types/*"],
+			"@lib/*": [".src/types/*"],
 			"@public/*": [".public/*"]
 		}
 	},

@@ -1,7 +1,14 @@
 'use client'
 import Link from 'next/link'
 import { AnimateContent } from '@components/index'
-import { Package, CreditCard, Truck, BarChart } from 'lucide-react'
+import {
+	Package,
+	CreditCard,
+	Truck,
+	BarChart,
+	UserRound,
+	LogOut
+} from 'lucide-react'
 
 export function Menu() {
 	return (
@@ -33,6 +40,22 @@ export function Menu() {
 						className='flex flex-row gap-2 items-center cursor-pointer select-none '>
 						<BarChart />
 						<p>Reportes</p>
+					</Link>
+				</AnimateContent>
+				<AnimateContent>
+					<Link
+						href='/GestionDeUsuarios'
+						className='flex flex-row gap-2 items-center cursor-pointer select-none '>
+						<UserRound />
+						<p>Usuario</p>
+					</Link>
+				</AnimateContent>
+				<AnimateContent>
+					<Link
+						href='/'
+						className='flex flex-row gap-2 items-center cursor-pointer select-none '>
+						<LogOut />
+						<p>Cerrar Session</p>
 					</Link>
 				</AnimateContent>
 			</section>
