@@ -1,20 +1,33 @@
-import { NextApiResponse } from 'next'
+import { NextRequest, NextResponse } from 'next/server'
 import { login } from '@/lib/firebase/auth'
-import { NextResponse } from 'next/server'
 
-export async function POST(response: NextApiResponse) {
-	const { email, password } = response.body
-
-	if (!email || !password) {
-		return NextResponse.json({ message: 'Faltan campos' }, { status: 400 })
-	}
-
+export async function POST(request: NextRequest) {
 	try {
-		const token = await login(email, password)
-		return NextResponse.json({ token }, { status: 200 })
-	} catch (error) {
-		return response
-			.status(401)
-			.json({ message: 'Credenciales inválidas', error: error })
+		// Obtener el cuerpo de la solicitud
+		const { email, password } = await request.json()
+
+		// Verificación de campos
+		if (!email || !password) {
+			return NextResponse.json(
+				{ message: 'Faltan campos', status: 400 },
+				{ status: 400 }
+			)
+		}
+
+		// Llamar la función de autenticación
+		const user = await login(email, password)
+
+		// Responder con éxito
+		return NextResponse.json({ user }, { status: 200 })
+	} catch (error: any) {
+		// Manejar errores
+		return NextResponse.json(
+			{
+				message: 'Credenciales inválidas',
+				error: error.message,
+				status: 401
+			},
+			{ status: 401 }
+		)
 	}
 }

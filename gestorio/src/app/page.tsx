@@ -14,28 +14,36 @@ export default function Home() {
 	const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 
+		setLoading(true)
+		setError('')
+
 		try {
-			setLoading(true)
-			setError('')
+			// Hacer la petición POST a la API de login
 			const response = await fetch('/api/login', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					API_KEY: process.env.NEXT_PUBLIC_API_KEY || ''
+					API_KEY: process.env.BACKEND_API_KEY || ''
 				},
-				body: JSON.stringify({ email, password })
+				body: JSON.stringify({ email: email, password: password })
 			})
 
+			// Verificar si la respuesta fue exitosa
 			if (!response.ok) {
 				const errorData = await response.json()
-				throw new Error(errorData.message)
+				throw new Error(errorData.message || 'Error al iniciar sesión')
 			}
 
-			const data = await response.json()
-			console.log('Token: ', data.token)
+			const data = await response.json() // Obtener la respuesta de la API
+			console.log('Login exitoso:', data) // Aquí podrías redirigir al usuario o guardar el token
+
+			// Si el login es exitoso, puedes redirigir o manejar el estado de sesión
 			router.push('/home')
 		} catch (error: any) {
+			// Manejo de errores
 			setError(error.message)
+		} finally {
+			setLoading(false)
 		}
 	}
 
