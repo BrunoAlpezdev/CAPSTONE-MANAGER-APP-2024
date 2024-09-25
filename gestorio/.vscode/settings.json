@@ -13,7 +13,8 @@
 		"mockproduct",
 		"Nescafé",
 		"nextui",
-		"SAVANNALOGO"
+		"SAVANNALOGO",
+		"zustand"
 	],
 	"editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
 	"editor.formatOnType": false, // required
