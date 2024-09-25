@@ -4,7 +4,10 @@ import type { NextRequest } from 'next/server'
 const API_KEY = String(process.env.BACKEND_API_KEY)
 
 export function middleware(request: NextRequest) {
-	if (request.nextUrl.pathname.startsWith('/api')) {
+	if (
+		request.nextUrl.pathname.startsWith('/api') &&
+		!request.nextUrl.pathname.includes('login')
+	) {
 		const apiKey = request.headers.get('API_KEY')
 
 		if (!apiKey || apiKey !== API_KEY) {

@@ -13,17 +13,21 @@ export default function Home() {
 
 	const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
-
-		setLoading(true)
 		setError('')
 
+		// Validar campos
+		if (!email || !password) {
+			setError('Faltan campos')
+			return
+		}
+
 		try {
+			setLoading(true)
 			// Hacer la petición POST a la API de login
 			const response = await fetch('/api/login', {
 				method: 'POST',
 				headers: {
-					'Content-Type': 'application/json',
-					API_KEY: process.env.BACKEND_API_KEY || ''
+					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({ email: email, password: password })
 			})
@@ -34,22 +38,30 @@ export default function Home() {
 				throw new Error(errorData.message || 'Error al iniciar sesión')
 			}
 
-			const data = await response.json() // Obtener la respuesta de la API
+			const data = await response.json()
 			console.log('Login exitoso:', data) // Aquí podrías redirigir al usuario o guardar el token
 
 			// Si el login es exitoso, puedes redirigir o manejar el estado de sesión
 			router.push('/home')
 		} catch (error: any) {
 			// Manejo de errores
-			setError(error.message)
+			if (error.message.includes('(auth/invalid-credential)')) {
+				setError('Correo o contraseña incorrecto')
+			}
 		} finally {
 			setLoading(false)
 		}
 	}
 
 	return (
-		<main className='fondo flex bg-Gris w-[100dvw] h-[100dvh] items-center justify-center p-24'>
-			<section className='flex flex-col border-2 bg-Gris border-Amarillo/60 shadow-lg px-12 py-16 rounded-lg'>
+		<main className='relative fondo flex bg-Gris w-[100dvw] h-[100dvh] items-center justify-center p-24'>
+			{/* Fondo con spinner de loading en absolute */}
+			{loading && (
+				<div className='absolute bg-Gris/80 backdrop-blur-md w-[100dvw] h-[100dvh] flex items-center justify-center z-10'>
+					<div className='animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-Blanco'></div>
+				</div>
+			)}
+			<section className='relative flex flex-col border-2 bg-Gris border-Amarillo/60 shadow-lg px-12 py-16 rounded-lg'>
 				<div className='flex justify-center items-center mb-8'>
 					<Image
 						priority
@@ -80,6 +92,11 @@ export default function Home() {
 						Iniciar Sesión
 					</button>
 				</form>
+				{error && (
+					<p className='text-Naranjo text-center w-fit self-center mt-4'>
+						{error}
+					</p>
+				)}
 			</section>
 		</main>
 	)
