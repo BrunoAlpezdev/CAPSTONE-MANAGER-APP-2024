@@ -19,6 +19,7 @@ const config: Config = {
 				Blanco: '#F4F4F4',
 				Amarillo: '#FFD54F',
 				Verde: '#009688',
+				GrisClaro: '#d9d9d9',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				card: {
