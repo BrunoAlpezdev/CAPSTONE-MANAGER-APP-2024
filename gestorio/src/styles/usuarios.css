@@ -1,0 +1,9 @@
+.action-bottom {
+	margin-left: 10px;
+	padding: 5px 10px;
+	border-radius: 5px;
+	background-color: rgb(72, 197, 72);
+	color: rgb(29, 29, 29);
+	border: none;
+	cursor: pointer;
+}
