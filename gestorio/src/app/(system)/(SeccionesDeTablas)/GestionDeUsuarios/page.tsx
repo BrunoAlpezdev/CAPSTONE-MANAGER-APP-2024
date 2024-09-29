@@ -1,7 +1,7 @@
 'use client'
 
 import { User, columns } from './columns'
-import { DataTable } from '@/components/Table/data-table'
+import { DataTable } from '@/components/data-table'
 import { ToggleMenu } from '@/components/index'
 import { useMenu } from '@/hooks/useMenu'
 import Image from 'next/image'

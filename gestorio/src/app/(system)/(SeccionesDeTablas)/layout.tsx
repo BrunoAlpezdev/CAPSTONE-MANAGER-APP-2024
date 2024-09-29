@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import '@/styles/system-layout.css'
-import { STHeader, Footer } from '@components/index'
+import { Footer } from '@components/index'
 
 //import { Bug, UserRound, LogOut } from 'lucide-react' // Iconos de lucide-react
 
@@ -17,6 +17,7 @@ export default function RootLayout({
 	return (
 		<>
 			<main>{children}</main>
+
 			<Footer />
 		</>
 	)
