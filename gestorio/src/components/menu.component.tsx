@@ -9,7 +9,6 @@ import {
 	UserRound,
 	LogOut
 } from 'lucide-react'
-import { logout } from '@/app/supabase/auth'
 import LogoutComponent from './auth/logout.component'
 
 export function Menu() {
