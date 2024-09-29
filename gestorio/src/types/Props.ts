@@ -1,3 +1,4 @@
+import { SVGProps } from 'react'
 /* eslint-disable no-unused-vars */
 export interface ProductoProps {
 	id: string
@@ -23,4 +24,8 @@ export interface RecentProductProps {
 		stock: number
 		quantity: number
 	}) => void
+}
+
+export type IconSvgProps = SVGProps<SVGSVGElement> & {
+	size?: number
 }

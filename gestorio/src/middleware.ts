@@ -1,24 +1,13 @@
-import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { updateSession } from '@/app/supabase/middleware'
 
-export function middleware(request: NextRequest) {
-	const user = {
-		isLogged: true,
-		role: 'user'
-	}
-
-	if (!user.isLogged) {
-		return NextResponse.redirect(new URL('/', request.url))
-	}
+export async function middleware(request: NextRequest) {
+	// Redirect to auth in case the path is blank, if authenticated, redirect to home
+	return await updateSession(request)
 }
 
 export const config = {
 	matcher: [
-		'/home',
-		'/profile',
-		'/settings',
-		'/dashboard',
-		'/admin',
-		'/SistemaDeVentas'
+		'/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'
 	]
 }
