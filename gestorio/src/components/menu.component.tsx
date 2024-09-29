@@ -9,6 +9,8 @@ import {
 	UserRound,
 	LogOut
 } from 'lucide-react'
+import { logout } from '@/app/supabase/auth'
+import LogoutComponent from './auth/logout.component'
 
 export function Menu() {
 	return (
@@ -51,12 +53,7 @@ export function Menu() {
 					</Link>
 				</AnimateContent>
 				<AnimateContent>
-					<Link
-						href='/'
-						className='flex flex-row gap-2 items-center cursor-pointer select-none '>
-						<LogOut />
-						<p>Cerrar Session</p>
-					</Link>
+					<LogoutComponent />
 				</AnimateContent>
 			</section>
 		</div>

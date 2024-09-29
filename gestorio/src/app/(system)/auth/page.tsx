@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { login, signup } from '@/lib/supabase/auth'
+import { useAuthStore } from '@/store/authStore'
 
 export default function Home() {
 	const router = useRouter()
@@ -11,31 +11,37 @@ export default function Home() {
 	const [password, setPassword] = useState('')
 	const [error, setError] = useState('')
 	const [loading, setLoading] = useState(false)
-	const [isRegistering, setIsRegistering] = useState(false)
+	const [bypass, setBypass] = useState(false)
+	const login = useAuthStore((state) => state.login)
+	const user = useAuthStore((state) => state.user)
 
 	const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		setError('')
 
-		if (isRegistering) {
-			signup(email, password)
-		}
-
-		// Validar campos
-		if (!email || !password) {
-			setError('Faltan campos')
-			return
-		}
-
 		try {
-			setLoading(true)
+			if (bypass) {
+				const confirmation = await login('alo@alo.com', '123123')
 
-			const data = await login(email, password)
+				if (!confirmation) {
+					setError('Error al iniciar sesión')
+					return
+				}
+			} else {
+				// Validar campos
+				if (!email || !password) {
+					setError('Faltan campos')
+					return
+				}
+				setLoading(true)
 
-			console.log(data)
+				const data = await login(email, password)
 
-			// Si el login es exitoso, puedes redirigir o manejar el estado de sesión
-			router.push('/home')
+				console.log(data)
+
+				// Si el login es exitoso, puedes redirigir o manejar el estado de sesión
+				router.push('/home')
+			}
 		} catch (error: any) {
 			// Manejo de errores
 			if (error.message.includes('(auth/invalid-credential)')) {
@@ -86,8 +92,8 @@ export default function Home() {
 					</button>
 					<button
 						className='self-center text-2xl text-Blanco bg-Naranjo rounded-lg w-fit px-12 py-2 mt-8 transition hover:scale-105 hover:bg-Naranjo/90'
-						onClick={() => setIsRegistering(true)}>
-						Registrarse (Botón de prueba para demostrar)
+						onClick={() => setBypass(true)}>
+						Bypass (Botón para iniciar con usuario predefinido)
 					</button>
 				</form>
 
