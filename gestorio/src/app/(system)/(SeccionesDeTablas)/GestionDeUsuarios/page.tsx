@@ -2,19 +2,10 @@
 
 import { User, columns } from './columns'
 import { DataTable } from '@/components/Table/data-table'
-import {
-	ProductList,
-	ToggleMenu,
-	Footer,
-	Sidebar,
-	POSFooter
-} from '@/components/index'
+import { ToggleMenu } from '@/components/index'
 import { useMenu } from '@/hooks/useMenu'
-import { useSale } from '@/hooks/useSale'
-import { usePayment } from '@/hooks/usePayment'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
-import { MapPinPlus } from 'lucide-react'
 
 async function getUsers(): Promise<User[]> {
 	const res = await fetch(
