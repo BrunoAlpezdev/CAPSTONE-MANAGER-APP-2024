@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { login, signup } from '@/lib/supabase/auth'
 
 export default function Home() {
 	const router = useRouter()
@@ -10,10 +11,15 @@ export default function Home() {
 	const [password, setPassword] = useState('')
 	const [error, setError] = useState('')
 	const [loading, setLoading] = useState(false)
+	const [isRegistering, setIsRegistering] = useState(false)
 
 	const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		setError('')
+
+		if (isRegistering) {
+			signup(email, password)
+		}
 
 		// Validar campos
 		if (!email || !password) {
@@ -23,23 +29,10 @@ export default function Home() {
 
 		try {
 			setLoading(true)
-			// Hacer la petición POST a la API de login
-			const response = await fetch('/api/login', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ email: email, password: password })
-			})
 
-			// Verificar si la respuesta fue exitosa
-			if (!response.ok) {
-				const errorData = await response.json()
-				throw new Error(errorData.message || 'Error al iniciar sesión')
-			}
+			const data = await login(email, password)
 
-			const data = await response.json()
-			console.log('Login exitoso:', data) // Aquí podrías redirigir al usuario o guardar el token
+			console.log(data)
 
 			// Si el login es exitoso, puedes redirigir o manejar el estado de sesión
 			router.push('/home')
@@ -91,7 +84,13 @@ export default function Home() {
 					<button className='self-center text-2xl text-Blanco bg-Naranjo rounded-lg w-fit px-12 py-2 mt-8 transition hover:scale-105 hover:bg-Naranjo/90'>
 						Iniciar Sesión
 					</button>
+					<button
+						className='self-center text-2xl text-Blanco bg-Naranjo rounded-lg w-fit px-12 py-2 mt-8 transition hover:scale-105 hover:bg-Naranjo/90'
+						onClick={() => setIsRegistering(true)}>
+						Registrarse (Botón de prueba para demostrar)
+					</button>
 				</form>
+
 				{error && (
 					<p className='text-Naranjo text-center w-fit self-center mt-4'>
 						{error}
