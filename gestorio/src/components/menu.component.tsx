@@ -30,7 +30,9 @@ export function Menu() {
 					</Link>
 				</AnimateContent>
 				<AnimateContent>
-					<Link href='/' className='flex flex-row gap-2 items-center'>
+					<Link
+						href='/GestionDeProveedores'
+						className='flex flex-row gap-2 items-center'>
 						<Truck />
 						<p>Proveedores</p>
 					</Link>
