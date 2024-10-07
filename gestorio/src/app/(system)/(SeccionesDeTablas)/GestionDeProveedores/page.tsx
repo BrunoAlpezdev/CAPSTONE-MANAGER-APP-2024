@@ -3,7 +3,7 @@
 import { User, columns } from './columns'
 import { DataTable } from '@/components/data-table'
 import { ToggleMenu } from '@/components/index'
-import { useMenu } from '@/hooks/useMenu'
+import { useMenu } from '@/hooks'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 

@@ -5,7 +5,7 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { RecentProduct, PaymentMethodSelector } from '@/components/index'
-import { SaleProduct } from '@/types/SaleProduct'
+import { SaleProduct } from '@/types'
 import { products } from '@/mocks/products'
 
 type SidebarProps = {

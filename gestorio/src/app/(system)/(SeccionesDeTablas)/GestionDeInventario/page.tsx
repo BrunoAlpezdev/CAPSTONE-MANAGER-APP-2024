@@ -2,7 +2,7 @@
 
 import { User, columns } from './columns'
 import { DataTable } from '@/components/inventario-table'
-import { useMenu } from '@/hooks/useMenu'
+import { useMenu } from '@/hooks'
 import { useState, useEffect } from 'react'
 
 async function getUsers(): Promise<User[]> {

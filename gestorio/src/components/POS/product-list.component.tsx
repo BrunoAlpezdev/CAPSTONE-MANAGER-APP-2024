@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Product } from '@/components/index'
-import { SaleProduct } from '@/types/SaleProduct'
+import { SaleProduct } from '@/types'
 
 type ProductListProps = {
 	saleItems: SaleProduct[]

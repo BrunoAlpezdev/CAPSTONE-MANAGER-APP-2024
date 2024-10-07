@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { AnimateContent } from '@components/index'
+import { AnimateContent } from '@/components'
 
 export function Header() {
 	return (

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import '@/styles/system-layout.css'
-import { Footer } from '@components/index'
+import { Footer } from '@/components'
 import React from 'react'
 import { ReportHeader } from '@/components/reportes/reportHeaderComponents'
 

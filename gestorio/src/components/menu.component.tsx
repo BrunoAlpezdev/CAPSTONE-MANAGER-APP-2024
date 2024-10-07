@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { AnimateContent } from '@components/index'
+import { AnimateContent } from '@/components'
 import {
 	Package,
 	CreditCard,

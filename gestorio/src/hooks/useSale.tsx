@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { SaleProduct } from '@/types/SaleProduct'
+import { SaleProduct } from '@/types'
 import { products } from '@/mocks/products'
 
 export function useSale() {
