@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import '@/styles/system.css'
 import '@/styles/system-layout.css'
-import { Footer, Header } from '@components/index'
+import { Footer, Header } from '@/components/index'
 
 export const metadata: Metadata = {
 	title: 'Gestorio',

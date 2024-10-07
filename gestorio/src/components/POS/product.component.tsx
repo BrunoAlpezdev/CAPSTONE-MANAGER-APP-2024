@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { ProductoProps } from '@/types/Props'
+import { ProductoProps } from '@/types'
 
 export function Product({
 	id,

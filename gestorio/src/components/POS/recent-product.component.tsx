@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { ShoppingCart } from 'lucide-react'
-import { RecentProductProps } from '@/types/Props'
+import { RecentProductProps } from '@/types'
 
 export function RecentProduct({
 	id,
