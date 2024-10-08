@@ -7,9 +7,9 @@ import {
 	Sidebar,
 	POSFooter
 } from '@/components/index'
-import { useMenu } from '@/hooks/useMenu'
-import { useSale } from '@/hooks/useSale'
-import { usePayment } from '@/hooks/usePayment'
+import { useMenu } from '@/hooks'
+import { useSale } from '@/hooks'
+import { usePayment } from '@/hooks'
 import Image from 'next/image'
 import { useState } from 'react'
 
