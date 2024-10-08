@@ -24,6 +24,7 @@ interface State {
  * @property {(email: string, password: string) => Promise<any>} login - Función para iniciar sesión de un usuario con correo electrónico y contraseña.
  * @property {(user: User) => void} setUser - Función para establecer el usuario actual.
  * @property {() => Promise<void>} logout - Función para cerrar sesión del usuario actual.
+ *
  */
 export const useAuthStore = create<State>((set, get) => {
 	return {
