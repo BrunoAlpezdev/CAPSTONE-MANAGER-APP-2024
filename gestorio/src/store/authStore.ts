@@ -1,9 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { create } from 'zustand'
 import { type User } from '@supabase/supabase-js'
-import { createClient } from '@/app/supabase/client'
-
-const supabase = createClient()
 
 interface State {
 	user: User | null
