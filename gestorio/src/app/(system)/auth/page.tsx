@@ -61,42 +61,53 @@ export default function Home() {
 	}
 
 	return (
-		<main className='relative fondo flex bg-Gris w-[100dvw] h-[100dvh] items-center justify-center p-24'>
+		<main className='relative fondo flex bg-background w-[100dvw] h-[100dvh] items-center justify-center p-24'>
 			{/* Fondo con spinner de loading en absolute */}
 			{loading && (
-				<div className='absolute bg-Gris/80 backdrop-blur-md w-[100dvw] h-[100dvh] flex items-center justify-center z-10'>
+				<div className='absolute bg-background/80 backdrop-blur-md w-[100dvw] h-[100dvh] flex items-center justify-center z-10'>
 					<div className='animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-Blanco'></div>
 				</div>
 			)}
 			<section className='flex flex-col gap-3'>
-				<section className='relative flex flex-col border-2 bg-Gris border-Amarillo/60 shadow-lg px-12 py-10 rounded-lg'>
-					<div className='flex justify-center items-center mb-8'>
+				<section className='relative flex flex-col border-2 bg-background border-primary/60 shadow-lg px-12 py-10 rounded-lg'>
+					<div className='flex justify-center items-center mb-8 gap-6'>
 						<Image
 							priority
-							src='/SAVANNALOGOpng.png'
+							src='/MINI-GESTORIO-ICON-CUBE.svg'
+							alt='Vercel Logo'
+							width={80}
+							height={100}
+							className='bg-background'
+						/>
+						<Image
+							priority
+							src='/GESTORIO-LOGO.svg'
 							alt='Vercel Logo'
 							width={500}
-							height={100}
-							className='bg-Gris'
+							height={200}
+							style={{ objectFit: 'contain' }}
+							className='bg-background'
 						/>
 					</div>
 
-					<form onSubmit={handleLogin} className='bg-Gris flex flex-col gap-4'>
-						<label className='bg-Gris text-Blanco text-xl'>Usuario</label>
+					<form
+						onSubmit={handleLogin}
+						className='bg-background flex flex-col gap-4'>
+						<label className='bg-background text-xl'>Usuario</label>
 						<input
-							className='bg-Verde text-Blanco h-9 px-2 rounded-md'
+							className='bg-secondary text-secondary-foreground h-9 px-2 rounded-md'
 							type='email'
 							onChange={(e) => setEmail(e.target.value)}
 						/>
 
-						<label className='bg-Gris text-Blanco text-xl'>Contraseña</label>
+						<label className='bg-background text-xl'>Contraseña</label>
 						<input
-							className='bg-Verde text-Blanco h-9 px-2 rounded-md'
+							className='bg-secondary text-secondary-foreground h-9 px-2 rounded-md'
 							type='password'
 							onChange={(e) => setPassword(e.target.value)}
 						/>
 
-						<button className='self-center text-2xl text-Blanco bg-Naranjo rounded-lg w-fit px-12 py-2 mt-6 transition hover:scale-105 hover:bg-Naranjo/90'>
+						<button className='self-center text-2xl bg-primary rounded-lg w-fit px-12 py-2 mt-6 transition hover:scale-105 hover:bg-primary/90'>
 							Iniciar Sesión
 						</button>
 					</form>
@@ -108,9 +119,9 @@ export default function Home() {
 					)}
 				</section>
 
-				<section className='relative flex flex-col border-2 bg-Gris border-Amarillo/60 shadow-lg p-2 rounded-lg'>
+				<section className='relative flex flex-col border-2 bg-background border-primary/60 shadow-lg p-2 rounded-lg'>
 					<button
-						className='self-center text-md text-Blanco bg-Naranjo rounded-lg w-fit p-2 transition hover:scale-105 hover:bg-Naranjo/90'
+						className='self-center text-md text-pretty bg-primary rounded-lg w-fit p-2 transition hover:scale-105 hover:bg-primary/90'
 						onClick={async () => {
 							setEmail('alo@alo.com')
 							setPassword('123123')

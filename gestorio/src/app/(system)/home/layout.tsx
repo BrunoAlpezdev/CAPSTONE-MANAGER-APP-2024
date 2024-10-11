@@ -5,7 +5,7 @@ import { Footer, Header } from '@/components/index'
 
 export const metadata: Metadata = {
 	title: 'Gestorio',
-	description: ''
+	description: 'a'
 }
 
 export default function RootLayout({
