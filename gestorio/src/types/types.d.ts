@@ -16,6 +16,16 @@ interface Tienda {
 	telefono?: string // Opcional si puede ser nulo
 }
 
+interface SaleProduct {
+	id: string
+	imgSrc?: string
+	name: string
+	variant: string
+	price: number
+	stock: number
+	quantity: number
+}
+
 interface Producto {
 	id: number
 	nombre: string
@@ -91,5 +101,6 @@ export {
 	Venta,
 	DetalleVenta,
 	Pedido,
-	DetallePedido
+	DetallePedido,
+	SaleProduct
 }

@@ -12,7 +12,6 @@ export default function Home() {
 	const [error, setError] = useState('')
 	const [loading, setLoading] = useState(false)
 	const login = useAuthStore((state) => state.login)
-	const user = useAuthStore((state) => state.user)
 
 	const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
