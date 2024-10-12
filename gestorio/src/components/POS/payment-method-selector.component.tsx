@@ -26,8 +26,10 @@ export function PaymentMethodSelector({
 			{paymentMethods.map((method) => (
 				<button
 					key={method.name}
-					className={`flex w-full justify-center items-center bg-Naranjo/90 p-2 rounded-md transition-all hover:scale-105 ${
-						selectedMethod === method.name ? 'bg-orange-500 text-white' : ''
+					className={`flex w-full justify-center items-center p-2 rounded-md transition-all hover:scale-105 ${
+						selectedMethod === method.name
+							? 'bg-primary-500 text-white'
+							: ' bg-secondary text-secondary-foreground'
 					}`}
 					onClick={() => onSelectMethod(method.name)}>
 					{method.icon}

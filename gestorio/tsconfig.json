@@ -11,7 +11,7 @@
 		"moduleResolution": "bundler",
 		"resolveJsonModule": true,
 		"isolatedModules": true,
-		"jsx": "react-jsxdev",
+		"jsx": "preserve",
 		"incremental": true,
 		"plugins": [
 			{
@@ -21,15 +21,15 @@
 		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./src/*"],
-			"@components/*": ["./src/components/*"],
+			"@/components/*": ["./src/components/*"],
 			"@styles/*": [".src/styles/*"],
-			"@utils/*": [".src/lib/utils/*"],
-			"@hooks/*": [".src/hooks/*"],
-			"@services/*": [".src/services/*"],
-			"@contexts/*": [".src/contexts/*"],
-			"@types/*": [".src/types/*"],
+			"@/utils/*": [".src/lib/utils/*"],
+			"@/hooks/*": [".src/hooks/*"],
+			"@/services/*": [".src/services/*"],
+			"@/contexts/*": [".src/contexts/*"],
+			"@/types/*": [".src/types/*"],
 			"@lib/*": [".src/types/*"],
-			"@public/*": [".public/*"]
+			"@/public/*": [".public/*"]
 		}
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

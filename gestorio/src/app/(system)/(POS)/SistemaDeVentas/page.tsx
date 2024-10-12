@@ -5,14 +5,15 @@ import {
 	ToggleMenu,
 	Footer,
 	Sidebar,
-	POSFooter
+	POSFooter,
+	FullLogo
 } from '@/components/index'
-import { useMenu } from '@/hooks/useMenu'
-import { useSale } from '@/hooks/useSale'
-import { usePayment } from '@/hooks/usePayment'
-import Image from 'next/image'
-import { useState } from 'react'
-
+import { useMenu } from '@/hooks'
+import { useSale } from '@/hooks'
+import { usePayment } from '@/hooks'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
+import { MenuIcon } from '@/components/icons'
 export default function POS() {
 	const { isMenuOpen, toggleMenu } = useMenu()
 	const {
@@ -31,6 +32,16 @@ export default function POS() {
 	} = usePayment(totalAmount)
 	const [isSelected, setIsSelected] = useState(true)
 
+	const { theme } = useTheme()
+	const [mounted, setMounted] = useState(false)
+
+	// Para evitar problemas de renderizado por desincronización en el servidor y el cliente
+	useEffect(() => {
+		setMounted(true)
+	}, [])
+
+	if (!mounted) return null // Para evitar que el componente se renderice antes de que el tema se monte
+
 	return (
 		<div className='relative transition-all'>
 			{/* Overlay translucido (transparencia oscura del menú) */}
@@ -45,19 +56,18 @@ export default function POS() {
 			<ToggleMenu isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
 
 			{/* Main POS */}
-			<div className='flex flex-col h-screen text-white'>
+			<div className='flex flex-col h-screen text-foreground'>
 				<header className='flex justify-between items-center h-16 px-3'>
 					<button onClick={toggleMenu}>
-						<Image src='menu.svg' alt='alt' width={30} height={30} />
+						{theme === 'dark' ? (
+							<MenuIcon className='fill-foreground' />
+						) : (
+							<MenuIcon className='fill-foreground' />
+						)}
 					</button>
-					<Image
-						width={200}
-						height={40}
-						src='/SAVANNALOGOpng.png'
-						alt='logo de negocio'
-					/>
+					<FullLogo size='large' />
 				</header>
-				<main className='flex-1 flex overflow-hidden'>
+				<main className='flex-1 flex overflow-hidden dark:bg-foreground dark:text-black shadow-inner z-auto'>
 					{/* Lista de Productos */}
 					<ProductList saleItems={saleItems} updateQuantity={updateQuantity} />
 					{/* Sidebar */}

@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { ToggleMenu, Footer, Sidebar } from '@/components/index'
-import { useMenu } from '@/hooks/useMenu'
+import { useMenu } from '@/hooks'
 import Image from 'next/image'
 import '@/styles/usuarios.css'
 
@@ -174,7 +174,7 @@ export default function GestionDeUsuarios() {
 									</td>
 									<td className='rounded-full decoration-slate-900'>
 										<button className='action-bottom hover:scale-105'>
-											accion<span></span>
+											acción<span></span>
 										</button>
 									</td>
 								</tr>

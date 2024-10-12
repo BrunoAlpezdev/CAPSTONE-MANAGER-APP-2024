@@ -1,7 +1,7 @@
 'use client'
 
 import { ToggleMenu, Footer, Sidebar } from '@/components/index'
-import { useMenu } from '@/hooks/useMenu'
+import { useMenu } from '@/hooks'
 import Image from 'next/image'
 
 export function STHeader() {
