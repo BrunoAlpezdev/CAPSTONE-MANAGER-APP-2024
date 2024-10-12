@@ -4,13 +4,8 @@ import { LogOut } from 'lucide-react'
 import { redirect } from 'next/navigation'
 
 export default async function LogoutComponent() {
-	const { logout } = useAuthStore()
-
 	return (
-		<form
-			onSubmit={async () => {
-				await logout()
-			}}>
+		<form onSubmit={async () => {}}>
 			<button
 				className='flex flex-row gap-2 items-center cursor-pointer select-none '
 				type='submit'>
