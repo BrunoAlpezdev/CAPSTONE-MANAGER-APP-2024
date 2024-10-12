@@ -12,9 +12,9 @@ export function RecentProduct({
 }: RecentProductProps) {
 	return (
 		<>
-			<div className='mb-4 bg-Verde/60 text-white p-2 rounded-md shadow-xl border'>
+			<div className='mb-4 bg-primary text-foreground p-2 rounded-md shadow-xl border'>
 				<div className='flex items-center'>
-					<div className='w-10 h-10 bg-Verde/60 rounded'>
+					<div className='w-10 h-10 bg-primary/60 rounded'>
 						<Image
 							src='/mockproduct.png'
 							alt='Producto'
@@ -32,7 +32,7 @@ export function RecentProduct({
 					</div>
 					<div className='flex'>
 						<button
-							className='bg-Verde text-white rounded-md p-2 border'
+							className='bg-primary text-foreground rounded-md p-2 border'
 							onClick={() =>
 								onAddToSale({ id, name, variant, price, stock, quantity: 0 })
 							}>

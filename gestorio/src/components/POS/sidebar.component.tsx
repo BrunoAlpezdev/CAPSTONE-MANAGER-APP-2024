@@ -75,8 +75,8 @@ export function Sidebar({
 	}, [barcode, inputFocus, otherFocus])
 
 	return (
-		<div className='flex flex-col gap-2 w-1/4 bg-Gris/90 p-4 text-Blanco'>
-			<section className='flex flex-row w-full bg-Verde gap-2 px-6 py-2 rounded-full shadow-lg'>
+		<div className='flex flex-col gap-2 w-1/4 bg-background/90 p-4 text-foreground'>
+			<section className='flex flex-row w-full bg-primary gap-2 px-6 py-2 rounded-full shadow-lg'>
 				<Image
 					width={30}
 					height={30}
@@ -93,14 +93,14 @@ export function Sidebar({
 						type='text'
 						onChange={(e) => setBarcode(e.target.value)}
 						placeholder='Ingrese manualmente o escanee código de barras'
-						className='border-none outline-none shadow-none bg-transparent bg-Verde text-Blanco placeholder-Blanco w-full ml-2 text-sm'
+						className='border-none outline-none shadow-none bg-primary text-foreground placeholder-foreground w-full ml-2 text-sm'
 						value={barcode}
 						onFocus={() => setInputFocus(true)}
 						onBlur={() => setInputFocus(false)}
 					/>
 				</form>
 			</section>
-			<section className='flex flex-row items-center w-fit px-2 py-1 text-sm bg-Verde rounded-full text-Blanco gap-1'>
+			<section className='flex flex-row items-center w-fit px-2 py-1 text-sm bg-primary rounded-full text-foreground gap-1'>
 				<Image
 					width={25}
 					height={25}
@@ -136,8 +136,13 @@ export function Sidebar({
 					selectedPaymentMethod === 'Débito' ? (
 						<form className='flex flex-col' onSubmit={(e) => handlePayment(e)}>
 							<label htmlFor='comprobante'>Número de comprobante</label>
-							<input id='comprobante' className='default-input' />
-							<button type='submit' className='mt-2 bg-Verde/70 p-2 rounded-lg'>
+							<input
+								id='comprobante'
+								className='bg-secondary rounded-md py-1 px-2 text-secondary-foreground'
+							/>
+							<button
+								type='submit'
+								className='mt-2 bg-primary/70 text-white p-2 rounded-lg'>
 								Confirmar
 							</button>
 						</form>
@@ -153,7 +158,7 @@ export function Sidebar({
 							<input
 								id='montoPagado'
 								type='number'
-								className='default-input'
+								className='bg-secondary rounded-md py-1 px-2 text-secondary-foreground'
 								onChange={(e) => {
 									if (Number(e.target.value) < totalAmount) {
 										setClientChangeValue(0)
@@ -167,7 +172,9 @@ export function Sidebar({
 
 							<label>Vuelto: {clientChangeValue.toFixed(0)} CLP</label>
 
-							<button type='submit' className='mt-2 bg-Verde/70 p-2 rounded-lg'>
+							<button
+								type='submit'
+								className='mt-2 bg-primary/70 text-white p-2 rounded-lg'>
 								Confirmar
 							</button>
 						</form>
