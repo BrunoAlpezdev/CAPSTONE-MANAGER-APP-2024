@@ -23,11 +23,11 @@ export function POSFooter({
 		<footer className='bg-background/90 p-4 flex items-center'>
 			<div className='flex text-md bg-primary/70 rounded-lg py-2 px-4 w-[73.9dvw] justify-between'>
 				<div className='flex items-center gap-4'>
-					<button className='bg-accent/70 p-2 rounded-md border flex flex-row gap-2'>
+					<button className='bg-accent/70 text-accent-foreground p-2 rounded-md border flex flex-row gap-2'>
 						<Ban />
 						Cancelar
 					</button>
-					<button className='bg-accent/70 p-2 rounded-md border flex flex-row gap-2'>
+					<button className='bg-accent/70 text-accent-foreground p-2 rounded-md border flex flex-row gap-2'>
 						<Bookmark />
 						Dejar Pendiente
 					</button>
