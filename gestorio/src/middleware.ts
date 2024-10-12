@@ -1,17 +1,15 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { useAuthStore } from './store/authStore'
 
 export function middleware(request: NextRequest) {
-	const user = {
-		isLogged: true,
-		role: 'user'
+	const { user } = useAuthStore.getState()
+
+	if (user !== null || user !== undefined) {
+		return NextResponse.next()
 	}
 
-	if (!user.isLogged && !request.nextUrl.pathname.startsWith('/api')) {
-		return NextResponse.redirect(new URL('/', request.url))
-	}
-
-	return NextResponse.next()
+	return NextResponse.redirect(new URL('/auth', request.url))
 }
 
 export const config = {

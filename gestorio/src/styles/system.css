@@ -1,16 +1,9 @@
 :root {
-	--foreground-rgb: #f4f4f4;
-	--background: #313031;
 	--Brand-Naranjo: #f05b29;
 	--Brand-Gris: #313031;
 	--Brand-Blanco: #f4f4f4;
 	--Brand-Amarillo: #ffd54f;
 	--Brand-Verde: #009688;
-}
-
-main {
-	color: #313131;
-	background: #f4f4f4;
 }
 
 .dashboard-container {
@@ -70,7 +63,7 @@ hr.rounded {
 }
 
 .main-fondo {
-	background-image: url('/menu-background.svg');
+	background-image: url('/MAIN-MENU-BG.svg');
 	background-repeat: no-repeat;
 	background-position: bottom;
 	background-size: 100%;

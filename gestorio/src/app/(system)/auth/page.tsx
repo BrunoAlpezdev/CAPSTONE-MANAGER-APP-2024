@@ -1,8 +1,8 @@
 'use client'
-
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { FullLogo } from '@/components'
+import { firebase_signIn } from '@/firebase/auth'
 import { useAuthStore } from '@/store/authStore'
 
 export default function Home() {
@@ -11,7 +11,6 @@ export default function Home() {
 	const [password, setPassword] = useState('')
 	const [error, setError] = useState('')
 	const [loading, setLoading] = useState(false)
-	const login = useAuthStore((state) => state.login)
 
 	const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
@@ -37,19 +36,19 @@ export default function Home() {
 
 			setLoading(true)
 
-			const data = await login(email, password)
+			firebase_signIn(email, password).then((data) => {
+				if (!data) {
+					setError('Correo o contraseña incorrecto')
+					setLoading(false)
+					return
+				}
+				const { user } = useAuthStore.getState()
+				console.log(user)
 
-			console.log(data)
-
-			if (!data) {
-				setError(data.error)
-				setLoading(false)
-				return
-			}
-
-			// Si el login es exitoso, puedes redirigir o manejar el estado de sesión
-			router.push('/home')
-			router.refresh()
+				// Si el login es exitoso, puedes redirigir o manejar el estado de sesión
+				router.push('/home')
+				router.refresh()
+			})
 		} catch (error: any) {
 			// Manejo de errores
 			if (error.message.includes('(auth/invalid-credential)')) {
@@ -70,26 +69,7 @@ export default function Home() {
 			)}
 			<section className='flex flex-col gap-3'>
 				<section className='relative flex flex-col border-2 bg-background border-primary/60 shadow-lg px-12 py-10 rounded-lg'>
-					<div className='flex justify-center items-center mb-8 gap-6'>
-						<Image
-							priority
-							src='/MINI-GESTORIO-ICON-CUBE.svg'
-							alt='Vercel Logo'
-							width={80}
-							height={100}
-							className='bg-background'
-						/>
-						<Image
-							priority
-							src='/GESTORIO-LOGO.svg'
-							alt='Vercel Logo'
-							width={500}
-							height={200}
-							style={{ objectFit: 'contain' }}
-							className='bg-background'
-						/>
-					</div>
-
+					<FullLogo size='huge' editClass='mb-8 gap-6' />
 					<form
 						onSubmit={handleLogin}
 						className='bg-background flex flex-col gap-4'>
@@ -125,7 +105,7 @@ export default function Home() {
 						onClick={async () => {
 							setEmail('alo@alo.com')
 							setPassword('123123')
-							await login(email, password).then(() => {
+							await firebase_signIn(email, password).then(() => {
 								router.push('/home')
 								router.refresh()
 							})
