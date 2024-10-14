@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { FullLogo } from '@/components'
-import { firebase_signIn } from '@/firebase/auth'
+import { signIn } from '@/firebase/auth'
 import { useAuthStore } from '@/store/authStore'
 
 export default function Home() {
@@ -36,7 +36,7 @@ export default function Home() {
 
 			setLoading(true)
 
-			firebase_signIn(email, password).then((data) => {
+			signIn(email, password).then((data) => {
 				if (!data) {
 					setError('Correo o contraseña incorrecto')
 					setLoading(false)
@@ -75,6 +75,7 @@ export default function Home() {
 						className='bg-background flex flex-col gap-4'>
 						<label className='bg-background text-xl'>Usuario</label>
 						<input
+							id='emailField'
 							className='bg-secondary text-secondary-foreground h-9 px-2 rounded-md'
 							type='email'
 							onChange={(e) => setEmail(e.target.value)}
@@ -82,6 +83,7 @@ export default function Home() {
 
 						<label className='bg-background text-xl'>Contraseña</label>
 						<input
+							id='passwordField'
 							className='bg-secondary text-secondary-foreground h-9 px-2 rounded-md'
 							type='password'
 							onChange={(e) => setPassword(e.target.value)}
@@ -103,12 +105,10 @@ export default function Home() {
 					<button
 						className='self-center text-md text-pretty bg-primary rounded-lg w-fit p-2 transition hover:scale-105 hover:bg-primary/90'
 						onClick={async () => {
-							setEmail('alo@alo.com')
-							setPassword('123123')
-							await firebase_signIn(email, password).then(() => {
-								router.push('/home')
-								router.refresh()
-							})
+							setLoading(true)
+							await signIn('alo@alo.com', '123123')
+							setLoading(false)
+							router.push('/home')
 						}}>
 						Bypass (Presionar dos veces porque esta bug)
 					</button>

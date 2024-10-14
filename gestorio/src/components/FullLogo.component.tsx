@@ -97,9 +97,7 @@ export function FullLogo({ size, editClass }: props) {
 	} else {
 		return (
 			<section className={editClass}>
-				<Link
-					href='/home'
-					className={`flex flex-row w-fit h-fit gap-${calculatedSize.GAP}`}>
+				<div className={`flex flex-row w-fit h-fit gap-${calculatedSize.GAP}`}>
 					<Image
 						priority
 						src='/MINI-GESTORIO-ICON-CUBE.svg'
@@ -117,7 +115,7 @@ export function FullLogo({ size, editClass }: props) {
 						style={{ objectFit: 'contain' }}
 						className='bg-background select-none pointer-events-none'
 					/>
-				</Link>
+				</div>
 			</section>
 		)
 	}
