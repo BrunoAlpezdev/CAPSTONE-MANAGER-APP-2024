@@ -10,14 +10,14 @@ export function Product({
 	onUpdateQuantity
 }: ProductoProps) {
 	return (
-		<div className='flex items-center justify-between bg-Verde/40 w-full h-24 rounded-xl'>
-			<div className='flex items-center justify-center w-fit h-full bg-Verde/40 p-4 rounded-xl'>
+		<div className='flex items-center justify-between bg-primary/40 w-full h-16 rounded-sm'>
+			<div className='flex items-center justify-center w-fit h-full bg-primary/40 p-2 rounded-sm'>
 				{/* left section */}
 				<Image
 					src='/mockproduct.png'
 					alt='alt'
-					width={80}
-					height={80}
+					width={50}
+					height={50}
 					className='aspect-square object-contain'
 				/>
 			</div>
@@ -52,7 +52,7 @@ export function Product({
 			</div>
 
 			{/* right section */}
-			<div className='flex items-center justify-center h-full bg-Verde/40 p-4 rounded-xl'>
+			<div className='flex items-center justify-center h-full bg-primary/40 p-4 rounded-sm'>
 				{/* minus, plus and a counter */}
 				<div className='flex items-center justify-center gap-x-2'>
 					<button onClick={() => onUpdateQuantity(id, quantity - 1)}>
@@ -61,7 +61,7 @@ export function Product({
 					<div className='flex '>
 						<input
 							type='numeric'
-							className='w-12 h-8 text-center bg-Verde/40 text-Gris/100 rounded-lg'
+							className='w-12 h-8 text-center bg-primary/40 text-Gris/100 rounded-lg'
 							value={quantity}
 							onChange={(e) =>
 								onUpdateQuantity(id, Math.max(0, parseInt(e.target.value) || 0))

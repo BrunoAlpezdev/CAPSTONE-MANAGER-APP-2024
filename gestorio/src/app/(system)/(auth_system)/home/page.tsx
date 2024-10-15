@@ -4,7 +4,7 @@ export default function HomePage() {
 	return (
 		<main className='flex flex-row w-full h-full font-semibold'>
 			<Menu />
-			<section className='flex flex-col gap-8 w-full p-6 text-center'>
+			<section className='flex flex-col gap-8 w-full p-6 text-center shadow-inner dark:bg-foreground dark:text-black'>
 				<header>
 					<h1>Dashboard</h1>
 				</header>

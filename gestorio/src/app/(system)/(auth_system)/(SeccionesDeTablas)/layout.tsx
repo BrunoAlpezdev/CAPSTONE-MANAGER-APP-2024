@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import '@/styles/system-layout.css'
 import { Footer } from '@/components'
-import React from 'react'
 import { ReportHeader } from '@/components/reportes/reportHeaderComponents'
 
 //import { Bug, UserRound, LogOut } from 'lucide-react' // Iconos de lucide-react
