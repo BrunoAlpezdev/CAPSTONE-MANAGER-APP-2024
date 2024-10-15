@@ -1,4 +1,4 @@
-import { DashboardItem, Menu } from '@/components/index'
+import { DashboardItem, Menu } from '@/components'
 
 export default function HomePage() {
 	return (

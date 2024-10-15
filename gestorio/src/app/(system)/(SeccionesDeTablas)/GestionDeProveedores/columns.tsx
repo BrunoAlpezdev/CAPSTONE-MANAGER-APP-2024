@@ -4,6 +4,7 @@ import { ColumnDef } from '@tanstack/react-table'
 import { MoreHorizontal, ArrowUpDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { useState } from 'react'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -12,6 +13,14 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger
+} from '@/components/ui/dialog'
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -44,7 +53,7 @@ export const columns: ColumnDef<User>[] = [
 		)
 	},
 	{
-		accessorKey: 'name',
+		accessorKey: 'Nombre',
 		header: ({ column }) => {
 			return (
 				<Button
@@ -59,20 +68,20 @@ export const columns: ColumnDef<User>[] = [
 		cell: ({ row }) => <div className='text-black'>{row.getValue('name')}</div>
 	},
 	{
-		accessorKey: 'product',
+		accessorKey: 'Tipo',
 		header: 'Product',
 		cell: ({ row }) => (
 			<div className='text-black'>{row.getValue('product')}</div>
 		)
 	},
 	{
-		accessorKey: 'email',
-		header: 'Email',
+		accessorKey: 'Stock',
+		header: 'Stock',
 		cell: ({ row }) => <div className='text-black'>{row.getValue('email')}</div>
 	},
 	{
-		accessorKey: 'lastSeen',
-		header: 'Last Seen',
+		accessorKey: 'Nose',
+		header: 'Nose',
 		cell: ({ row }) => {
 			const date = new Date(row.getValue('lastSeen'))
 			const formatted = date.toLocaleDateString()
@@ -83,6 +92,7 @@ export const columns: ColumnDef<User>[] = [
 		id: 'actions',
 		cell: ({ row }) => {
 			const user = row.original
+			const [isOpen, setIsOpen] = useState(false)
 			return (
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -92,14 +102,16 @@ export const columns: ColumnDef<User>[] = [
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
-						<DropdownMenuLabel>Accion</DropdownMenuLabel>
+						<DropdownMenuLabel>Actions</DropdownMenuLabel>
 						<DropdownMenuItem
 							onClick={() => navigator.clipboard.writeText(user.id)}>
-							Copy User ID
+							Agregar
 						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem>View customer</DropdownMenuItem>
-						<DropdownMenuItem>View user details</DropdownMenuItem>
+						<DropdownMenuItem>Modificar</DropdownMenuItem>
+						<DropdownMenuItem
+							onClick={() => navigator.clipboard.writeText(user.id)}>
+							Eliminar
+						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			)
