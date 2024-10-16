@@ -7,10 +7,7 @@
 }
 
 .dashboard-container {
-	background-color: rgba(49, 48, 49, 0.05);
-	border-radius: 0.375rem /* 6px */;
 	border-width: 1px;
-	border-color: rgb(255 213 79 / 0.4);
 }
 
 .box-shadow {
@@ -29,7 +26,11 @@ hr.dotted {
 
 /* Solid border */
 hr.solid {
-	border-top: 3px solid #95ccff;
+	border-top: 3px solid hsl(215 83% 53%);
+}
+
+.dark hr.solid {
+	border-top: 3px solid hsl(217 91% 60%);
 }
 
 /* Solid border */
@@ -67,22 +68,4 @@ hr.rounded {
 	background-repeat: no-repeat;
 	background-position: bottom;
 	background-size: 100%;
-}
-
-.scrollbar-modifier::-webkit-scrollbar {
-	width: 8px; /* Ancho del scrollbar */
-}
-
-.scrollbar-modifier::-webkit-scrollbar-track {
-	background: var(--Brand-Gris); /* Color de fondo del track */
-}
-
-.scrollbar-modifier::-webkit-scrollbar-thumb {
-	background-color: #88888800; /* Color del "pulgar" (thumb) */
-	border-radius: 10px; /* Redondear las esquinas */
-	border: 1px solid #f1f1f1; /* Espacio alrededor del thumb */
-}
-
-.scrollbar-modifier::-webkit-scrollbar-thumb:hover {
-	background: var(--Brand-Verde); /* Color cuando se pasa el ratón por encima */
 }

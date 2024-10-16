@@ -4,9 +4,10 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { RecentProduct, PaymentMethodSelector } from '@/components/index'
+import { RecentProduct, PaymentMethodSelector } from '@/components'
 import { SaleProduct } from '@/types'
 import { products } from '@/mocks/products'
+import { ScanBarcode, History } from 'lucide-react'
 
 type SidebarProps = {
 	addToSale: (product: SaleProduct) => void
@@ -77,12 +78,7 @@ export function Sidebar({
 	return (
 		<div className='flex flex-col gap-2 w-1/4 bg-background/90 p-4 text-foreground'>
 			<section className='flex flex-row w-full bg-primary gap-2 px-6 py-2 rounded-full shadow-lg'>
-				<Image
-					width={30}
-					height={30}
-					src='/barcode.svg'
-					alt='icono de código de barras'
-				/>
+				<ScanBarcode />
 				<form
 					className='flex flex-row w-full'
 					onSubmit={(e) => {
@@ -101,12 +97,7 @@ export function Sidebar({
 				</form>
 			</section>
 			<section className='flex flex-row items-center w-fit px-2 py-1 text-sm bg-primary rounded-full text-foreground gap-1'>
-				<Image
-					width={25}
-					height={25}
-					src='/recent.svg'
-					alt='icono de código de barras'
-				/>
+				<History />
 				<p>Recientes</p>
 			</section>
 

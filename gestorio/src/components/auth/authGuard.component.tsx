@@ -1,15 +1,19 @@
 import { AUTH_ROUTE } from '@/lib/routes'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { redirect, usePathname } from 'next/navigation'
 import '@/styles/authGuard.css'
+import { useEffect } from 'react'
 
 export default function AuthGuard() {
 	const pathname = usePathname()
 
+	useEffect(() => {
+		redirect(AUTH_ROUTE)
+	}, [])
+
 	return (
-		<div className='authValidation'>
-			<pre>Estás intentando acceder a: {pathname}</pre>
-			<Link href={`${AUTH_ROUTE}`}>Inicia sesión</Link> para continuar.
-		</div>
+		<>
+			<h1>alo</h1>
+		</>
 	)
 }

@@ -59,15 +59,11 @@ export default function POS() {
 			<div className='flex flex-col h-screen text-foreground'>
 				<header className='flex justify-between items-center h-16 px-3'>
 					<button onClick={toggleMenu}>
-						{theme === 'dark' ? (
-							<MenuIcon className='fill-foreground' />
-						) : (
-							<MenuIcon className='fill-foreground' />
-						)}
+						<MenuIcon className='fill-foreground' />
 					</button>
 					<FullLogo size='large' />
 				</header>
-				<main className='flex-1 flex overflow-hidden dark:bg-foreground dark:text-black shadow-inner z-auto'>
+				<main className='inner-custom-shadow dashboard-fondo flex-1 flex overflow-hidden dark:bg-foreground dark:text-black z-auto'>
 					{/* Lista de Productos */}
 					<ProductList saleItems={saleItems} updateQuantity={updateQuantity} />
 					{/* Sidebar */}
