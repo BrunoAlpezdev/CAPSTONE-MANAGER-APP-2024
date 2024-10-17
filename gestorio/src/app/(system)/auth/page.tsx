@@ -101,18 +101,20 @@ export default function Home() {
 					)}
 				</section>
 
-				<section className='relative flex flex-col border-2 bg-background border-primary/60 shadow-lg p-2 rounded-lg'>
-					<button
-						className='self-center text-md text-pretty bg-primary rounded-lg w-fit p-2 transition hover:scale-105 hover:bg-primary/90'
-						onClick={async () => {
-							setLoading(true)
-							await signIn('alo@alo.com', '123123')
-							setLoading(false)
-							router.push('/home')
-						}}>
-						Bypass (Presionar dos veces porque esta bug)
-					</button>
-				</section>
+				{process.env.NODE_ENV === 'development' && (
+					<section className='relative flex flex-col border-2 bg-background border-primary/60 shadow-lg p-2 rounded-lg'>
+						<button
+							className='self-center text-md text-pretty bg-primary rounded-lg w-fit p-2 transition hover:scale-105 hover:bg-primary/90'
+							onClick={async () => {
+								setLoading(true)
+								await signIn('alo@alo.com', '123123')
+								setLoading(false)
+								router.push('/home')
+							}}>
+							Bypass
+						</button>
+					</section>
+				)}
 			</section>
 		</main>
 	)
