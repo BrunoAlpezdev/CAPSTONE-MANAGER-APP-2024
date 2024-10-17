@@ -1,5 +1,4 @@
 'use client'
-
 import {
 	ProductList,
 	ToggleMenu,
@@ -11,10 +10,13 @@ import {
 import { useMenu } from '@/hooks'
 import { useSale } from '@/hooks'
 import { usePayment } from '@/hooks'
-import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { MenuIcon } from '@/components/icons'
+import setupDatabase from '@/lib/db/RxDB'
+import { RxDatabase } from 'rxdb'
 export default function POS() {
+	const [db, setDb] = useState<RxDatabase | null>(null)
+	const [error, setError] = useState<string | null>(null)
 	const { isMenuOpen, toggleMenu } = useMenu()
 	const {
 		saleItems,
@@ -31,13 +33,22 @@ export default function POS() {
 		handlePayment
 	} = usePayment(totalAmount)
 	const [isSelected, setIsSelected] = useState(true)
-
-	const { theme } = useTheme()
 	const [mounted, setMounted] = useState(false)
 
 	// Para evitar problemas de renderizado por desincronización en el servidor y el cliente
 	useEffect(() => {
 		setMounted(true)
+		async function initDatabase() {
+			try {
+				const database = await setupDatabase() // Invoca la función de setup
+				setDb(database) // Almacena la referencia de la base de datos en el estado
+			} catch (err) {
+				console.error('Error setting up the database:', err)
+				setError('Failed to setup database')
+			}
+		}
+
+		initDatabase() // Llama a la función de inicialización
 	}, [])
 
 	if (!mounted) return null // Para evitar que el componente se renderice antes de que el tema se monte

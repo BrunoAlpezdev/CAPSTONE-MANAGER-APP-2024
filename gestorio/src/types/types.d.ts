@@ -1,13 +1,6 @@
-import { AuthError, Session, User, WeakPassword } from '@supabase/supabase-js'
-
-interface gestorioUser {
-	data: {
-		user: User
-		session: Session
-		weakPassword?: WeakPassword // Opcional
-	}
-	error: AuthError | null
-}
+/* https://firebase.google.com/docs/reference/js/firestore_.timestamp */
+/* fromDate(date)	static	Creates a new timestamp from the given date. */
+import { Timestamp } from 'firebase/firestore'
 
 interface Tienda {
 	id: number
@@ -61,7 +54,7 @@ interface Cliente {
 
 interface Venta {
 	id: number
-	fecha: Date // Timestamp
+	fecha: Timestamp // Timestamp
 	total: number // Asumiendo que el total es un número entero en CLP
 	tienda_id: number
 	cliente_id: number
@@ -77,7 +70,7 @@ interface DetalleVenta {
 
 interface Pedido {
 	id: number
-	fecha: Date // Timestamp
+	fecha: Timestamp // Timestamp
 	proveedor_id: number
 	tienda_id: number
 	estado: string
