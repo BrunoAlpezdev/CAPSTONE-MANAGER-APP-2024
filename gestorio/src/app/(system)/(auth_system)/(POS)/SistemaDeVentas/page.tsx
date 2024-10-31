@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react'
 import { MenuIcon } from '@/components/icons'
 import setupDatabase from '@/lib/db/RxDB'
 import { RxDatabase } from 'rxdb'
+
 export default function POS() {
 	const [db, setDb] = useState<RxDatabase | null>(null)
 	const [error, setError] = useState<string | null>(null)
@@ -58,7 +59,7 @@ export default function POS() {
 			{/* Overlay translucido (transparencia oscura del menú) */}
 			{isMenuOpen && (
 				<div
-					className='fixed inset-0 bg-black bg-opacity-50 z-40'
+					className='fixed inset-0 z-40 bg-black bg-opacity-50'
 					onClick={toggleMenu}
 					aria-hidden='true'
 				/>
@@ -67,14 +68,14 @@ export default function POS() {
 			<ToggleMenu isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
 
 			{/* Main POS */}
-			<div className='flex flex-col h-screen text-foreground'>
-				<header className='flex justify-between items-center h-16 px-3'>
+			<div className='flex h-screen flex-col text-foreground'>
+				<header className='flex h-16 items-center justify-between px-3'>
 					<button onClick={toggleMenu}>
 						<MenuIcon className='fill-foreground' />
 					</button>
 					<FullLogo size='large' />
 				</header>
-				<main className='inner-custom-shadow dashboard-fondo flex-1 flex overflow-hidden dark:bg-foreground dark:text-black z-auto'>
+				<main className='inner-custom-shadow dashboard-fondo z-auto flex flex-1 overflow-hidden dark:bg-foreground dark:text-black'>
 					{/* Lista de Productos */}
 					<ProductList saleItems={saleItems} updateQuantity={updateQuantity} />
 					{/* Sidebar */}
@@ -97,7 +98,6 @@ export default function POS() {
 					isPaymentOpen={isPaymentOpen}
 					totalAmount={totalAmount}
 				/>
-				<Footer />
 			</div>
 		</div>
 	)

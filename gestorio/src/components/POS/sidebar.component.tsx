@@ -5,12 +5,12 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { RecentProduct, PaymentMethodSelector } from '@/components'
-import { SaleProduct } from '@/types'
+import { CartItem } from '@/types'
 import { products } from '@/mocks/products'
 import { ScanBarcode, History } from 'lucide-react'
 
 type SidebarProps = {
-	addToSale: (product: SaleProduct) => void
+	addToSale: (product: CartItem) => void
 	addToSaleByBarcode: (barcode: string) => void
 	isPaymentOpen: boolean
 	selectedPaymentMethod: string
@@ -36,12 +36,12 @@ export function Sidebar({
 		setBarcode('')
 	}
 
-	const saleProducts: SaleProduct[] = products.map((product) => ({
+	const saleProducts: CartItem[] = products.map((product) => ({
 		...product,
-		quantity: 0
+		cantidad: 0
 	}))
 
-	const [sidebarItems] = useState<SaleProduct[]>(saleProducts)
+	const [sidebarItems] = useState<CartItem[]>(saleProducts)
 
 	const [inputFocus, setInputFocus] = useState(false)
 	const [otherFocus, setOtherFocus] = useState(false)
@@ -76,11 +76,11 @@ export function Sidebar({
 	}, [barcode, inputFocus, otherFocus])
 
 	return (
-		<div className='flex flex-col gap-2 w-1/4 bg-background/90 p-4 text-foreground'>
-			<section className='flex flex-row w-full bg-primary gap-2 px-6 py-2 rounded-full shadow-lg'>
+		<div className='flex w-1/4 flex-col gap-2 bg-background/90 p-4 text-foreground'>
+			<section className='flex w-full flex-row gap-2 rounded-full bg-primary px-6 py-2 shadow-lg'>
 				<ScanBarcode />
 				<form
-					className='flex flex-row w-full'
+					className='flex w-full flex-row'
 					onSubmit={(e) => {
 						e.preventDefault()
 						handleProductAdded(barcode)
@@ -89,26 +89,26 @@ export function Sidebar({
 						type='text'
 						onChange={(e) => setBarcode(e.target.value)}
 						placeholder='Ingrese manualmente o escanee código de barras'
-						className='border-none outline-none shadow-none bg-primary text-foreground placeholder-foreground w-full ml-2 text-sm'
+						className='ml-2 w-full border-none bg-primary text-sm text-foreground placeholder-foreground shadow-none outline-none'
 						value={barcode}
 						onFocus={() => setInputFocus(true)}
 						onBlur={() => setInputFocus(false)}
 					/>
 				</form>
 			</section>
-			<section className='flex flex-row items-center w-fit px-2 py-1 text-sm bg-primary rounded-full text-foreground gap-1'>
+			<section className='flex w-fit flex-row items-center gap-1 rounded-full bg-primary px-2 py-1 text-sm text-foreground'>
 				<History />
 				<p>Recientes</p>
 			</section>
 
-			<div className='flex-1 overflow-y-auto mb-4 scrollbar-modifier pr-2'>
+			<div className='scrollbar-modifier mb-4 flex-1 overflow-y-auto pr-2'>
 				{sidebarItems.map((product) => (
 					<RecentProduct
 						key={product.id}
 						id={product.id}
-						name={product.name}
-						variant={product.variant}
-						price={product.price}
+						name={product.nombre}
+						variant={product.variante}
+						price={product.precio}
 						stock={product.stock}
 						onAddToSale={addToSale}
 					/>
@@ -129,11 +129,11 @@ export function Sidebar({
 							<label htmlFor='comprobante'>Número de comprobante</label>
 							<input
 								id='comprobante'
-								className='bg-secondary rounded-md py-1 px-2 text-secondary-foreground'
+								className='rounded-md bg-secondary px-2 py-1 text-secondary-foreground'
 							/>
 							<button
 								type='submit'
-								className='mt-2 bg-primary/70 text-white p-2 rounded-lg'>
+								className='mt-2 rounded-lg bg-primary/70 p-2 text-white'>
 								Confirmar
 							</button>
 						</form>
@@ -149,7 +149,7 @@ export function Sidebar({
 							<input
 								id='montoPagado'
 								type='number'
-								className='bg-secondary rounded-md py-1 px-2 text-secondary-foreground'
+								className='rounded-md bg-secondary px-2 py-1 text-secondary-foreground'
 								onChange={(e) => {
 									if (Number(e.target.value) < totalAmount) {
 										setClientChangeValue(0)
@@ -165,7 +165,7 @@ export function Sidebar({
 
 							<button
 								type='submit'
-								className='mt-2 bg-primary/70 text-white p-2 rounded-lg'>
+								className='mt-2 rounded-lg bg-primary/70 p-2 text-white'>
 								Confirmar
 							</button>
 						</form>

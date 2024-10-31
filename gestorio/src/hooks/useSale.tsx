@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { SaleProduct } from '@/types'
+import { Producto, CartItem } from '@/types'
 import { products } from '@/mocks/products'
 
 export function useSale() {
-	const [saleItems, setSaleItems] = useState<SaleProduct[]>([])
+	const [saleItems, setSaleItems] = useState<CartItem[]>([])
 
-	const addToSaleByBarcode = (barcode: string) => {
+	const addToSaleByBarcode = (barcode: string): Producto | undefined => {
 		// Aquí se debería hacer una petición a la API para obtener el producto
 		// con el código de barras especificado
 		const product = products.find((product) => product.id === barcode)
@@ -15,31 +15,7 @@ export function useSale() {
 			return
 		}
 
-		const productToADD: SaleProduct = {
-			id: product.id,
-			imgSrc: product.imgSrc,
-			name: product.name,
-			variant: product.variant,
-			price: product.price,
-			stock: product.stock,
-			quantity: 1
-		}
-		addToSale({ ...productToADD })
-	}
-
-	const addToSale = (product: SaleProduct) => {
-		const existingItem = saleItems.find((item) => item.id === product.id)
-		if (existingItem) {
-			setSaleItems(
-				saleItems.map((item) =>
-					item.id === product.id
-						? { ...item, quantity: item.quantity + 1 }
-						: item
-				)
-			)
-		} else {
-			setSaleItems([...saleItems, { ...product, quantity: 1 }])
-		}
+		return product
 	}
 
 	const updateQuantity = (id: string, newQuantity: number) => {
@@ -55,13 +31,12 @@ export function useSale() {
 	}
 
 	const totalAmount = saleItems.reduce(
-		(sum, item) => sum + item.price * item.quantity,
+		(sum, item) => sum + item.precio * item.cantidad,
 		0
 	)
 
 	return {
 		saleItems,
-		addToSale,
 		addToSaleByBarcode,
 		updateQuantity,
 		totalAmount
