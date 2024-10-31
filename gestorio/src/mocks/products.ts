@@ -1,82 +1,84 @@
-export const products = [
+import { Producto } from '@/types'
+
+export const products: Producto[] = [
 	{
 		id: '1',
-		imgSrc: '/mockproduct.png',
-		name: 'El Toro Rojo',
-		variant: 'L',
+		imagen: '/mockproduct.png',
+		nombre: 'El Toro Rojo',
+		variante: 'L',
 		stock: 24,
-		price: 1700
+		precio: 1700
 	},
 	{
 		id: '687051872024',
-		imgSrc: '/mockproduct.png',
-		name: 'Pan Pansito',
-		variant: 'chiquito',
+		imagen: '/mockproduct.png',
+		nombre: 'Pan Pansito',
+		variante: 'chiquito',
 		stock: 24,
-		price: 300
+		precio: 300
 	},
 	{
 		id: '7802820442229',
-		imgSrc: '/mockproduct2.jpg',
-		name: 'Café Nescafé',
-		variant: 'Venti',
+		imagen: '/mockproduct2.jpg',
+		nombre: 'Café Nescafé',
+		variante: 'Venti',
 		stock: 24,
-		price: 2300
+		precio: 2300
 	},
 	{
 		id: 'UF15Y0662',
-		imgSrc: '/mockproduct.png',
-		name: 'Leche Entera',
-		variant: 'L',
+		imagen: '/mockproduct.png',
+		nombre: 'Leche Entera',
+		variante: 'L',
 		stock: 24,
-		price: 1200
+		precio: 1200
 	},
 	{
 		id: 'UF19M4032',
-		imgSrc: '/mockproduct.png',
-		name: 'Arroz Integral',
-		variant: 'L',
+		imagen: '/mockproduct.png',
+		nombre: 'Arroz Integral',
+		variante: 'L',
 		stock: 24,
-		price: 1500
+		precio: 1500
 	},
 	{
 		id: 'UF18H1468',
-		imgSrc: '/mockproduct.png',
-		name: 'Aceite de Oliva',
-		variant: 'L',
+		imagen: '/mockproduct.png',
+		nombre: 'Aceite de Oliva',
+		variante: 'L',
 		stock: 24,
-		price: 3500
+		precio: 3500
 	},
 	{
 		id: 'UF17L7177',
-		imgSrc: '/mockproduct.png',
-		name: 'Huevos (Docena)',
-		variant: 'L',
+		imagen: '/mockproduct.png',
+		nombre: 'Huevos (Docena)',
+		variante: 'L',
 		stock: 24,
-		price: 2000
+		precio: 2000
 	},
 	{
 		id: 'UF15D6617',
-		imgSrc: '/mockproduct.png',
-		name: 'Queso Fresco',
-		variant: 'L',
+		imagen: '/mockproduct.png',
+		nombre: 'Queso Fresco',
+		variante: 'L',
 		stock: 24,
-		price: 2800
+		precio: 2800
 	},
 	{
 		id: 'UF17J2572',
-		imgSrc: '/mockproduct.png',
-		name: 'Manzanas (Kg)',
-		variant: 'L',
+		imagen: '/mockproduct.png',
+		nombre: 'Manzanas (Kg)',
+		variante: 'L',
 		stock: 24,
-		price: 1800
+		precio: 1800
 	},
 	{
 		id: 'UF10W0503',
-		imgSrc: '/mockproduct.png',
-		name: 'Pasta Integral',
-		variant: 'L',
+		imagen: '/mockproduct.png',
+		nombre: 'Pasta Integral',
+		variante: 'L',
 		stock: 24,
-		price: 1000
+		precio: 1000
 	}
 ]

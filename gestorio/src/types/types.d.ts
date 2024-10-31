@@ -9,23 +9,24 @@ interface Tienda {
 	telefono?: string // Opcional si puede ser nulo
 }
 
-interface SaleProduct {
+// Definición de tipos para los productos, items del carrito y tickets
+interface Producto {
 	id: string
-	imgSrc?: string
-	name: string
-	variant: string
-	price: number
+	nombre: string
+	imagen?: string
+	variante?: string // Opcional si puede ser nulo
+	precio: number // Asumiendo que el precio es un número entero en CLP
 	stock: number
-	quantity: number
 }
 
-interface Producto {
-	id: number
-	nombre: string
-	descripcion?: string // Opcional si puede ser nulo
-	precio: number // Asumiendo que el precio es un número entero en CLP
+interface CartItem extends Producto {
 	cantidad: number
-	tienda_id: number
+}
+
+interface Ticket {
+	id: number
+	name: string
+	items: CartItem[]
 }
 
 interface Proveedor {
@@ -85,15 +86,15 @@ interface DetallePedido {
 }
 
 export {
-	gestorioUser,
 	Tienda,
 	Producto,
+	CartItem,
+	Ticket,
 	Proveedor,
 	Usuario,
 	Cliente,
 	Venta,
 	DetalleVenta,
 	Pedido,
-	DetallePedido,
-	SaleProduct
+	DetallePedido
 }
