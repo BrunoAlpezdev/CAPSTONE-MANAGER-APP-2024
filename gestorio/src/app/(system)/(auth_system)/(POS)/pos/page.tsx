@@ -295,7 +295,7 @@ export default function POS() {
 		return () => {
 			document.removeEventListener('keypress', handleKeyPress)
 		}
-	}, [isDarkMode, handleProductAdded, scannedCode, inputFocus, otherFocus])
+	}, [handleProductAdded, scannedCode, inputFocus, otherFocus])
 
 	return (
 		<div className='relative transition-all'>

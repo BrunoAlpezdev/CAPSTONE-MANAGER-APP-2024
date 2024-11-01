@@ -109,9 +109,9 @@ export const columns: ColumnDef<User>[] = [
 			}
 
 			useEffect(() => {
-				const overlay = document.getElementById('dialog-overlay')
-				if (overlay) {
-					overlay.style.pointerEvents = isOpen ? 'none' : 'auto'
+				const body = document.querySelector('body')
+				if (body) {
+					body.style.pointerEvents = isOpen ? 'all' : 'all'
 				}
 			}, [isOpen])
 
@@ -178,10 +178,6 @@ export const columns: ColumnDef<User>[] = [
 							</div>
 						</DialogContent>
 					</Dialog>
-					<div
-						id='dialog-overlay'
-						style={{ pointerEvents: isOpen ? 'none' : 'all' }}
-					/>
 				</>
 			)
 		}

@@ -39,13 +39,27 @@
 	background-size: 100%;
 }
 
+.dark .tables-fondo {
+	background-image: url('/backgrounds/DARK-DASHBOARD-BG.svg');
+	background-repeat: no-repeat;
+	background-position: bottom;
+	background-size: 100%;
+}
+
+.tables-fondo {
+	background-image: url('/backgrounds/DASHBOARD-BG.svg');
+	background-repeat: no-repeat;
+	background-position: bottom;
+	background-size: 100%;
+}
+
 .inner-custom-shadow {
 	box-shadow: inset 4px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 @layer base {
 	.default-input {
-		@apply border-none rounded-lg py-1 px-2 bg-Gris;
+		@apply rounded-lg border-none bg-Gris px-2 py-1;
 	}
 	* {
 		@apply border-border;
