@@ -102,10 +102,18 @@ export const columns: ColumnDef<User>[] = [
 					console.error('Error al copiar:', error)
 				}
 			}
+
 			const handleCancel = () => {
 				setIsOpen(false)
 				window.location.reload() // Recarga la página
 			}
+
+			useEffect(() => {
+				const overlay = document.getElementById('dialog-overlay')
+				if (overlay) {
+					overlay.style.pointerEvents = isOpen ? 'none' : 'auto'
+				}
+			}, [isOpen])
 
 			return (
 				<>
@@ -144,7 +152,7 @@ export const columns: ColumnDef<User>[] = [
 									type='text'
 									name='username'
 									id='username'
-									className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+									className='mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
 									defaultValue={user.name}
 								/>
 								<label
@@ -156,7 +164,7 @@ export const columns: ColumnDef<User>[] = [
 									type='text'
 									name='type'
 									id='type'
-									className='mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+									className='mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
 									value={productType} // Usa value para controlar el input
 								/>
 							</div>
@@ -170,6 +178,10 @@ export const columns: ColumnDef<User>[] = [
 							</div>
 						</DialogContent>
 					</Dialog>
+					<div
+						id='dialog-overlay'
+						style={{ pointerEvents: isOpen ? 'none' : 'all' }}
+					/>
 				</>
 			)
 		}
