@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import Image from 'next/image'
 import { Button, TicketButton } from '@/components/ui/button'
 import { DefInput, Input } from '@/components/ui/input'
@@ -45,10 +45,6 @@ import { products } from '@/mocks/products'
 import { Label } from '@/components/ui/label'
 
 export default function POS() {
-	// Estado para manejar la bd
-	const [db, setDb] = useState<RxDatabase | null>(null)
-	const [error, setError] = useState<string | null>(null)
-	const [mounted, setMounted] = useState(false)
 	// Estado para manejar los tickets (incluyendo los pendientes)
 	const [tickets, setTickets] = useState<Ticket[]>([
 		{ id: 1, name: 'Ticket Actual', items: [] }
@@ -277,19 +273,6 @@ export default function POS() {
 	}, [isDarkMode])
 
 	useEffect(() => {
-		setMounted(true)
-		async function initDatabase() {
-			try {
-				const database = await setupDatabase() // Invoca la función de setup
-				setDb(database) // Almacena la referencia de la base de datos en el estado
-			} catch (err) {
-				console.error('Error setting up the database:', err)
-				setError('Failed to setup database')
-			}
-		}
-
-		initDatabase() // Llama a la función de inicialización
-
 		if (otherFocus) {
 			return
 		}
@@ -313,8 +296,6 @@ export default function POS() {
 			document.removeEventListener('keypress', handleKeyPress)
 		}
 	}, [isDarkMode, handleProductAdded, scannedCode, inputFocus, otherFocus])
-
-	if (!mounted) return null // Para evitar que el componente se renderice antes de que el tema se monte
 
 	return (
 		<div className='relative transition-all'>
@@ -487,7 +468,7 @@ export default function POS() {
 							/>
 						</div>
 						<h3 className='mt-1 font-semibold'>Productos</h3>
-						<ScrollArea className='scrollbar-modifier flex-grow'>
+						<ScrollArea className='scrollbar-modifier flex-grow pr-3'>
 							{filteredProducts.map((product) => (
 								<Button
 									key={product.id}
