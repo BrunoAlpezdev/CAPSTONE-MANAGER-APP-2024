@@ -1,7 +1,7 @@
 import { addRxPlugin, createRxDatabase } from 'rxdb'
 import { getRxStorageDexie } from 'rxdb/plugins/storage-dexie'
 import { replicateFirestore } from 'rxdb/plugins/replication-firestore'
-import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode'
+import { disableWarnings, RxDBDevModePlugin } from 'rxdb/plugins/dev-mode'
 import { firestore } from '@/firebase' // archivo de configuración de Firebase
 import {
 	collection,
@@ -11,11 +11,28 @@ import {
 	updateDoc
 } from 'firebase/firestore'
 
-if (process.env.NODE_ENV === 'development') {
-	addRxPlugin(RxDBDevModePlugin)
-}
+disableWarnings()
+
 // Inicializa RxDB
 async function setupDatabase() {
+	if (process.env.NODE_ENV === 'development') {
+		await import('rxdb/plugins/dev-mode').then((module) =>
+			addRxPlugin(module.RxDBDevModePlugin)
+		)
+	}
+
+	/* // Realizar el setup de la base de datos solo si es un rango horario especifico
+	const date = new Date()
+	const hour = date.getHours()
+	if (hour < 10 || hour > 12) {
+		console.log('No se puede replicar la base de datos en este horario')
+		return
+	} else if (hour < 18 || hour > 22) {
+		console.log('No se puede replicar la base de datos en este horario')
+		return
+	} */
+
+	// Crea una nueva base de datos con el nombre 'replicateddb'
 	const db = await createRxDatabase({
 		name: 'replicateddb',
 		storage: getRxStorageDexie(),
@@ -31,13 +48,13 @@ async function setupDatabase() {
 				primaryKey: 'id', // Asegúrate que este campo está bien definido y corresponde al Firestore
 				type: 'object',
 				properties: {
-					id: { type: 'string', maxLength: 22 }, // Debe estar presente y no ser falsy
-					nombreNegocio: { type: 'string' },
-					correo: { type: 'string' },
+					id: { type: 'string', maxLength: 22 },
+					_deleted: { type: 'boolean', default: false },
 					authToken: { type: 'string' },
+					correo: { type: 'string' },
+					nombreNegocio: { type: 'string' },
 					plan: { type: 'string' },
-					telefono: { type: 'string' },
-					_deleted: { type: 'boolean' }
+					telefono: { type: 'number' }
 				}
 			}
 		}
@@ -59,20 +76,43 @@ async function setupDatabase() {
 		replicationIdentifier: 'negocios-replication', // Identificador de la replicación
 		deletedField: '_deleted', // Campo para marcar elementos como eliminados
 		pull: {
-			batchSize: 10 // Número de documentos a obtener por lote desde Firestore
+			batchSize: 2 // Número de documentos a obtener por lote desde Firestore
 		},
 		push: {
-			batchSize: 10 // Número de documentos a enviar por lote hacia Firestore
-		}
+			batchSize: 2 // Número de documentos a enviar por lote hacia Firestore
+		},
+		serverTimestampField: 'serverTimestamp'
 	})
 
-	const allDocs = await getDocs(query(collection(firestore, 'negocios')))
-	allDocs.forEach((doc) => {
+	// Función para obtener los documentos de la colección 'negocios'
+	setTimeout(async () => {
+		try {
+			const negocios = await db.negocios.find().exec()
+			console.log(
+				'Datos almacenados en RxDB:',
+				negocios.map((n) => n.toJSON())
+			)
+		} catch (error) {
+			console.error('Error al consultar RxDB:', error)
+		}
+	}, 1000) // Ajusta el tiempo si es necesario
+
+	const verificarDatosEnFirestore = async () => {
+		const querySnapshot = await getDocs(collection(firestore, 'negocios'))
+		querySnapshot.forEach((doc) => {
+			console.log(doc.id, ' => ', doc.data())
+		})
+	}
+
+	verificarDatosEnFirestore()
+
+	/* 	const allDocsResult = await getDocs(query(collection(firestore, 'negocios')))
+	allDocsResult.forEach((doc) => {
 		updateDoc(doc.ref, {
 			_deleted: false,
 			serverTimestamp: serverTimestamp()
 		})
-	})
+	}) */
 
 	return db
 }
