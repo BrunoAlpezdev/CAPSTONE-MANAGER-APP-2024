@@ -9,6 +9,41 @@ import {
 } from '@/components/ui/card'
 import { BarChart3, Users, Package, FileText } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { LandingCard } from '@/components/Landing/landing-card'
+
+const features = [
+	{
+		icon: <BarChart3 className='h-12 w-12 mb-2 text-primary' />,
+		title: 'POS Avanzado',
+		description:
+			'Sistema de punto de venta intuitivo y rápido para agilizar tus transacciones.',
+		image:
+			'https://d13kjxnqnhcmn2.cloudfront.net/AcuCustom/Sitename/DAM/056/Bespoke_reports_-_Main.png'
+	},
+	{
+		icon: <BarChart3 className='h-12 w-12 mb-4 text-primary' />,
+		title: 'Reportes Detallados',
+		description:
+			'Obtén insights valiosos con nuestros informes personalizables y en tiempo real.',
+		image:
+			'https://d13kjxnqnhcmn2.cloudfront.net/AcuCustom/Sitename/DAM/056/Bespoke_reports_-_Main.png'
+	},
+	{
+		icon: <Users className='h-12 w-12 mb-4 text-primary' />,
+		title: 'Gestión de Usuarios',
+		description: 'Administra fácilmente los roles y permisos de tu equipo.',
+		image:
+			'https://d13kjxnqnhcmn2.cloudfront.net/AcuCustom/Sitename/DAM/056/Bespoke_reports_-_Main.png'
+	},
+	{
+		icon: <Package className='h-12 w-12 mb-4 text-primary' />,
+		title: 'Control de Inventario',
+		description:
+			'Mantén un seguimiento preciso de tu stock y optimiza tus pedidos.',
+		image:
+			'https://d13kjxnqnhcmn2.cloudfront.net/AcuCustom/Sitename/DAM/056/Bespoke_reports_-_Main.png'
+	}
+]
 
 export default function Home() {
 	const router = useRouter()
@@ -48,26 +83,15 @@ export default function Home() {
 				</Button>
 
 				<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-24'>
-					<FeatureCard
-						icon={<BarChart3 className='h-12 w-12 mb-4 text-primary' />}
-						title='POS Avanzado'
-						description='Sistema de punto de venta intuitivo y rápido para agilizar tus transacciones.'
-					/>
-					<FeatureCard
-						icon={<FileText className='h-12 w-12 mb-4 text-primary' />}
-						title='Reportes Detallados'
-						description='Obtén insights valiosos con nuestros informes personalizables y en tiempo real.'
-					/>
-					<FeatureCard
-						icon={<Users className='h-12 w-12 mb-4 text-primary' />}
-						title='Gestión de Usuarios'
-						description='Administra fácilmente los roles y permisos de tu equipo.'
-					/>
-					<FeatureCard
-						icon={<Package className='h-12 w-12 mb-4 text-primary' />}
-						title='Control de Inventario'
-						description='Mantén un seguimiento preciso de tu stock y optimiza tus pedidos.'
-					/>
+					{features.map((feature, index) => (
+						<LandingCard
+							key={index}
+							icon={feature.icon}
+							image={feature.image}
+							title={feature.title}
+							description={feature.description}
+						/>
+					))}
 				</div>
 			</main>
 
