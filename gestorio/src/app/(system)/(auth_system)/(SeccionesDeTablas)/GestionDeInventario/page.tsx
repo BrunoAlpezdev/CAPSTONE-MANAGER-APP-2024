@@ -1,7 +1,7 @@
 'use client'
 
 import { Footer, FullLogo, ToggleMenu } from '@/components'
-import { User, columns } from './columns'
+import { columns } from './columns'
 import { DataTable } from '@/components/inventario-table'
 import { useMenu } from '@/hooks'
 import { useState, useEffect } from 'react'
@@ -9,10 +9,11 @@ import { Toaster } from 'react-hot-toast'
 import { SystemHeader } from '@/components/systemHeader.component'
 import { MenuIcon, Moon, Sun } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
+import { Producto } from '@/types'
 
-async function getUsers(): Promise<User[]> {
+async function getProducts(): Promise<Producto[]> {
 	const res = await fetch(
-		'https://64a6f5fc096b3f0fcc80e3fa.mockapi.io/api/users'
+		'https://6725676cc39fedae05b4ac87.mockapi.io/api/Productos'
 	)
 	const data = await res.json()
 
@@ -25,24 +26,24 @@ async function getUsers(): Promise<User[]> {
 }
 
 export default function GestionDeUsuarios() {
-	const [data, setData] = useState<User[]>([])
+	const [data, setData] = useState<Producto[]>([])
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 
 	const { isMenuOpen, toggleMenu } = useMenu()
 
 	useEffect(() => {
-		const loadUsers = async () => {
+		const loadProductos = async () => {
 			try {
-				const users = await getUsers()
-				setData(users)
+				const productos = await getProducts()
+				setData(productos)
 			} catch (error: any) {
 				setError(error.message)
 			} finally {
 				setLoading(false)
 			}
 		}
-		loadUsers()
+		loadProductos()
 	}, [])
 	const [isDarkMode, setIsDarkMode] = useState(() => {
 		return (

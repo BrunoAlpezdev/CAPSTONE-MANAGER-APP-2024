@@ -69,13 +69,15 @@ export function DataTable<TData, TValue>({
 	return (
 		<>
 			{/*Table*/}
-			<div className=' flex items-center justify- mr-5'>
-				<div className='flex items-center py-4 ml-3'>
+			<div className='justify- mr-5 flex items-center'>
+				<div className='ml-3 flex items-center py-4'>
 					<Input
 						placeholder='Filtrar Nombre'
-						value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
+						value={
+							(table.getColumn('nombre')?.getFilterValue() as string) ?? ''
+						}
 						onChange={(event) =>
-							table.getColumn('name')?.setFilterValue(event.target.value)
+							table.getColumn('nombre')?.setFilterValue(event.target.value)
 						}
 						className='max-w-sm'
 					/>
@@ -158,7 +160,7 @@ export function DataTable<TData, TValue>({
 				</Table>
 			</div>{' '}
 			{/*Pagination*/}
-			<div className='flex items-center justify-end space-x-2 py-4 mr-5'>
+			<div className='mr-5 flex items-center justify-end space-x-2 py-4'>
 				<Button
 					variant='outline'
 					size='sm'

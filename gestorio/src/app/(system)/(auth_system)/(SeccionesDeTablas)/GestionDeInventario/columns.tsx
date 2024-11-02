@@ -6,6 +6,7 @@ import { MoreHorizontal, ArrowUpDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useState, useEffect } from 'react'
+import { Producto } from '@/types'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -22,17 +23,11 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from '@/components/ui/dialog'
+import Image from 'next/image'
 
 // This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-export type User = {
-	id: string
-	name: string
-	product: 'pending' | 'processing' | 'success' | 'failed'
-	email: string
-}
 
-export const columns: ColumnDef<User>[] = [
+export const columns: ColumnDef<Producto>[] = [
 	{
 		id: 'select',
 		header: ({ table }) => (
@@ -54,49 +49,85 @@ export const columns: ColumnDef<User>[] = [
 		)
 	},
 	{
-		accessorKey: 'Name',
+		accessorKey: 'imagen',
+		header: 'Imagen',
+		cell: ({ row }) => {
+			const product = row.original
+			return (
+				<div className='font-medium text-foreground'>
+					{product.imagen ? (
+						<Image
+							src={product.imagen}
+							alt='Imagen Producto'
+							height={40}
+							width={40}
+							className='aspect-square object-contain'
+						/>
+					) : (
+						<Image
+							src='https://loremflickr.com/cache/resized/defaultImage.small_640_480_nofilter.jpg'
+							alt='Imagen Producto'
+							height={4}
+							width={4}
+							className='aspect-square object-contain'
+						/>
+					)}
+				</div>
+			)
+		}
+	},
+	{
+		accessorKey: 'nombre',
 		header: ({ column }) => {
 			return (
 				<Button
 					variant='ghost'
 					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-					className='text-black'>
+					className='text-foreground'>
 					Nombre
-					<ArrowUpDown className='ml-2 h-4 w-4 text-black' />
+					<ArrowUpDown className='ml-2 h-4 w-4 text-foreground' />
 				</Button>
 			)
 		},
-		cell: ({ row }) => <div className='text-black'>{row.getValue('name')}</div>
-	},
-	{
-		accessorKey: 'Tipo',
-		header: 'Tipo',
-		cell: ({ row }) => <div className='text-black'>{row.getValue('Tipo')}</div>
-	},
-	{
-		accessorKey: 'Stock',
-		header: 'Stock',
-		cell: ({ row }) => <div className='text-black'>{row.getValue('Stock')}</div>
-	},
-	{
-		accessorKey: 'Nose',
-		header: 'Nose',
 		cell: ({ row }) => {
-			const date = new Date(row.getValue('lastSeen'))
-			const formatted = date.toLocaleDateString()
-			return <div className='font-medium text-black'>{formatted}</div>
+			const product = row.original
+			return <div className='text-foreground'>{product.nombre}</div>
+		}
+	},
+	{
+		accessorKey: 'variante',
+		header: 'Variante',
+		cell: ({ row }) => {
+			const product = row.original
+			return <div className='text-foreground'>{product.variante}</div>
+		}
+	},
+	{
+		accessorKey: 'precio',
+		header: 'Precio',
+		cell: ({ row }) => {
+			const product = row.original
+			return <div className='text-foreground'>{product.precio}</div>
+		}
+	},
+	{
+		accessorKey: 'stock',
+		header: 'Stock',
+		cell: ({ row }) => {
+			const product = row.original
+			return <div className='text-foreground'>{product.stock}</div>
 		}
 	},
 	{
 		id: 'actions',
 		cell: ({ row }) => {
-			const user = row.original
+			const product = row.original
 			const [isOpen, setIsOpen] = useState(false)
-			const [productType, setProductType] = useState(user.product)
+			const [productType, setProductType] = useState(product.variante)
 
 			const handleCopyToClipboard = async () => {
 				try {
-					await navigator.clipboard.writeText(user.id)
+					await navigator.clipboard.writeText(product.id)
 					console.log('Copiado al portapapeles')
 				} catch (error) {
 					console.error('Error al copiar:', error)
@@ -121,7 +152,7 @@ export const columns: ColumnDef<User>[] = [
 						<DropdownMenuTrigger asChild>
 							<Button variant='ghost' className='h-8 w-8 p-0'>
 								<span className='sr-only'>Open menu</span>
-								<MoreHorizontal className='h-4 w-4 text-black' />
+								<MoreHorizontal className='h-4 w-4 text-foreground' />
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align='end'>
@@ -135,7 +166,7 @@ export const columns: ColumnDef<User>[] = [
 					<Dialog open={isOpen} onOpenChange={setIsOpen}>
 						<DialogContent>
 							<DialogHeader>
-								<DialogTitle className='text-black'>
+								<DialogTitle className='text-foreground'>
 									Modificar campos
 								</DialogTitle>
 								<DialogDescription>
@@ -145,7 +176,7 @@ export const columns: ColumnDef<User>[] = [
 							<div>
 								<label
 									htmlFor='username'
-									className='block text-sm font-medium text-gray-700'>
+									className='block text-sm font-medium text-foreground'>
 									Nombre
 								</label>
 								<input
@@ -153,11 +184,11 @@ export const columns: ColumnDef<User>[] = [
 									name='username'
 									id='username'
 									className='mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
-									defaultValue={user.name}
+									defaultValue={product.nombre}
 								/>
 								<label
 									htmlFor='type'
-									className='block text-sm font-medium text-gray-700'>
+									className='block text-sm font-medium text-foreground'>
 									Tipo
 								</label>
 								<input
