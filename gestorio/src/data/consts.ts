@@ -10,10 +10,10 @@ import {
 const MENUPAGES = [
 	{ title: 'Dashboard', icon: Home, href: '/home' },
 	{ title: 'Ventas', icon: CreditCard, href: '/pos' },
-	{ title: 'Inventario', icon: Package, href: '/Inventario' },
-	{ title: 'Proveedores', icon: Truck, href: '/GestionDeProveedores' },
-	{ title: 'Usuarios', icon: UserRound, href: '/GestionDeUsuarios' },
-	{ title: 'Reportes', icon: BarChart, href: '/Reportes' }
+	{ title: 'Inventario', icon: Package, href: '/inventario' },
+	{ title: 'Proveedores', icon: Truck, href: '/proveedores' },
+	{ title: 'Usuarios', icon: UserRound, href: '/usuarios' },
+	{ title: 'Reportes', icon: BarChart, href: '/reportes' }
 ]
 
 export { MENUPAGES }
