@@ -6,7 +6,7 @@ import { MoreHorizontal, ArrowUpDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useState, useEffect } from 'react'
-import { Producto } from '@/types'
+import { Usuario } from '@/types'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -23,11 +23,10 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from '@/components/ui/dialog'
-import Image from 'next/image'
 
 // This type is used to define the shape of our data.
 
-export const columns: ColumnDef<Producto>[] = [
+export const columns: ColumnDef<Usuario>[] = [
 	{
 		id: 'select',
 		header: ({ table }) => (
@@ -49,34 +48,6 @@ export const columns: ColumnDef<Producto>[] = [
 		)
 	},
 	{
-		accessorKey: 'imagen',
-		header: 'Imagen',
-		cell: ({ row }) => {
-			const product = row.original
-			return (
-				<div className='font-medium text-foreground'>
-					{product.imagen ? (
-						<Image
-							src={product.imagen}
-							alt='Imagen Producto'
-							height={40}
-							width={40}
-							className='aspect-square object-contain'
-						/>
-					) : (
-						<Image
-							src='https://loremflickr.com/cache/resized/defaultImage.small_640_480_nofilter.jpg'
-							alt='Imagen Producto'
-							height={4}
-							width={4}
-							className='aspect-square object-contain'
-						/>
-					)}
-				</div>
-			)
-		}
-	},
-	{
 		accessorKey: 'nombre',
 		header: ({ column }) => {
 			return (
@@ -90,44 +61,36 @@ export const columns: ColumnDef<Producto>[] = [
 			)
 		},
 		cell: ({ row }) => {
-			const product = row.original
-			return <div className='text-foreground'>{product.nombre}</div>
+			const user = row.original
+			return <div className='text-foreground'>{user.nombre}</div>
 		}
 	},
 	{
-		accessorKey: 'variante',
-		header: 'Variante',
+		accessorKey: 'email',
+		header: 'Email',
 		cell: ({ row }) => {
-			const product = row.original
-			return <div className='text-foreground'>{product.variante}</div>
+			const user = row.original
+			return <div className='text-foreground'>{user.email}</div>
 		}
 	},
 	{
-		accessorKey: 'precio',
-		header: 'Precio',
+		accessorKey: 'rol',
+		header: 'Rol',
 		cell: ({ row }) => {
-			const product = row.original
-			return <div className='text-foreground'>{product.precio}</div>
-		}
-	},
-	{
-		accessorKey: 'stock',
-		header: 'Stock',
-		cell: ({ row }) => {
-			const product = row.original
-			return <div className='text-foreground'>{product.stock}</div>
+			const user = row.original
+			return <div className='text-foreground'>{user.rol}</div>
 		}
 	},
 	{
 		id: 'actions',
 		cell: ({ row }) => {
-			const product = row.original
+			const user = row.original
 			const [isOpen, setIsOpen] = useState(false)
-			const [productType, setProductType] = useState(product.variante)
+			const [userType, setUserType] = useState(user.rol)
 
 			const handleCopyToClipboard = async () => {
 				try {
-					await navigator.clipboard.writeText(product.id)
+					await navigator.clipboard.writeText(user.id)
 					console.log('Copiado al portapapeles')
 				} catch (error) {
 					console.error('Error al copiar:', error)
@@ -184,7 +147,7 @@ export const columns: ColumnDef<Producto>[] = [
 									name='username'
 									id='username'
 									className='mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
-									defaultValue={product.nombre}
+									defaultValue={user.nombre}
 								/>
 								<label
 									htmlFor='type'
@@ -196,7 +159,7 @@ export const columns: ColumnDef<Producto>[] = [
 									name='type'
 									id='type'
 									className='mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
-									value={productType} // Usa value para controlar el input
+									value={userType} // Usa value para controlar el input
 								/>
 							</div>
 							<div className='mt-4 flex justify-end'>

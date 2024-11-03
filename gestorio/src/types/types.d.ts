@@ -38,12 +38,11 @@ interface Proveedor {
 }
 
 interface Usuario {
-	id: number
+	id: string
 	nombre: string
 	email: string
 	rol: string
-	tienda_id: number
-	auth_user_id?: string // UUID, opcional si puede ser nulo
+	negocio_id: number
 }
 
 interface Cliente {

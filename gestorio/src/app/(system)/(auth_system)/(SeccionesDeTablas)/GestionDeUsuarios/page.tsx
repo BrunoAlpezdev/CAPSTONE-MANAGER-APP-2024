@@ -9,41 +9,39 @@ import { Toaster } from 'react-hot-toast'
 import { SystemHeader } from '@/components/systemHeader.component'
 import { MenuIcon, Moon, Sun } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
-import { Producto } from '@/types'
+import { Usuario } from '@/types'
+import { collection, getDocs } from 'firebase/firestore'
+import { firestore } from '@/firebase/firebaseConfig'
 
-async function getProducts(): Promise<Producto[]> {
-	const res = await fetch(
-		'https://6725676cc39fedae05b4ac87.mockapi.io/api/Productos'
-	)
-	const data = await res.json()
-
-	// Validación de datos
-	if (!Array.isArray(data)) {
-		throw new Error('Los datos no son un array')
-	}
-
+async function getUsers() {
+	const usuariosCol = collection(firestore, 'usuarios')
+	const snapshot = await getDocs(usuariosCol)
+	const data = snapshot.docs.map((doc) => ({
+		id: doc.id,
+		...doc.data()
+	})) as Usuario[]
 	return data
 }
 
 export default function GestionDeUsuarios() {
-	const [data, setData] = useState<Producto[]>([])
+	const [data, setData] = useState<Usuario[]>([])
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 
 	const { isMenuOpen, toggleMenu } = useMenu()
 
 	useEffect(() => {
-		const loadProductos = async () => {
+		const loadUsuarios = async () => {
 			try {
-				const productos = await getProducts()
-				setData(productos)
+				const usuarios = await getUsers()
+				setData(usuarios)
 			} catch (error: any) {
 				setError(error.message)
 			} finally {
 				setLoading(false)
 			}
 		}
-		loadProductos()
+		loadUsuarios()
 	}, [])
 	const [isDarkMode, setIsDarkMode] = useState(() => {
 		return (
@@ -83,7 +81,7 @@ export default function GestionDeUsuarios() {
 			<main className='tables-fondo m-3 flex h-screen w-[calc(100dvw-40px)]'>
 				<div className='w-full rounded-md border border-primary/60 bg-white/5 p-2 text-foreground backdrop-blur-sm'>
 					<h1 className='text-center text-3xl font-bold'>
-						Gestión De Proveedores
+						Gestión De Usuarios
 					</h1>
 					<DataTable columns={columns} data={data} />
 				</div>
