@@ -141,15 +141,15 @@
 }
 
 .scrollbar-modifier::-webkit-scrollbar-thumb {
-	background-color: hsl(214.3 31.8% 91.4%); /* Color del "pulgar" (thumb) */
-	border-radius: 10px; /* Redondear las esquinas */
-	border: 1px solid hsl(222 47% 11%); /* Espacio alrededor del thumb */
-}
-
-.dark .scrollbar-modifier::-webkit-scrollbar-thumb {
 	background-color: hsl(217.2 32.6% 17.5%); /* Color del "pulgar" (thumb) */
 	border-radius: 10px; /* Redondear las esquinas */
 	border: 1px solid hsl(210 40% 98%); /* Espacio alrededor del thumb */
+}
+
+.dark .scrollbar-modifier::-webkit-scrollbar-thumb {
+	background-color: hsl(214.3 31.8% 91.4%); /* Color del "pulgar" (thumb) */
+	border-radius: 10px; /* Redondear las esquinas */
+	border: 1px solid hsl(217.2 32.6% 17.5%); /* Espacio alrededor del thumb */
 }
 
 .dark .scrollbar-modifier::-webkit-scrollbar-thumb:hover {

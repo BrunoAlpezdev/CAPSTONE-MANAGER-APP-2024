@@ -1,17 +1,16 @@
 'use client'
 
-import { Footer, FullLogo, ToggleMenu } from '@/components'
+import { Footer, ToggleMenu } from '@/components'
 import { columns } from './columns'
 import { DataTable } from '@/components/inventario-table'
 import { useMenu } from '@/hooks'
 import { useState, useEffect } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { SystemHeader } from '@/components/systemHeader.component'
-import { MenuIcon, Moon, Sun } from 'lucide-react'
-import { Switch } from '@/components/ui/switch'
 import { Usuario } from '@/types'
 import { collection, getDocs } from 'firebase/firestore'
 import { firestore } from '@/firebase/firebaseConfig'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 async function getUsers() {
 	const usuariosCol = collection(firestore, 'usuarios')
@@ -57,7 +56,7 @@ export default function GestionDeUsuarios() {
 		}
 	}, [isDarkMode])
 
-	if (loading) return <p className='text-white'>Cargando usuarios...</p>
+	if (loading) return <p className='text-foreground'>Cargando usuarios...</p>
 	if (error) return <p className='text-red-500'>Error: {error}</p>
 
 	return (
@@ -78,13 +77,13 @@ export default function GestionDeUsuarios() {
 
 			{/* Main POS */}
 
-			<main className='tables-fondo m-3 flex h-screen w-[calc(100dvw-40px)]'>
-				<div className='w-full rounded-md border border-primary/60 bg-white/5 p-2 text-foreground backdrop-blur-sm'>
+			<main className='tables-fondo m-3 flex h-[calc(100dvh-108px)] w-[calc(100dvw-40px)]'>
+				<ScrollArea className='scrollbar-modifier flex h-full w-full rounded-md border border-primary/60 bg-white/5 p-2 text-foreground backdrop-blur-sm'>
 					<h1 className='text-center text-3xl font-bold'>
 						Gestión De Usuarios
 					</h1>
 					<DataTable columns={columns} data={data} />
-				</div>
+				</ScrollArea>
 			</main>
 
 			<Footer />
