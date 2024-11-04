@@ -215,14 +215,16 @@ export default function POS() {
 			])
 			// Crea un nuevo ticket vacío y lo establece como el actual
 			const newTicketId = Date.now() + 1
-			setTickets((prevTickets) => [
-				...prevTickets,
-				{ id: newTicketId, name: 'Nuevo Ticket', items: [] }
-			])
+			setTickets((prevTickets) => [...prevTickets])
+			// Limpiar el Ticket actual (default)
+			tickets[0].items = []
 			setCurrentTicketId(newTicketId)
 			setPendingTicketName('')
 			setIsDialogOpen(false)
 			toast.success('Ticket guardado como pendiente')
+			switchToTicket(1)
+		} else {
+			toast.error('No se puede guardar un ticket vacío o sin nombre')
 		}
 	}
 
@@ -231,13 +233,30 @@ export default function POS() {
 		setCurrentTicketId(ticketId)
 	}
 
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+
 	// Función para cancelar el ticket actual
 	const cancelCurrentTicket = () => {
-		setTickets((prevTickets) =>
-			prevTickets.map((ticket) =>
-				ticket.id === currentTicketId ? { ...ticket, items: [] } : ticket
+		if (currentTicketId === 1) {
+			setTickets((prevTickets) =>
+				prevTickets.map((ticket) =>
+					ticket.id === 1 ? { ...ticket, items: [] } : ticket
+				)
 			)
-		)
+		} else {
+			setTickets((prevTickets) =>
+				prevTickets.filter((ticket) => ticket.id !== currentTicketId)
+			)
+			if (tickets.length === 1) {
+				setTickets([{ id: Date.now(), name: 'Nuevo Ticket', items: [] }])
+				setCurrentTicketId(Date.now())
+			} else {
+				setCurrentTicketId(
+					tickets.find((ticket) => ticket.id !== currentTicketId)?.id ||
+						tickets[0].id
+				)
+			}
+		}
 		toast.success('Ticket actual cancelado')
 	}
 
@@ -496,7 +515,7 @@ export default function POS() {
 						{/* Payment section */}
 						<Card className='col-span-2'>
 							<CardHeader className='bg-primary text-foreground'>
-								<CardTitle>Pago</CardTitle>
+								<CardTitle className='text-foreground'>Pago</CardTitle>
 							</CardHeader>
 							<CardContent>
 								<div className='flex justify-between p-1'>
@@ -657,13 +676,33 @@ export default function POS() {
 							<CreditCard className='h-4 w-4' />
 							Imprimir Ticket
 						</Button> */}
-						<Button
-							variant='destructive'
-							className='w-fit gap-2'
-							onClick={cancelCurrentTicket}>
-							<Ban className='h-4 w-4' />
-							Cancelar Ticket
-						</Button>
+
+						<Dialog
+							open={isDeleteDialogOpen}
+							onOpenChange={setIsDeleteDialogOpen}>
+							<DialogTrigger asChild>
+								<Button
+									variant='destructive'
+									className='w-fit gap-2'
+									onClick={() => setIsDeleteDialogOpen(true)}>
+									<Ban className='h-4 w-4' />
+									Cancelar Ticket
+								</Button>
+							</DialogTrigger>
+							<DialogContent>
+								<DialogHeader>
+									<DialogTitle>¿Desea Cancelar el Ticket Actual?</DialogTitle>
+								</DialogHeader>
+								<Button variant='destructive' onClick={cancelCurrentTicket}>
+									Cancelar Ticket Actual
+								</Button>
+								<Button
+									variant='secondary'
+									onClick={() => setIsDeleteDialogOpen(false)}>
+									Volver
+								</Button>
+							</DialogContent>
+						</Dialog>
 
 						<RadioGroup defaultValue='boleta'>
 							<div className='flex items-center space-x-2'>
