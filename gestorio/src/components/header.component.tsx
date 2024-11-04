@@ -50,7 +50,7 @@ export function Header() {
 								height={30}
 								className='pointer-events-none aspect-square cursor-pointer rounded-full'
 							/>
-							<p className='select-none'>Negocio</p>
+							<p className='select-none text-foreground'>Negocio</p>
 						</button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent className='w-fit'>

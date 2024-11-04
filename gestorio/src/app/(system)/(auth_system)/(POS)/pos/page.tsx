@@ -76,6 +76,7 @@ export default function POS() {
 	const [inputFocus, setInputFocus] = useState(false)
 	const [otherFocus, setOtherFocus] = useState(false)
 	const [paymentMethod, setPaymentMethod] = useState('cash')
+	const [confirmFocus, setConfirmFocus] = useState(false)
 
 	const handleProductAdded = (barcode: string) => {
 		addToCartByBarcode(barcode)
@@ -257,6 +258,7 @@ export default function POS() {
 				)
 			}
 		}
+		setIsDeleteDialogOpen(false)
 		toast.success('Ticket actual cancelado')
 	}
 
@@ -292,11 +294,12 @@ export default function POS() {
 	}, [isDarkMode])
 
 	useEffect(() => {
-		if (otherFocus) {
-			return
-		}
 		const handleKeyPress = (e: KeyboardEvent) => {
+			if (otherFocus) {
+				return
+			}
 			if (e.key === 'Enter') {
+				if (scannedCode === '') return
 				handleProductAdded(scannedCode) // Procesar el código de barras cuando se presione Enter
 				toast('Producto Escaneado', { icon: '🛒' }) // Mostrar un toast de confirmación
 				setScannedCode('') // Limpiar el valor del código de barras
@@ -315,6 +318,96 @@ export default function POS() {
 			document.removeEventListener('keypress', handleKeyPress)
 		}
 	}, [handleProductAdded, scannedCode, inputFocus, otherFocus])
+
+	useEffect(() => {
+		const handleKeyPress = (e: KeyboardEvent) => {
+			if (confirmFocus) {
+				if (e.key === 'Enter') {
+					// hacer click programaticamente a confirm-button nextjs "Button"
+					const confirmButton = document.getElementById('confirm-button')
+					if (confirmButton) {
+						confirmButton.click()
+					}
+				}
+			}
+		}
+		document.addEventListener('keypress', handleKeyPress)
+
+		return () => {
+			document.removeEventListener('keypress', handleKeyPress)
+		}
+	}, [confirmFocus])
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				const activeElement = document.activeElement as HTMLElement
+				if (activeElement) {
+					activeElement.blur()
+				}
+			}
+			if (e.key === 'F1') {
+				const scannerInput = document.getElementById(
+					'scanner'
+				) as HTMLInputElement
+				if (scannerInput) {
+					scannerInput.focus()
+				}
+				e.preventDefault()
+				return
+			}
+			if (e.key === 'F2') {
+				const searchProductsInput = document.getElementById(
+					'search-products'
+				) as HTMLInputElement
+				if (searchProductsInput) {
+					searchProductsInput.focus()
+				}
+				e.preventDefault()
+				return
+			}
+			if (e.key === 'F3') {
+				e.preventDefault()
+				setPaymentMethod('cash')
+				const cashAmountInput = document.getElementById(
+					'cash-amount'
+				) as HTMLInputElement
+				if (cashAmountInput) {
+					cashAmountInput.focus()
+				}
+				return
+			}
+
+			if (e.key === 'F5') {
+				e.preventDefault()
+				setPaymentMethod('debit')
+				const debitVoucherInput = document.getElementById(
+					'debit-voucher'
+				) as HTMLInputElement
+				if (debitVoucherInput) {
+					debitVoucherInput.focus()
+				}
+				return
+			}
+			if (e.key === 'F6') {
+				e.preventDefault()
+				setPaymentMethod('credit')
+				const creditVoucherInput = document.getElementById(
+					'credit-voucher'
+				) as HTMLInputElement
+				if (creditVoucherInput) {
+					creditVoucherInput.focus()
+				}
+				return
+			}
+		}
+
+		window.addEventListener('keydown', handleKeyDown)
+
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [])
 
 	return (
 		<div className='relative transition-all'>
@@ -457,7 +550,7 @@ export default function POS() {
 								<label
 									htmlFor='scanner'
 									className='mb-1 block text-sm font-medium'>
-									Escáner
+									Escáner (F1)
 								</label>
 								<Input
 									id='scanner'
@@ -474,7 +567,7 @@ export default function POS() {
 							<label
 								htmlFor='search-products'
 								className='mb-1 block text-sm font-medium'>
-								Buscar Productos
+								Buscar Productos (F2)
 							</label>
 							<Input
 								id='search-products'
@@ -524,11 +617,11 @@ export default function POS() {
 										${calculateTotal().toLocaleString('es-CL')}
 									</span>
 								</div>
-								<Tabs defaultValue='cash'>
+								<Tabs value={paymentMethod} onValueChange={setPaymentMethod}>
 									<TabsList className='grid w-full grid-cols-3'>
-										<TabsTrigger value='cash'>Efectivo</TabsTrigger>
-										<TabsTrigger value='debit'>Débito</TabsTrigger>
-										<TabsTrigger value='credit'>Crédito</TabsTrigger>
+										<TabsTrigger value='cash'>Efectivo (F3)</TabsTrigger>
+										<TabsTrigger value='debit'>Débito (F5)</TabsTrigger>
+										<TabsTrigger value='credit'>Crédito (F6)</TabsTrigger>
 									</TabsList>
 									<TabsContent value='cash'>
 										<div className='space-y-2'>
@@ -547,8 +640,14 @@ export default function POS() {
 												}}
 												placeholder='Ingrese monto en efectivo'
 												className='default-input'
-												onFocus={() => setOtherFocus(true)}
-												onBlur={() => setOtherFocus(false)}
+												onFocus={() => {
+													setOtherFocus(true)
+													setConfirmFocus(true)
+												}}
+												onBlur={() => {
+													setOtherFocus(false)
+													setConfirmFocus(false)
+												}}
 											/>
 										</div>
 										{parseInt(cashAmount) > 0 && (
@@ -577,8 +676,14 @@ export default function POS() {
 												}}
 												placeholder='Ingrese número de comprobante'
 												className='default-input'
-												onFocus={() => setOtherFocus(true)}
-												onBlur={() => setOtherFocus(false)}
+												onFocus={() => {
+													setOtherFocus(true)
+													setConfirmFocus(true)
+												}}
+												onBlur={() => {
+													setOtherFocus(false)
+													setConfirmFocus(false)
+												}}
 											/>
 										</div>
 									</TabsContent>
@@ -598,8 +703,14 @@ export default function POS() {
 												}}
 												placeholder='Ingrese número de comprobante'
 												className='default-input'
-												onFocus={() => setOtherFocus(true)}
-												onBlur={() => setOtherFocus(false)}
+												onFocus={() => {
+													setOtherFocus(true)
+													setConfirmFocus(true)
+												}}
+												onBlur={() => {
+													setOtherFocus(false)
+													setConfirmFocus(false)
+												}}
 											/>
 										</div>
 										<div className='mt-4 space-y-2'>
@@ -626,6 +737,7 @@ export default function POS() {
 									</TabsContent>
 								</Tabs>
 								<Button
+									id='confirm-button'
 									className='mt-4 w-full bg-primary text-primary-foreground hover:bg-primary/90'
 									onClick={confirmOrder}>
 									Confirmar Orden
