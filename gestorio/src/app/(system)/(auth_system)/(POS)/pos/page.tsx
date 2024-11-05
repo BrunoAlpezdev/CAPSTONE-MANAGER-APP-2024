@@ -81,6 +81,8 @@ export default function POS() {
 	const [confirmFocus, setConfirmFocus] = useState(false)
 	// Estado para el tipo de documento (boleta o factura)
 	const [isBoleta, setIsBoleta] = useState(true)
+	//
+	const [quantFocus, setQuantFocus] = useState(false)
 
 	const limpiarFoco = () => {
 		const activeElement = document.activeElement as HTMLElement
@@ -155,10 +157,13 @@ export default function POS() {
 							items: ticket.items
 								.map((item) =>
 									item.id === productId
-										? { ...item, cantidad: Math.max(0, item.cantidad + change) }
+										? {
+												...item,
+												cantidad: Math.min(item.stock, item.cantidad + change)
+											}
 										: item
 								)
-								.filter((item) => item.cantidad > 0)
+								.filter((item) => item.cantidad >= 0)
 						}
 					: ticket
 			)
@@ -194,8 +199,8 @@ export default function POS() {
 			prevTickets.filter((ticket) => ticket.id !== currentTicketId)
 		)
 		if (tickets.length === 1) {
-			setTickets([{ id: Date.now(), name: 'Nuevo Ticket', items: [] }])
-			setCurrentTicketId(Date.now())
+			setTickets([{ id: 1, name: 'Ticket Actual', items: [] }])
+			setCurrentTicketId(1)
 		} else {
 			setCurrentTicketId(
 				tickets.find((ticket) => ticket.id !== currentTicketId)?.id ||
@@ -359,7 +364,7 @@ export default function POS() {
 				return
 			}
 
-			if (!inputFocus && !otherFocus) {
+			if (!inputFocus && !otherFocus && e.key !== '-' && e.key !== '+') {
 				setScannedCode((prevBarcode) => prevBarcode + e.key)
 			}
 		}
@@ -507,6 +512,32 @@ export default function POS() {
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
+			if (
+				(!quantFocus && e.key === 'ArrowUp') ||
+				(!quantFocus && e.key === 'ArrowDown')
+			) {
+				//si el ticket tiene 1 o mas productos hacer focus a `item-quantity-0`
+				if (currentTicket.items.length > 0) {
+					const firstInput = document.getElementById(
+						`item-quantity-0`
+					) as HTMLInputElement
+					if (firstInput) {
+						firstInput.focus()
+					}
+				} else {
+					makeToast('No hay productos en el ticket', '⚠️')
+				}
+			}
+		}
+		window.addEventListener('keydown', handleKeyDown)
+
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [quantFocus])
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.key === 'ArrowRight') {
 				if (currentTicketId < tickets.length) {
 					setCurrentTicketId((prevId) => prevId + 1)
@@ -592,7 +623,7 @@ export default function POS() {
 							Carrito Actual: {currentTicket.name}
 						</h2>
 						<ScrollArea className='scrollbar-modifier h-[calc(100vh-267px)] text-foreground'>
-							{currentTicket.items.map((item) => (
+							{currentTicket.items.map((item, index) => (
 								<div
 									key={item.id}
 									className='mb-2 mr-3 flex items-center rounded-lg bg-primary/25 p-1 shadow-small shadow-foreground backdrop-blur-sm'>
@@ -638,11 +669,54 @@ export default function POS() {
 											<Minus className='h-4 w-4' />
 										</Button>
 										<Input
+											id={`item-quantity-${index}`}
 											className='mx-2'
 											value={item.cantidad}
 											onChange={(e) => {
 												const newQuantity = parseInt(e.target.value) || 0
 												updateQuantity(item.id, newQuantity - item.cantidad)
+											}}
+											max={item.stock}
+											onKeyDown={(e) => {
+												if (e.key === '-') {
+													updateQuantity(item.id, -1)
+												} else if (e.key === '+') {
+													updateQuantity(item.id, 1)
+												}
+												if (e.key === 'ArrowDown') {
+													// IR AL SIGUIENTE ITEM DE ABAJO, SI ES EL ULTIMO, OMITIR
+													e.preventDefault()
+													if (index === currentTicket.items.length - 1) {
+														return
+													}
+													const nextInput = document.getElementById(
+														`item-quantity-${index + 1}`
+													) as HTMLInputElement
+													if (nextInput) {
+														nextInput.focus()
+													}
+												}
+												if (e.key === 'ArrowUp') {
+													// IR AL SIGUIENTE ITEM DE ARRIBA, A SU INPUT basándose en `item-quantity-${index}`, SI ES EL ULTIMO, OMITIR
+													e.preventDefault()
+													if (index === 0) {
+														return
+													}
+													const nextInput = document.getElementById(
+														`item-quantity-${index - 1}`
+													) as HTMLInputElement
+													if (nextInput) {
+														nextInput.focus()
+													}
+												}
+											}}
+											onFocus={() => {
+												setOtherFocus(true)
+												setQuantFocus(true)
+											}}
+											onBlur={() => {
+												setOtherFocus(false)
+												setQuantFocus(false)
 											}}
 										/>
 										<Button
