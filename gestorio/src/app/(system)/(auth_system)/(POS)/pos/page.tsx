@@ -46,7 +46,6 @@ import { Label } from '@/components/ui/label'
 
 export default function POS() {
 	// Estado para manejar los tickets (incluyendo los pendientes)
-	// Estado para manejar los tickets (incluyendo los pendientes)
 	const [tickets, setTickets] = useState<Ticket[]>(() => {
 		// Cargar los tickets desde localStorage al iniciar la aplicación
 		const savedTickets = localStorage.getItem('tickets')
@@ -257,34 +256,44 @@ export default function POS() {
 	// Función para cancelar el ticket actual
 	const cancelCurrentTicket = () => {
 		if (currentTicketId === 1) {
+			// Si el ticket es el 1 y no tiene items
 			if (currentTicket.items.length === 0) {
 				makeToast('No hay items en el ticket actual para cancelar', '✖️')
 				setIsDeleteDialogOpen(false)
 				return
 			}
+			// Limpiar los items del ticket 1
 			setTickets((prevTickets) =>
 				prevTickets.map((ticket) =>
 					ticket.id === 1 ? { ...ticket, items: [] } : ticket
 				)
 			)
 		} else {
-			setTickets((prevTickets) =>
-				prevTickets.filter((ticket) => ticket.id !== currentTicketId)
-			)
-			if (tickets.length === 1) {
-				setTickets([{ id: Date.now(), name: 'Nuevo Ticket', items: [] }])
-				setCurrentTicketId(Date.now())
-			} else {
-				setCurrentTicketId(
-					tickets.find((ticket) => ticket.id !== currentTicketId)?.id ||
-						tickets[0].id
+			// Eliminar el ticket actual si no es el ID 1
+			setTickets((prevTickets) => {
+				// Filtrar y reorganizar IDs después de eliminar
+				const filteredTickets = prevTickets.filter(
+					(ticket) => ticket.id !== currentTicketId
 				)
-			}
+
+				// Reorganizar IDs, manteniendo el ticket 1 y reasignando el resto
+				const reorganizedTickets = filteredTickets.map((ticket, index) => ({
+					...ticket,
+					id: index + 1 // El primer índice empieza en 2, porque el 1 siempre es el 1
+				}))
+
+				return [...reorganizedTickets]
+			})
+
+			// Actualizar el ID del ticket actual
+			setCurrentTicketId(
+				tickets.find((ticket) => ticket.id !== currentTicketId)?.id ||
+					tickets[0].id
+			)
 		}
 		setIsDeleteDialogOpen(false)
 		makeToast('Ticket actual cancelado')
 	}
-
 	// Filtra los productos basados en el término de búsqueda
 	const filteredProducts = products.filter(
 		(product) =>
