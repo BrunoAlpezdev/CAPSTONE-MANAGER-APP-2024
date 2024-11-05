@@ -833,7 +833,7 @@ export default function POS() {
 							</DialogTrigger>
 							<DialogContent>
 								<DialogHeader>
-									<DialogTitle>Guardar Ticket Pendiente</DialogTitle>
+									<DialogTitle>Guardar Ticket Pendiente (Insertar)</DialogTitle>
 								</DialogHeader>
 								<div className='py-4'>
 									<label
@@ -875,7 +875,7 @@ export default function POS() {
 									className='w-fit gap-2'
 									onClick={() => setIsDeleteDialogOpen(true)}>
 									<Ban className='h-4 w-4' />
-									Cancelar Ticket
+									Cancelar Ticket (Suprimir)
 								</Button>
 							</DialogTrigger>
 							<DialogContent>
