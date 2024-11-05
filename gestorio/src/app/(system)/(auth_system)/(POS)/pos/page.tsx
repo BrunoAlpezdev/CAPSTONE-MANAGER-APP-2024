@@ -88,6 +88,7 @@ export default function POS() {
 		const activeElement = document.activeElement as HTMLElement
 		if (activeElement) {
 			activeElement.blur()
+			setOtherFocus(false)
 		}
 	}
 
@@ -517,15 +518,17 @@ export default function POS() {
 				(!quantFocus && e.key === 'ArrowDown')
 			) {
 				//si el ticket tiene 1 o mas productos hacer focus a `item-quantity-0`
-				if (currentTicket.items.length > 0) {
-					const firstInput = document.getElementById(
-						`item-quantity-0`
-					) as HTMLInputElement
-					if (firstInput) {
-						firstInput.focus()
+				try {
+					if (currentTicket.items.length > 0) {
+						const firstInput = document.getElementById(
+							`item-quantity-0`
+						) as HTMLInputElement
+						if (firstInput) {
+							firstInput.focus()
+						}
 					}
-				} else {
-					makeToast('No hay productos en el ticket', '⚠️')
+				} catch (e) {
+					console.log(e)
 				}
 			}
 		}
@@ -534,17 +537,17 @@ export default function POS() {
 		return () => {
 			window.removeEventListener('keydown', handleKeyDown)
 		}
-	}, [quantFocus])
+	}, [quantFocus, currentTicketId, tickets.length])
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.key === 'ArrowRight') {
+			if (e.ctrlKey && e.key === 'ArrowRight') {
 				if (currentTicketId < tickets.length) {
 					setCurrentTicketId((prevId) => prevId + 1)
 				}
 			}
 
-			if (e.key === 'ArrowLeft') {
+			if (e.ctrlKey && e.key === 'ArrowLeft') {
 				if (currentTicketId > 1) {
 					setCurrentTicketId((prevId) => prevId - 1)
 				}
@@ -709,12 +712,31 @@ export default function POS() {
 														nextInput.focus()
 													}
 												}
+												if (e.ctrlKey && e.key === 'ArrowRight') {
+													e.preventDefault()
+													const nextInput = document.getElementById(
+														`item-quantity-0`
+													) as HTMLInputElement
+													if (nextInput) {
+														nextInput.focus()
+													}
+												}
+												if (e.ctrlKey && e.key === 'ArrowLeft') {
+													e.preventDefault()
+													const nextInput = document.getElementById(
+														`item-quantity-0`
+													) as HTMLInputElement
+													if (nextInput) {
+														nextInput.focus()
+													}
+												}
 											}}
 											onFocus={() => {
 												setOtherFocus(true)
 												setQuantFocus(true)
 											}}
 											onBlur={() => {
+												setInputFocus(false)
 												setOtherFocus(false)
 												setQuantFocus(false)
 											}}
