@@ -637,7 +637,14 @@ export default function POS() {
 											onClick={() => updateQuantity(item.id, -1)}>
 											<Minus className='h-4 w-4' />
 										</Button>
-										<span className='mx-2'>{item.cantidad}</span>
+										<Input
+											className='mx-2'
+											value={item.cantidad}
+											onChange={(e) => {
+												const newQuantity = parseInt(e.target.value) || 0
+												updateQuantity(item.id, newQuantity - item.cantidad)
+											}}
+										/>
 										<Button
 											variant='outline'
 											size='icon'
