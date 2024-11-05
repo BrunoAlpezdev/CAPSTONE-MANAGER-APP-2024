@@ -1,10 +1,12 @@
-import { DashboardItem, Menu } from '@/components/index'
+'use client'
+
+import { DashboardItem, Menu } from '@/components'
 
 export default function HomePage() {
 	return (
-		<main className='flex flex-row w-full h-full font-semibold'>
+		<main className='flex h-full w-full flex-row font-semibold'>
 			<Menu />
-			<section className='flex flex-col gap-8 w-full p-6 text-center shadow-inner dark:bg-foreground dark:text-black'>
+			<section className='dashboard-fondo flex w-full flex-col gap-8 p-6 text-center text-foreground shadow-inner'>
 				<header>
 					<h1>Dashboard</h1>
 				</header>

@@ -68,7 +68,7 @@ export function DataTable<TData, TValue>({
 	return (
 		<>
 			{/*Table*/}
-			<div className=' flex items-center justify-between'>
+			<div className=' flex items-center justify- mr-5'>
 				<div className='flex items-center py-4 ml-3'>
 					<Input
 						placeholder='Filtrar Nombre'
@@ -154,7 +154,7 @@ export function DataTable<TData, TValue>({
 				</Table>
 			</div>{' '}
 			{/*Pagination*/}
-			<div className='flex items-center justify-end space-x-2 py-4'>
+			<div className='flex items-center justify-end space-x-2 py-4 mr-5'>
 				<Button
 					variant='outline'
 					size='sm'

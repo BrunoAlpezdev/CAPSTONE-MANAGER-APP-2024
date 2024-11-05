@@ -1,13 +1,6 @@
-import { AuthError, Session, User, WeakPassword } from '@supabase/supabase-js'
-
-interface gestorioUser {
-	data: {
-		user: User
-		session: Session
-		weakPassword?: WeakPassword // Opcional
-	}
-	error: AuthError | null
-}
+/* https://firebase.google.com/docs/reference/js/firestore_.timestamp */
+/* fromDate(date)	static	Creates a new timestamp from the given date. */
+import { Timestamp } from 'firebase/firestore'
 
 interface Tienda {
 	id: number
@@ -16,23 +9,24 @@ interface Tienda {
 	telefono?: string // Opcional si puede ser nulo
 }
 
-interface SaleProduct {
+// Definición de tipos para los productos, items del carrito y tickets
+interface Producto {
 	id: string
-	imgSrc?: string
-	name: string
-	variant: string
-	price: number
+	nombre: string
+	imagen?: string
+	variante?: string // Opcional si puede ser nulo
+	precio: number // Asumiendo que el precio es un número entero en CLP
 	stock: number
-	quantity: number
 }
 
-interface Producto {
-	id: number
-	nombre: string
-	descripcion?: string // Opcional si puede ser nulo
-	precio: number // Asumiendo que el precio es un número entero en CLP
+interface CartItem extends Producto {
 	cantidad: number
-	tienda_id: number
+}
+
+interface Ticket {
+	id: number
+	name: string
+	items: CartItem[]
 }
 
 interface Proveedor {
@@ -44,12 +38,11 @@ interface Proveedor {
 }
 
 interface Usuario {
-	id: number
+	id: string
 	nombre: string
 	email: string
 	rol: string
-	tienda_id: number
-	auth_user_id?: string // UUID, opcional si puede ser nulo
+	negocio_id: number
 }
 
 interface Cliente {
@@ -61,7 +54,7 @@ interface Cliente {
 
 interface Venta {
 	id: number
-	fecha: Date // Timestamp
+	fecha: Timestamp // Timestamp
 	total: number // Asumiendo que el total es un número entero en CLP
 	tienda_id: number
 	cliente_id: number
@@ -77,7 +70,7 @@ interface DetalleVenta {
 
 interface Pedido {
 	id: number
-	fecha: Date // Timestamp
+	fecha: Timestamp // Timestamp
 	proveedor_id: number
 	tienda_id: number
 	estado: string
@@ -92,15 +85,15 @@ interface DetallePedido {
 }
 
 export {
-	gestorioUser,
 	Tienda,
 	Producto,
+	CartItem,
+	Ticket,
 	Proveedor,
 	Usuario,
 	Cliente,
 	Venta,
 	DetalleVenta,
 	Pedido,
-	DetallePedido,
-	SaleProduct
+	DetallePedido
 }

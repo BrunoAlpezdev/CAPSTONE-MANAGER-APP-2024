@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { Package } from 'lucide-react'
 
 type props = {
 	title: string
@@ -6,16 +7,16 @@ type props = {
 
 export function DashboardItem(props: props) {
 	return (
-		<div className='dashboard-container box-shadow flex-grow'>
+		<div className='dashboard-container box-shadow flex-grow border-primary/40 bg-foreground/5 backdrop-blur-md text-foreground rounded-sm'>
 			<section className='flex flex-row px-4 mt-2 gap-2'>
-				<Image alt='Block Icon' src='/block.svg' width={20} height={20} />
+				<Package />
 				<h2>{props.title}</h2>
 			</section>
 			<hr className='solid my-2' />
 			{/* Tabla */}
 			<div className='p-4 w-full flex-grow'>
-				<table className='min-w-full text-left bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden'>
-					<thead className='bg-gray-100 text-Gris/80'>
+				<table className='min-w-full text-left bg-background border border-border rounded-lg shadow-md overflow-hidden'>
+					<thead className='bg-border text-foreground/90'>
 						<tr>
 							<th className='px-6 py-3 text-xs font-medium uppercase tracking-wider'>
 								Column 1
@@ -25,7 +26,7 @@ export function DashboardItem(props: props) {
 							</th>
 						</tr>
 					</thead>
-					<tbody className='divide-y divide-gray-200 text-Gris'>
+					<tbody className='divide-y divide-border text-foreground'>
 						<tr>
 							<td className='px-6 py-4 whitespace-nowrap text-sm font-medium '>
 								Row 1, Column 1

@@ -10,8 +10,8 @@ export function Product({
 	onUpdateQuantity
 }: ProductoProps) {
 	return (
-		<div className='flex items-center justify-between bg-primary/40 w-full h-16 rounded-sm'>
-			<div className='flex items-center justify-center w-fit h-full bg-primary/40 p-2 rounded-sm'>
+		<div className='flex h-16 w-full items-center justify-between rounded-sm bg-primary/40'>
+			<div className='flex h-full w-fit items-center justify-center rounded-sm bg-primary/40 p-2'>
 				{/* left section */}
 				<Image
 					src='/mockproduct.png'
@@ -22,46 +22,54 @@ export function Product({
 				/>
 			</div>
 			{/* midsection */}
-			<div className='flex flex-wrap items-center justify-center gap-x-24 w-full h-full px-4'>
-				<table className='min-w-full text-left rounded-lg overflow-hidden'>
+			<div className='flex h-full w-full flex-wrap items-center justify-center gap-x-24 px-4'>
+				<table className='min-w-full overflow-hidden rounded-lg text-left'>
 					<thead className='text-Gris'>
 						<tr>
-							<th className=' text-s font-medium uppercase tracking-wider'>
+							<th className='text-s font-medium uppercase tracking-wider text-foreground'>
 								Nombre Producto
 							</th>
-							<th className=' text-s font-medium uppercase tracking-wider'>
+							<th className='text-s font-medium uppercase tracking-wider text-foreground'>
 								Variante
 							</th>
-							<th className=' text-s font-medium uppercase tracking-wider'>
+							<th className='text-s font-medium uppercase tracking-wider text-foreground'>
 								$/Unidad
 							</th>
-							<th className=' text-s font-medium uppercase tracking-wider'>
+							<th className='text-s font-medium uppercase tracking-wider text-foreground'>
 								$/Cantidad
 							</th>
 						</tr>
 					</thead>
 					<tbody className='divide-y divide-gray-200 text-Gris'>
 						<tr>
-							<td className='whitespace-nowrap text-s font-medium '>{name}</td>
-							<td className=' whitespace-nowrap text-s '>{variant}</td>
-							<td className=' whitespace-nowrap text-s '>{price}</td>
-							<td className=' whitespace-nowrap text-s '>{price * quantity}</td>
+							<td className='text-s whitespace-nowrap font-medium text-foreground'>
+								{name}
+							</td>
+							<td className='text-s whitespace-nowrap text-foreground'>
+								{variant}
+							</td>
+							<td className='text-s whitespace-nowrap text-foreground'>
+								{price}
+							</td>
+							<td className='text-s whitespace-nowrap text-foreground'>
+								{price * quantity}
+							</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 
 			{/* right section */}
-			<div className='flex items-center justify-center h-full bg-primary/40 p-4 rounded-sm'>
+			<div className='flex h-full items-center justify-center rounded-sm bg-primary/40 p-4'>
 				{/* minus, plus and a counter */}
 				<div className='flex items-center justify-center gap-x-2'>
 					<button onClick={() => onUpdateQuantity(id, quantity - 1)}>
 						<Image src='/minus.svg' alt='alt' width={30} height={30} />
 					</button>
-					<div className='flex '>
+					<div className='flex'>
 						<input
 							type='numeric'
-							className='w-12 h-8 text-center bg-primary/40 text-Gris/100 rounded-lg'
+							className='h-8 w-12 rounded-lg bg-primary/40 text-center text-Gris/100'
 							value={quantity}
 							onChange={(e) =>
 								onUpdateQuantity(id, Math.max(0, parseInt(e.target.value) || 0))

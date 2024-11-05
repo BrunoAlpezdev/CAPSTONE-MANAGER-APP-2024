@@ -73,14 +73,15 @@ export function FullLogo({ size, editClass }: props) {
 	if (typeof calculatedSize === 'string') {
 		return (
 			<section className={editClass}>
-				<Link href='/home' className='flex flex-row gap-6 w-fit h-fit'>
+				<Link href='/home' className='flex h-fit w-fit flex-row gap-6'>
 					<Image
 						priority
 						src='/MINI-GESTORIO-ICON-CUBE.svg'
 						alt='Gestorio CL Mini Logo'
 						width={40}
 						height={40}
-						className='bg-background select-none pointer-events-none'
+						style={{ objectFit: 'contain', width: 'auto', height: 'auto' }}
+						className='pointer-events-none select-none bg-background'
 					/>
 					<Image
 						priority
@@ -88,8 +89,8 @@ export function FullLogo({ size, editClass }: props) {
 						alt='Gestorio CL Logo'
 						width={40}
 						height={40}
-						style={{ objectFit: 'contain' }}
-						className='bg-background select-none pointer-events-none'
+						style={{ objectFit: 'contain', width: 'auto', height: 'auto' }}
+						className='pointer-events-none select-none bg-background'
 					/>
 				</Link>
 			</section>
@@ -97,16 +98,14 @@ export function FullLogo({ size, editClass }: props) {
 	} else {
 		return (
 			<section className={editClass}>
-				<Link
-					href='/home'
-					className={`flex flex-row w-fit h-fit gap-${calculatedSize.GAP}`}>
+				<div className={`flex h-fit w-fit flex-row gap-${calculatedSize.GAP}`}>
 					<Image
 						priority
 						src='/MINI-GESTORIO-ICON-CUBE.svg'
 						alt='Gestorio CL Mini Logo'
 						width={calculatedSize.CUBE_WIDTH}
 						height={calculatedSize.CUBE_HEIGHT}
-						className='bg-background select-none pointer-events-none'
+						className='pointer-events-none select-none bg-background'
 					/>
 					<Image
 						priority
@@ -115,9 +114,9 @@ export function FullLogo({ size, editClass }: props) {
 						width={calculatedSize.LOGO_WIDTH}
 						height={calculatedSize.LOGO_HEIGHT}
 						style={{ objectFit: 'contain' }}
-						className='bg-background select-none pointer-events-none'
+						className='pointer-events-none select-none bg-background'
 					/>
-				</Link>
+				</div>
 			</section>
 		)
 	}

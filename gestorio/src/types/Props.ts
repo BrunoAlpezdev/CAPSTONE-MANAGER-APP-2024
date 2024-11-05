@@ -13,7 +13,7 @@ export interface ProductoProps {
 export interface RecentProductProps {
 	id: string
 	name: string
-	variant: string
+	variant?: string
 	price: number
 	stock: number
 	onAddToSale: (product: {
