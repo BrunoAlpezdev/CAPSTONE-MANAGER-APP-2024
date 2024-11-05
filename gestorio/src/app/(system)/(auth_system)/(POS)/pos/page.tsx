@@ -828,12 +828,12 @@ export default function POS() {
 									variant='outline'
 									className='w-fit gap-2'>
 									<Bookmark className='h-4 w-4' />
-									Dejar Pendiente
+									Dejar Pendiente (Insertar)
 								</Button>
 							</DialogTrigger>
 							<DialogContent>
 								<DialogHeader>
-									<DialogTitle>Guardar Ticket Pendiente (Insertar)</DialogTitle>
+									<DialogTitle>Guardar Ticket Pendiente</DialogTitle>
 								</DialogHeader>
 								<div className='py-4'>
 									<label
