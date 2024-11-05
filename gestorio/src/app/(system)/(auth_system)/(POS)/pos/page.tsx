@@ -46,18 +46,21 @@ import { Label } from '@/components/ui/label'
 
 export default function POS() {
 	// Estado para manejar los tickets (incluyendo los pendientes)
-	const [tickets, setTickets] = useState<Ticket[]>([
-		{ id: 1, name: 'Ticket Actual', items: [] }
-	])
+	// Estado para manejar los tickets (incluyendo los pendientes)
+	const [tickets, setTickets] = useState<Ticket[]>(() => {
+		// Cargar los tickets desde localStorage al iniciar la aplicación
+		const savedTickets = localStorage.getItem('tickets')
+		return savedTickets
+			? JSON.parse(savedTickets)
+			: [{ id: 1, name: 'Ticket Actual', items: [] }]
+	})
 	// ID del ticket actualmente seleccionado
 	const [currentTicketId, setCurrentTicketId] = useState(1)
 	// Estado para el código escaneado
 	const [scannedCode, setScannedCode] = useState('')
 	// Estados para los diferentes métodos de pago
-	const [cashAmount, setCashAmount] = useState('')
-	const [debitVoucher, setDebitVoucher] = useState('')
-	const [creditVoucher, setCreditVoucher] = useState('')
-	const [creditInstallments, setCreditInstallments] = useState('1')
+	const [cashAmount, setCashAmount] = useState(0)
+	const [cardVoucher, setCardVoucher] = useState('')
 	// Estado para el modo oscuro
 	const [isDarkMode, setIsDarkMode] = useState(() => {
 		return (
@@ -66,7 +69,7 @@ export default function POS() {
 		)
 	})
 	// Estado para controlar la apertura del diálogo de ticket pendiente
-	const [isDialogOpen, setIsDialogOpen] = useState(false)
+	const [isPendingDialogOpen, setIsPendingDialogOpen] = useState(false)
 	// Estado para el nombre del ticket pendiente
 	const [pendingTicketName, setPendingTicketName] = useState('')
 	// Estado para el término de búsqueda de productos
@@ -77,6 +80,15 @@ export default function POS() {
 	const [otherFocus, setOtherFocus] = useState(false)
 	const [paymentMethod, setPaymentMethod] = useState('cash')
 	const [confirmFocus, setConfirmFocus] = useState(false)
+	// Estado para el tipo de documento (boleta o factura)
+	const [isBoleta, setIsBoleta] = useState(true)
+
+	const limpiarFoco = () => {
+		const activeElement = document.activeElement as HTMLElement
+		if (activeElement) {
+			activeElement.blur()
+		}
+	}
 
 	const handleProductAdded = (barcode: string) => {
 		addToCartByBarcode(barcode)
@@ -162,27 +174,22 @@ export default function POS() {
 		)
 	}
 
-	// Manejador para la entrada del escáner
-	const handleScannerInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setScannedCode(e.target.value)
-		// En una aplicación real, aquí se buscaría el producto por código
-		// y se añadiría al carrito si se encuentra
-	}
-
 	// Función para confirmar la orden actual
 	const confirmOrder = () => {
+		let total = calculateTotal()
 		if (
-			(paymentMethod === 'cash' && cashAmount === '0') ||
-			(paymentMethod === 'cash' && cashAmount === '')
+			(paymentMethod === 'cash' && cashAmount < total) ||
+			(paymentMethod === 'cash' && cashAmount === 0)
 		) {
-			toast.error('El monto en efectivo es menor al total de la orden')
+			makeToast('El monto en efectivo es menor al total de la orden', '✖️')
 			return
 		}
-		toast.success(
-			`Orden confirmada! Total: $${calculateTotal().toLocaleString('es-CL')} vuelto: $${Math.max(
+		makeToast(
+			`Orden confirmada! Total: $${total} vuelto: $${Math.max(
 				0,
-				parseInt(cashAmount) - calculateTotal()
-			).toLocaleString('es-CL')}`
+				cashAmount - calculateTotal()
+			).toLocaleString('es-CL')}`,
+			'✅'
 		)
 		setTickets((prevTickets) =>
 			prevTickets.filter((ticket) => ticket.id !== currentTicketId)
@@ -196,36 +203,47 @@ export default function POS() {
 					tickets[0].id
 			)
 		}
-		setCashAmount('')
-		setDebitVoucher('')
-		setCreditVoucher('')
-		setCreditInstallments('1')
+		limpiarFoco()
+		setCashAmount(0)
+		setCardVoucher('')
 	}
 
 	// Función para guardar un ticket como pendiente
 	const setPendingTicket = () => {
 		if (currentTicket.items.length > 0 && pendingTicketName) {
-			// Guarda el ticket actual como pendiente
-			setTickets((prevTickets) => [
-				...prevTickets,
-				{
-					id: Date.now(),
-					name: pendingTicketName,
-					items: [...currentTicket.items]
-				}
-			])
-			// Crea un nuevo ticket vacío y lo establece como el actual
-			const newTicketId = Date.now() + 1
-			setTickets((prevTickets) => [...prevTickets])
-			// Limpiar el Ticket actual (default)
-			tickets[0].items = []
-			setCurrentTicketId(newTicketId)
-			setPendingTicketName('')
-			setIsDialogOpen(false)
-			toast.success('Ticket guardado como pendiente')
-			switchToTicket(1)
+			// Verifica si el ticket actual ya ha sido guardado como pendiente
+			const isAlreadyPending = tickets.some(
+				(ticket) => ticket.name === pendingTicketName
+			)
+
+			if (isAlreadyPending) {
+				// Si el ticket ya está pendiente, cambia al ticket en la posición 1
+				setCurrentTicketId(1)
+				setPendingTicketName('')
+				setIsPendingDialogOpen(false)
+				makeToast('El ticket ya está pendiente, cambiando al ticket 1', '📌')
+				switchToTicket(1)
+			} else {
+				// Guarda el ticket actual como pendiente
+				setTickets((prevTickets) => [
+					...prevTickets,
+					{
+						id: prevTickets.length + 1,
+						name: pendingTicketName,
+						items: [...currentTicket.items]
+					}
+				])
+				// Limpiar el Ticket actual (default)
+				tickets[0].items = []
+				setCurrentTicketId(1)
+				setPendingTicketName('')
+				setIsPendingDialogOpen(false)
+				makeToast('Ticket guardado como pendiente', '📌')
+				switchToTicket(1)
+			}
+			limpiarFoco()
 		} else {
-			toast.error('No se puede guardar un ticket vacío o sin nombre')
+			makeToast('No hay items en el ticket o falta el nombre del ticket', '⚠️')
 		}
 	}
 
@@ -239,6 +257,11 @@ export default function POS() {
 	// Función para cancelar el ticket actual
 	const cancelCurrentTicket = () => {
 		if (currentTicketId === 1) {
+			if (currentTicket.items.length === 0) {
+				makeToast('No hay items en el ticket actual para cancelar', '✖️')
+				setIsDeleteDialogOpen(false)
+				return
+			}
 			setTickets((prevTickets) =>
 				prevTickets.map((ticket) =>
 					ticket.id === 1 ? { ...ticket, items: [] } : ticket
@@ -259,7 +282,7 @@ export default function POS() {
 			}
 		}
 		setIsDeleteDialogOpen(false)
-		toast.success('Ticket actual cancelado')
+		makeToast('Ticket actual cancelado')
 	}
 
 	// Filtra los productos basados en el término de búsqueda
@@ -268,6 +291,26 @@ export default function POS() {
 			product.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
 			product.variante?.toLowerCase().includes(searchTerm.toLowerCase())
 	)
+
+	const makeToast = (message: string, icon?: string) => {
+		toast.custom(
+			(t) => (
+				<div
+					className={`h-fit rounded-sm border-1 border-primary/60 bg-white/5 px-4 py-2 text-foreground backdrop-blur-lg ${t.visible ? 'animate-appearance-in' : 'animate-appearance-out'}`}>
+					<div className='flex items-center'>
+						{icon && <span className='mr-2'>{icon}</span>}
+						<span>{message}</span>
+					</div>
+				</div>
+			),
+			{ duration: 2000 }
+		)
+	}
+
+	// Guardar los tickets en localStorage cada vez que cambien
+	useEffect(() => {
+		localStorage.setItem('tickets', JSON.stringify(tickets))
+	}, [tickets])
 
 	// Efecto para aplicar el modo oscuro
 	useEffect(() => {
@@ -301,7 +344,7 @@ export default function POS() {
 			if (e.key === 'Enter') {
 				if (scannedCode === '') return
 				handleProductAdded(scannedCode) // Procesar el código de barras cuando se presione Enter
-				toast('Producto Escaneado', { icon: '🛒' }) // Mostrar un toast de confirmación
+				makeToast('Producto Escaneado', '🛒') // Mostrar un toast de confirmación
 				setScannedCode('') // Limpiar el valor del código de barras
 				e.preventDefault() // Evitar que el "enter" haga un comportamiento por defecto
 				return
@@ -339,12 +382,49 @@ export default function POS() {
 	}, [confirmFocus])
 
 	useEffect(() => {
+		const handleKeyPress = (e: KeyboardEvent) => {
+			if (isPendingDialogOpen) {
+				if (e.key === 'Enter') {
+					// hacer click programaticamente a confirm-button nextjs "Button"
+					const confirmButton = document.getElementById(
+						'confirm-pending-button'
+					)
+					if (confirmButton) {
+						confirmButton.click()
+					}
+				}
+			}
+		}
+
+		document.addEventListener('keypress', handleKeyPress)
+		return () => {
+			document.removeEventListener('keypress', handleKeyPress)
+		}
+	}, [isPendingDialogOpen])
+
+	useEffect(() => {
+		const handleKeyPress = (e: KeyboardEvent) => {
+			if (isDeleteDialogOpen) {
+				if (e.key === 'Enter') {
+					// hacer click programaticamente a confirm-cancel-button nextjs "Button"
+					const confirmButton = document.getElementById('confirm-cancel-button')
+					if (confirmButton) {
+						confirmButton.click()
+					}
+				}
+			}
+		}
+
+		document.addEventListener('keypress', handleKeyPress)
+		return () => {
+			document.removeEventListener('keypress', handleKeyPress)
+		}
+	}, [isDeleteDialogOpen])
+
+	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.key === 'Escape') {
-				const activeElement = document.activeElement as HTMLElement
-				if (activeElement) {
-					activeElement.blur()
-				}
+				limpiarFoco()
 			}
 			if (e.key === 'F1') {
 				const scannerInput = document.getElementById(
@@ -366,7 +446,7 @@ export default function POS() {
 				e.preventDefault()
 				return
 			}
-			if (e.key === 'F3') {
+			if (e.key === 'PageDown') {
 				e.preventDefault()
 				setPaymentMethod('cash')
 				const cashAmountInput = document.getElementById(
@@ -378,27 +458,34 @@ export default function POS() {
 				return
 			}
 
-			if (e.key === 'F5') {
+			if (e.key === 'PageUp') {
 				e.preventDefault()
-				setPaymentMethod('debit')
-				const debitVoucherInput = document.getElementById(
-					'debit-voucher'
+				setPaymentMethod('card')
+				const cardVoucherInput = document.getElementById(
+					'card-voucher'
 				) as HTMLInputElement
-				if (debitVoucherInput) {
-					debitVoucherInput.focus()
+				if (cardVoucherInput) {
+					cardVoucherInput.focus()
 				}
 				return
 			}
-			if (e.key === 'F6') {
-				e.preventDefault()
-				setPaymentMethod('credit')
-				const creditVoucherInput = document.getElementById(
-					'credit-voucher'
-				) as HTMLInputElement
-				if (creditVoucherInput) {
-					creditVoucherInput.focus()
+
+			if (e.key === 'Insert') {
+				const dejarPendienteButton = document.getElementById(
+					'dejar-pendiente-button'
+				)
+				if (dejarPendienteButton) {
+					dejarPendienteButton.click()
 				}
-				return
+			}
+
+			if (e.key === 'Delete') {
+				const cancelarTicketButton = document.getElementById(
+					'cancelar-ticket-button'
+				)
+				if (cancelarTicketButton) {
+					cancelarTicketButton.click()
+				}
 			}
 		}
 
@@ -408,6 +495,28 @@ export default function POS() {
 			window.removeEventListener('keydown', handleKeyDown)
 		}
 	}, [])
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'ArrowRight') {
+				if (currentTicketId < tickets.length) {
+					setCurrentTicketId((prevId) => prevId + 1)
+				}
+			}
+
+			if (e.key === 'ArrowLeft') {
+				if (currentTicketId > 1) {
+					setCurrentTicketId((prevId) => prevId - 1)
+				}
+			}
+		}
+
+		window.addEventListener('keydown', handleKeyDown)
+
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [currentTicketId, tickets.length])
 
 	return (
 		<div className='relative transition-all'>
@@ -555,7 +664,7 @@ export default function POS() {
 								<Input
 									id='scanner'
 									value={scannedCode}
-									onChange={handleScannerInput}
+									onChange={(e) => setScannedCode(e.target.value)}
 									placeholder='Escanea o ingresa código'
 									className='default-input font-bold'
 									onFocus={() => setInputFocus(true)}
@@ -618,10 +727,9 @@ export default function POS() {
 									</span>
 								</div>
 								<Tabs value={paymentMethod} onValueChange={setPaymentMethod}>
-									<TabsList className='grid w-full grid-cols-3'>
-										<TabsTrigger value='cash'>Efectivo (F3)</TabsTrigger>
-										<TabsTrigger value='debit'>Débito (F5)</TabsTrigger>
-										<TabsTrigger value='credit'>Crédito (F6)</TabsTrigger>
+									<TabsList className='grid w-full grid-cols-2'>
+										<TabsTrigger value='cash'>Efectivo (PageDown)</TabsTrigger>
+										<TabsTrigger value='card'>Tarjeta (PageUp)</TabsTrigger>
 									</TabsList>
 									<TabsContent value='cash'>
 										<div className='space-y-2'>
@@ -633,9 +741,9 @@ export default function POS() {
 											<Input
 												id='cash-amount'
 												type='number'
-												value={cashAmount}
+												value={cashAmount === 0 ? '' : cashAmount}
 												onChange={(e) => {
-													setCashAmount(e.target.value)
+													setCashAmount(parseInt(e.target.value) || 0)
 													setPaymentMethod('cash')
 												}}
 												placeholder='Ingrese monto en efectivo'
@@ -650,29 +758,29 @@ export default function POS() {
 												}}
 											/>
 										</div>
-										{parseInt(cashAmount) > 0 && (
+										{cashAmount > 0 && (
 											<div className='mt-4 rounded-md bg-secondary p-2'>
 												<span className='font-semibold'>Vuelto:</span> $
 												{Math.max(
 													0,
-													parseInt(cashAmount) - calculateTotal()
+													cashAmount - calculateTotal()
 												).toLocaleString('es-CL')}
 											</div>
 										)}
 									</TabsContent>
-									<TabsContent value='debit'>
+									<TabsContent value='card'>
 										<div className='space-y-2'>
 											<label
-												htmlFor='debit-voucher'
+												htmlFor='card-voucher'
 												className='block text-sm font-medium'>
 												Número de Comprobante
 											</label>
 											<Input
-												id='debit-voucher'
-												value={debitVoucher}
+												id='card-voucher'
+												value={cardVoucher}
 												onChange={(e) => {
-													setDebitVoucher(e.target.value)
-													setPaymentMethod('debit')
+													setCardVoucher(e.target.value)
+													setPaymentMethod('card')
 												}}
 												placeholder='Ingrese número de comprobante'
 												className='default-input'
@@ -685,54 +793,6 @@ export default function POS() {
 													setConfirmFocus(false)
 												}}
 											/>
-										</div>
-									</TabsContent>
-									<TabsContent value='credit'>
-										<div className='space-y-2'>
-											<label
-												htmlFor='credit-voucher'
-												className='block text-sm font-medium'>
-												Número de Comprobante
-											</label>
-											<Input
-												id='credit-voucher'
-												value={creditVoucher}
-												onChange={(e) => {
-													setCreditVoucher(e.target.value)
-													setPaymentMethod('credit')
-												}}
-												placeholder='Ingrese número de comprobante'
-												className='default-input'
-												onFocus={() => {
-													setOtherFocus(true)
-													setConfirmFocus(true)
-												}}
-												onBlur={() => {
-													setOtherFocus(false)
-													setConfirmFocus(false)
-												}}
-											/>
-										</div>
-										<div className='mt-4 space-y-2'>
-											<label
-												htmlFor='credit-installments'
-												className='block text-sm font-medium'>
-												Cuotas
-											</label>
-											<Select
-												value={creditInstallments}
-												onValueChange={setCreditInstallments}>
-												<SelectTrigger id='credit-installments'>
-													<SelectValue placeholder='Seleccione número de cuotas' />
-												</SelectTrigger>
-												<SelectContent>
-													{[1, 2, 3, 6, 12, 18, 24].map((num) => (
-														<SelectItem key={num} value={num.toString()}>
-															{num} cuota{num > 1 ? 's' : ''}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
 										</div>
 									</TabsContent>
 								</Tabs>
@@ -750,9 +810,14 @@ export default function POS() {
 				{/* Footer */}
 				<footer className='col-span-2 flex items-center justify-between border-t bg-muted p-4'>
 					<div className='flex space-x-2'>
-						<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+						<Dialog
+							open={isPendingDialogOpen}
+							onOpenChange={setIsPendingDialogOpen}>
 							<DialogTrigger asChild>
-								<Button variant='outline' className='w-fit gap-2'>
+								<Button
+									id='dejar-pendiente-button'
+									variant='outline'
+									className='w-fit gap-2'>
 									<Bookmark className='h-4 w-4' />
 									Dejar Pendiente
 								</Button>
@@ -777,7 +842,9 @@ export default function POS() {
 										onBlur={() => setOtherFocus(false)}
 									/>
 								</div>
-								<Button onClick={setPendingTicket}>Guardar</Button>
+								<Button id='confirm-pending-button' onClick={setPendingTicket}>
+									Guardar
+								</Button>
 							</DialogContent>
 						</Dialog>
 
@@ -794,6 +861,7 @@ export default function POS() {
 							onOpenChange={setIsDeleteDialogOpen}>
 							<DialogTrigger asChild>
 								<Button
+									id='cancelar-ticket-button'
 									variant='destructive'
 									className='w-fit gap-2'
 									onClick={() => setIsDeleteDialogOpen(true)}>
@@ -818,11 +886,19 @@ export default function POS() {
 
 						<RadioGroup defaultValue='boleta'>
 							<div className='flex items-center space-x-2'>
-								<RadioGroupItem value='boleta' id='r1' />
+								<RadioGroupItem
+									value='boleta'
+									id='r1'
+									onClick={() => setIsBoleta(true)}
+								/>
 								<Label htmlFor='r1'>Boleta</Label>
 							</div>
 							<div className='flex items-center space-x-2'>
-								<RadioGroupItem value='factura' id='r2' />
+								<RadioGroupItem
+									value='factura'
+									id='r2'
+									onClick={() => setIsBoleta(false)}
+								/>
 								<Label htmlFor='r2'>Factura</Label>
 							</div>
 						</RadioGroup>
