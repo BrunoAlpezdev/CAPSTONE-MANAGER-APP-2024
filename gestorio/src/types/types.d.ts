@@ -13,6 +13,7 @@ interface Tienda {
 interface Producto {
 	id: string
 	nombre: string
+	variante?: string // Opcional si puede ser nulo
 	imagen?: string
 	id_negocio: String
 	precio: number // Asumiendo que el precio es un número entero en CLP
