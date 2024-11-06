@@ -1,4 +1,3 @@
-import { nextui } from '@nextui-org/theme'
 import type { Config } from 'tailwindcss'
 import tailwindcssAnimate from 'tailwindcss-animate'
 
@@ -83,6 +82,6 @@ const config: Config = {
     	}
     },
 	darkmode: 'class',
-	plugins: [nextui(), tailwindcssAnimate]
+	plugins: [tailwindcssAnimate]
 }
 export default config
