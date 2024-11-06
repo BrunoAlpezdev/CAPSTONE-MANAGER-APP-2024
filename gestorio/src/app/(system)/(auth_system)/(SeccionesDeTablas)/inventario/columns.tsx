@@ -95,11 +95,11 @@ export const columns: ColumnDef<Producto>[] = [
 		}
 	},
 	{
-		accessorKey: 'variante',
-		header: 'Variante',
+		accessorKey: 'id',
+		header: 'id',
 		cell: ({ row }) => {
 			const product = row.original
-			return <div className='text-foreground'>{product.variante}</div>
+			return <div className='text-foreground'>{product.id}</div>
 		}
 	},
 	{
@@ -123,7 +123,7 @@ export const columns: ColumnDef<Producto>[] = [
 		cell: ({ row }) => {
 			const product = row.original
 			const [isOpen, setIsOpen] = useState(false)
-			const [productType, setProductType] = useState(product.variante)
+			const [productType, setProductType] = useState(product.id_negocio)
 
 			const handleCopyToClipboard = async () => {
 				try {
@@ -136,7 +136,6 @@ export const columns: ColumnDef<Producto>[] = [
 
 			const handleCancel = () => {
 				setIsOpen(false)
-				window.location.reload() // Recarga la página
 			}
 
 			useEffect(() => {
@@ -187,16 +186,16 @@ export const columns: ColumnDef<Producto>[] = [
 									defaultValue={product.nombre}
 								/>
 								<label
-									htmlFor='type'
+									htmlFor='precio'
 									className='block text-sm font-medium text-foreground'>
-									Tipo
+									precio
 								</label>
 								<input
 									type='text'
 									name='type'
 									id='type'
 									className='mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
-									value={productType} // Usa value para controlar el input
+									defaultValue={product.precio} // Usa value para controlar el input
 								/>
 							</div>
 							<div className='mt-4 flex justify-end'>
