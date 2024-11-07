@@ -10,6 +10,7 @@ import {
 	serverTimestamp,
 	updateDoc
 } from 'firebase/firestore'
+import { negocioSchema } from './schemas'
 
 disableWarnings()
 
@@ -41,22 +42,7 @@ async function setupDatabase() {
 
 	await db.addCollections({
 		negocios: {
-			schema: {
-				title: 'negocios schema',
-				description: 'describes a negocio',
-				version: 0,
-				primaryKey: 'id', // Asegúrate que este campo está bien definido y corresponde al Firestore
-				type: 'object',
-				properties: {
-					id: { type: 'string', maxLength: 22 },
-					_deleted: { type: 'boolean', default: false },
-					authToken: { type: 'string' },
-					correo: { type: 'string' },
-					nombreNegocio: { type: 'string' },
-					plan: { type: 'string' },
-					telefono: { type: 'number' }
-				}
-			}
+			schema: negocioSchema
 		}
 	})
 	const envProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
@@ -76,10 +62,10 @@ async function setupDatabase() {
 		replicationIdentifier: 'negocios-replication', // Identificador de la replicación
 		deletedField: '_deleted', // Campo para marcar elementos como eliminados
 		pull: {
-			batchSize: 2 // Número de documentos a obtener por lote desde Firestore
+			batchSize: 1 // Número de documentos a obtener por lote desde Firestore
 		},
 		push: {
-			batchSize: 2 // Número de documentos a enviar por lote hacia Firestore
+			batchSize: 1 // Número de documentos a enviar por lote hacia Firestore
 		},
 		serverTimestampField: 'serverTimestamp'
 	})

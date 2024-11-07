@@ -9,6 +9,16 @@ interface Tienda {
 	telefono?: string // Opcional si puede ser nulo
 }
 
+interface Negocio {
+	id: number
+	nombre: string
+	ownerID: string
+	telefono?: string // Opcional si puede ser nulo
+	authToken: string
+	correo: string
+	plan: string
+}
+
 // Definición de tipos para los productos, items del carrito y tickets
 interface Producto {
 	id: string

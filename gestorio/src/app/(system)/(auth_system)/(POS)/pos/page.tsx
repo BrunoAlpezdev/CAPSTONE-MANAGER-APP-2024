@@ -41,7 +41,7 @@ import { useMenu, useSale } from '@/hooks'
 import { Footer, FullLogo, ToggleMenu } from '@/components'
 
 import { Producto, Ticket } from '@/types'
-import { products } from '@/mocks/products'
+/* import { products } from '@/mocks/products' */
 import { Label } from '@/components/ui/label'
 
 export default function POS() {
@@ -81,14 +81,26 @@ export default function POS() {
 	const [confirmFocus, setConfirmFocus] = useState(false)
 	// Estado para el tipo de documento (boleta o factura)
 	const [isBoleta, setIsBoleta] = useState(true)
-	//
+
 	const [quantFocus, setQuantFocus] = useState(false)
+
+	const [db, setDb] = useState<RxDatabase | null>(null)
+
+	const [products, setProducts] = useState<Producto[]>([])
+
+	const fetchItems = async () => {
+		// fetch productos from RxDB Dexie database
+		/* const db = await setupDatabase()
+		setDb(db)
+		const productos = await db.productos.find().exec()
+		console.log('a ' + productos)
+		return productos */
+	}
 
 	const limpiarFoco = () => {
 		const activeElement = document.activeElement as HTMLElement
 		if (activeElement) {
 			activeElement.blur()
-			setOtherFocus(false)
 		}
 	}
 
@@ -158,13 +170,10 @@ export default function POS() {
 							items: ticket.items
 								.map((item) =>
 									item.id === productId
-										? {
-												...item,
-												cantidad: Math.min(item.stock, item.cantidad + change)
-											}
+										? { ...item, cantidad: Math.max(0, item.cantidad + change) }
 										: item
 								)
-								.filter((item) => item.cantidad >= 0)
+								.filter((item) => item.cantidad > 0)
 						}
 					: ticket
 			)
@@ -200,8 +209,8 @@ export default function POS() {
 			prevTickets.filter((ticket) => ticket.id !== currentTicketId)
 		)
 		if (tickets.length === 1) {
-			setTickets([{ id: 1, name: 'Ticket Actual', items: [] }])
-			setCurrentTicketId(1)
+			setTickets([{ id: Date.now(), name: 'Nuevo Ticket', items: [] }])
+			setCurrentTicketId(Date.now())
 		} else {
 			setCurrentTicketId(
 				tickets.find((ticket) => ticket.id !== currentTicketId)?.id ||
@@ -311,7 +320,7 @@ export default function POS() {
 		toast.custom(
 			(t) => (
 				<div
-					className={`h-fit rounded-sm border-1 border-primary/60 bg-white/5 px-4 py-2 text-foreground backdrop-blur-lg ${t.visible ? 'animate-appearance-in' : 'animate-appearance-out'}`}>
+					className={`border-1 h-fit rounded-sm border-primary/60 bg-white/5 px-4 py-2 text-foreground backdrop-blur-lg ${t.visible ? 'animate-appearance-in' : 'animate-appearance-out'}`}>
 					<div className='flex items-center'>
 						{icon && <span className='mr-2'>{icon}</span>}
 						<span>{message}</span>
@@ -365,7 +374,7 @@ export default function POS() {
 				return
 			}
 
-			if (!inputFocus && !otherFocus && e.key !== '-' && e.key !== '+') {
+			if (!inputFocus && !otherFocus) {
 				setScannedCode((prevBarcode) => prevBarcode + e.key)
 			}
 		}
@@ -513,41 +522,13 @@ export default function POS() {
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (
-				(!quantFocus && e.key === 'ArrowUp') ||
-				(!quantFocus && e.key === 'ArrowDown')
-			) {
-				//si el ticket tiene 1 o mas productos hacer focus a `item-quantity-0`
-				try {
-					if (currentTicket.items.length > 0) {
-						const firstInput = document.getElementById(
-							`item-quantity-0`
-						) as HTMLInputElement
-						if (firstInput) {
-							firstInput.focus()
-						}
-					}
-				} catch (e) {
-					console.log(e)
-				}
-			}
-		}
-		window.addEventListener('keydown', handleKeyDown)
-
-		return () => {
-			window.removeEventListener('keydown', handleKeyDown)
-		}
-	}, [quantFocus, currentTicketId, tickets.length])
-
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.ctrlKey && e.key === 'ArrowRight') {
+			if (e.key === 'ArrowRight') {
 				if (currentTicketId < tickets.length) {
 					setCurrentTicketId((prevId) => prevId + 1)
 				}
 			}
 
-			if (e.ctrlKey && e.key === 'ArrowLeft') {
+			if (e.key === 'ArrowLeft') {
 				if (currentTicketId > 1) {
 					setCurrentTicketId((prevId) => prevId - 1)
 				}
@@ -560,6 +541,13 @@ export default function POS() {
 			window.removeEventListener('keydown', handleKeyDown)
 		}
 	}, [currentTicketId, tickets.length])
+
+	useEffect(() => {
+		/* const fetchData = async () => {
+			setProducts(await fetchItems())
+		}
+		fetchData() */
+	}, [])
 
 	return (
 		<div className='relative transition-all'>
@@ -626,10 +614,10 @@ export default function POS() {
 							Carrito Actual: {currentTicket.name}
 						</h2>
 						<ScrollArea className='scrollbar-modifier h-[calc(100vh-267px)] text-foreground'>
-							{currentTicket.items.map((item, index) => (
+							{currentTicket.items.map((item) => (
 								<div
 									key={item.id}
-									className='mb-2 mr-3 flex items-center rounded-lg bg-primary/25 p-1 shadow-small shadow-foreground backdrop-blur-sm'>
+									className='shadow-small mb-2 mr-3 flex items-center rounded-lg bg-primary/25 p-1 shadow-foreground backdrop-blur-sm'>
 									{item.imagen ? (
 										<Image
 											src={item.imagen}
@@ -671,76 +659,7 @@ export default function POS() {
 											onClick={() => updateQuantity(item.id, -1)}>
 											<Minus className='h-4 w-4' />
 										</Button>
-										<Input
-											id={`item-quantity-${index}`}
-											className='mx-2'
-											value={item.cantidad}
-											onChange={(e) => {
-												const newQuantity = parseInt(e.target.value) || 0
-												updateQuantity(item.id, newQuantity - item.cantidad)
-											}}
-											max={item.stock}
-											onKeyDown={(e) => {
-												if (e.key === '-') {
-													updateQuantity(item.id, -1)
-												} else if (e.key === '+') {
-													updateQuantity(item.id, 1)
-												}
-												if (e.key === 'ArrowDown') {
-													// IR AL SIGUIENTE ITEM DE ABAJO, SI ES EL ULTIMO, OMITIR
-													e.preventDefault()
-													if (index === currentTicket.items.length - 1) {
-														return
-													}
-													const nextInput = document.getElementById(
-														`item-quantity-${index + 1}`
-													) as HTMLInputElement
-													if (nextInput) {
-														nextInput.focus()
-													}
-												}
-												if (e.key === 'ArrowUp') {
-													// IR AL SIGUIENTE ITEM DE ARRIBA, A SU INPUT basándose en `item-quantity-${index}`, SI ES EL ULTIMO, OMITIR
-													e.preventDefault()
-													if (index === 0) {
-														return
-													}
-													const nextInput = document.getElementById(
-														`item-quantity-${index - 1}`
-													) as HTMLInputElement
-													if (nextInput) {
-														nextInput.focus()
-													}
-												}
-												if (e.ctrlKey && e.key === 'ArrowRight') {
-													e.preventDefault()
-													const nextInput = document.getElementById(
-														`item-quantity-0`
-													) as HTMLInputElement
-													if (nextInput) {
-														nextInput.focus()
-													}
-												}
-												if (e.ctrlKey && e.key === 'ArrowLeft') {
-													e.preventDefault()
-													const nextInput = document.getElementById(
-														`item-quantity-0`
-													) as HTMLInputElement
-													if (nextInput) {
-														nextInput.focus()
-													}
-												}
-											}}
-											onFocus={() => {
-												setOtherFocus(true)
-												setQuantFocus(true)
-											}}
-											onBlur={() => {
-												setInputFocus(false)
-												setOtherFocus(false)
-												setQuantFocus(false)
-											}}
-										/>
+										<span className='mx-2'>{item.cantidad}</span>
 										<Button
 											variant='outline'
 											size='icon'
@@ -931,7 +850,7 @@ export default function POS() {
 									variant='outline'
 									className='w-fit gap-2'>
 									<Bookmark className='h-4 w-4' />
-									Dejar Pendiente (Insertar)
+									Dejar Pendiente
 								</Button>
 							</DialogTrigger>
 							<DialogContent>
@@ -978,7 +897,7 @@ export default function POS() {
 									className='w-fit gap-2'
 									onClick={() => setIsDeleteDialogOpen(true)}>
 									<Ban className='h-4 w-4' />
-									Cancelar Ticket (Suprimir)
+									Cancelar Ticket
 								</Button>
 							</DialogTrigger>
 							<DialogContent>
