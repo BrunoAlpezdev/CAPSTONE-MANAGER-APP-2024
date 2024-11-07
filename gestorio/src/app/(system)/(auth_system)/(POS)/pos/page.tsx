@@ -1,14 +1,16 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect, use, CSSProperties } from 'react'
 import Image from 'next/image'
 import { Button, TicketButton } from '@/components/ui/button'
+import ClimbingBoxLoader from 'react-spinners/ClimbingBoxLoader'
 import { DefInput, Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Switch } from '@/components/ui/switch'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import useDatabaseStore from '@/store/dbStore'
 import {
 	Select,
 	SelectContent,
@@ -43,6 +45,9 @@ import { Footer, FullLogo, ToggleMenu } from '@/components'
 import { Producto, Ticket } from '@/types'
 /* import { products } from '@/mocks/products' */
 import { Label } from '@/components/ui/label'
+import { getDownloadURL, ref } from 'firebase/storage'
+import { storage } from '@/firebase'
+import useImageStore from '@/store/useImageStorage'
 
 export default function POS() {
 	// Estado para manejar los tickets (incluyendo los pendientes)
@@ -82,19 +87,64 @@ export default function POS() {
 	// Estado para el tipo de documento (boleta o factura)
 	const [isBoleta, setIsBoleta] = useState(true)
 
-	const [quantFocus, setQuantFocus] = useState(false)
-
-	const [db, setDb] = useState<RxDatabase | null>(null)
-
+	const [productsLoading, setProductsLoading] = useState(true)
+	const db = useDatabaseStore((state) => state.db)
 	const [products, setProducts] = useState<Producto[]>([])
 
-	const fetchItems = async () => {
-		// fetch productos from RxDB Dexie database
-		/* const db = await setupDatabase()
-		setDb(db)
-		const productos = await db.productos.find().exec()
-		console.log('a ' + productos)
-		return productos */
+	// Función para obtener la URL de la imagen desde Firebase Storage
+	const getImageUrl = async (imagePath: string) => {
+		try {
+			const imageRef = ref(storage, `productos-img/${imagePath}`) // Crea una referencia al archivo en el bucket
+
+			// Obtén la URL de descarga de la imagen
+			const url = await getDownloadURL(imageRef)
+
+			return url
+		} catch (error) {
+			console.error('Error al obtener la URL de la imagen:', error)
+			return '' // Retorna una cadena vacía si hay un error
+		}
+	}
+
+	const fetchProductos = async () => {
+		if (db) {
+			try {
+				// Obtén los datos de los productos desde la base de datos local (RxDB)
+				const productosData = await db.productos.find().exec()
+
+				// Mapear los productos y actualizar el estado con los datos de los productos
+				const productosConImagenes = await Promise.all(
+					productosData.map(async (producto: any) => {
+						const productoJson = producto.toJSON()
+
+						// Aquí obtienes la URL de la imagen desde Firebase Storage
+						const imageUrl = await getImageUrl(productoJson.imagen)
+						// Establece la URL en el store de imágenes
+						useImageStore.getState().setImageUrl(productoJson.id, imageUrl)
+
+						const productoArmado: Producto = {
+							id: productoJson.id,
+							barcode: productoJson.barcode,
+							id_negocio: productoJson.id_negocio,
+							nombre: productoJson.nombre,
+							variante: productoJson.variante,
+							stock: productoJson.stock,
+							precio: productoJson.precio,
+							imagen: imageUrl
+						}
+						// Devolver el producto con la URL de la imagen ya cargada
+						return productoArmado
+					})
+				)
+
+				// Actualizar el estado de productos con los datos completos
+				setProducts(productosConImagenes)
+			} catch (error) {
+				makeToast('Error al obtener los productos:', '✖️')
+			} finally {
+				setProductsLoading(false)
+			}
+		}
 	}
 
 	const limpiarFoco = () => {
@@ -136,13 +186,13 @@ export default function POS() {
 	const addToCartByBarcode = (barcode: string) => {
 		// Aquí se debería hacer una petición a la API para obtener el producto
 		// con el código de barras especificado
-		const product = products.find((product) => product.id === barcode)
+		const product = products.find((product) => product.barcode === barcode)
 
 		if (!product || product === undefined) {
-			console.error('Producto no encontrado')
+			makeToast('Producto No Encontrado', '✖️') // Mostrar un toast de confirmación
 			return
 		}
-
+		makeToast('Producto Escaneado', '🛒') // Mostrar un toast de confirmación
 		addToCart(product)
 	}
 
@@ -209,8 +259,8 @@ export default function POS() {
 			prevTickets.filter((ticket) => ticket.id !== currentTicketId)
 		)
 		if (tickets.length === 1) {
-			setTickets([{ id: Date.now(), name: 'Nuevo Ticket', items: [] }])
-			setCurrentTicketId(Date.now())
+			setTickets([{ id: 1, name: 'Ticket Actual', items: [] }])
+			setCurrentTicketId(1)
 		} else {
 			setCurrentTicketId(
 				tickets.find((ticket) => ticket.id !== currentTicketId)?.id ||
@@ -316,6 +366,12 @@ export default function POS() {
 			product.variante?.toLowerCase().includes(searchTerm.toLowerCase())
 	)
 
+	const cssOverride: CSSProperties = {
+		display: 'block',
+		margin: '0 auto',
+		borderColor: 'red'
+	}
+
 	const makeToast = (message: string, icon?: string) => {
 		toast.custom(
 			(t) => (
@@ -330,6 +386,11 @@ export default function POS() {
 			{ duration: 2000 }
 		)
 	}
+
+	// Fetchea los productos al montar el componente
+	useEffect(() => {
+		fetchProductos()
+	}, [])
 
 	// Guardar los tickets en localStorage cada vez que cambien
 	useEffect(() => {
@@ -368,7 +429,7 @@ export default function POS() {
 			if (e.key === 'Enter') {
 				if (scannedCode === '') return
 				handleProductAdded(scannedCode) // Procesar el código de barras cuando se presione Enter
-				makeToast('Producto Escaneado', '🛒') // Mostrar un toast de confirmación
+
 				setScannedCode('') // Limpiar el valor del código de barras
 				e.preventDefault() // Evitar que el "enter" haga un comportamiento por defecto
 				return
@@ -629,7 +690,7 @@ export default function POS() {
 										/>
 									) : (
 										<Image
-											src={'https://placehold.co/400'}
+											src={'item.svg'}
 											alt={item.nombre}
 											width={50}
 											height={50}
@@ -720,6 +781,16 @@ export default function POS() {
 							/>
 						</div>
 						<h3 className='mt-1 font-semibold'>Productos</h3>
+						{/* Loader */}
+						{productsLoading && <p>Cargando Productos...</p>}
+						<ClimbingBoxLoader
+							color='#2477eb'
+							loading={productsLoading}
+							size={15}
+							cssOverride={cssOverride}
+							aria-label='Loading Spinner'
+							data-testid='loader'
+						/>
 						<ScrollArea className='scrollbar-modifier flex-grow pr-3'>
 							{filteredProducts.map((product) => (
 								<Button
@@ -727,13 +798,24 @@ export default function POS() {
 									variant='outline'
 									className='mb-2 w-full justify-start px-3 py-7'
 									onClick={() => addToCart(product)}>
-									<Image
-										src={product.imagen ?? 'https://via.placeholder.com/30'}
-										alt={product.nombre}
-										width={30}
-										height={30}
-										className='mr-2 rounded-md'
-									/>
+									{product.imagen ? (
+										<Image
+											src={product.imagen}
+											alt={product.nombre}
+											width={30}
+											height={30}
+											className='mr-2 rounded-md'
+										/>
+									) : (
+										<Image
+											src='item.svg'
+											alt={product.nombre}
+											width={30}
+											height={30}
+											className='mr-2 rounded-md'
+										/>
+									)}
+
 									<div className='flex-grow text-left'>
 										<div>{product.nombre}</div>
 										<div className='text-sm text-muted-foreground transition-all'>

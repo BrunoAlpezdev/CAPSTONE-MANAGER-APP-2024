@@ -1,19 +1,22 @@
-import { RxDatabase } from 'rxdb'
+// store/databaseStore.ts
 import { create } from 'zustand'
+import setupDatabase from '@/lib/db/RxDB' // Ajusta la ruta según tu estructura
 
-interface DbState {
-	db: RxDatabase | null
+interface DatabaseState {
+	db: any | null
+	initializeDatabase: () => Promise<void>
 }
 
-interface SetDb {
-	(db: RxDatabase): void
-}
-
-interface DbStore extends DbState {
-	setDb: SetDb
-}
-
-export const useDbStore = create<DbStore>((set) => ({
+const useDatabaseStore = create<DatabaseState>((set) => ({
 	db: null,
-	setDb: (db: RxDatabase) => set({ db })
+	initializeDatabase: async () => {
+		try {
+			const database = await setupDatabase()
+			set({ db: database })
+		} catch (error) {
+			console.error('Error al inicializar la base de datos:', error)
+		}
+	}
 }))
+
+export default useDatabaseStore

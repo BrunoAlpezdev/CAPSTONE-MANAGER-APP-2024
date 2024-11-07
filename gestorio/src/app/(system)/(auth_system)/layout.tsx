@@ -8,8 +8,17 @@ import '@/styles/authGuard.css'
 import '@/styles/globals.css'
 import { ThemeProvider } from '@/components'
 import AuthGuard from '@/components/auth/authGuard.component'
+import useDatabaseStore from '@/store/dbStore'
+import { useEffect } from 'react'
 
 export default function Layout({ children }: { children: ReactNode }) {
+	const initializeDatabase = useDatabaseStore(
+		(state) => state.initializeDatabase
+	)
+
+	useEffect(() => {
+		initializeDatabase()
+	}, [initializeDatabase])
 	const user = useUser()
 
 	if (user === false)

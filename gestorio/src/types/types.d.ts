@@ -22,6 +22,7 @@ interface Negocio {
 // Definición de tipos para los productos, items del carrito y tickets
 interface Producto {
 	id: string
+	barcode: string
 	nombre: string
 	variante?: string // Opcional si puede ser nulo
 	imagen?: string
