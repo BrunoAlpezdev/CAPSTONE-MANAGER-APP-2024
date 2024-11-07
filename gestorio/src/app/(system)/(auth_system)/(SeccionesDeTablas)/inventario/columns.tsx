@@ -24,6 +24,7 @@ import {
 	DialogTrigger
 } from '@/components/ui/dialog'
 import Image from 'next/image'
+import { useNotifications } from '@/hooks'
 
 // This type is used to define the shape of our data.
 
@@ -144,6 +145,14 @@ export const columns: ColumnDef<Producto>[] = [
 					body.style.pointerEvents = isOpen ? 'all' : 'all'
 				}
 			}, [isOpen])
+
+			const { addNotification } = useNotifications()
+			useEffect(() => {
+				if (product.stock < 10) {
+					const message = `El producto ${product.nombre} tiene un stock menor a 10 unidades.`
+					addNotification(message)
+				}
+			}, [product])
 
 			return (
 				<>
