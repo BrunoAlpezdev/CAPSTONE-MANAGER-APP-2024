@@ -23,7 +23,8 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from '@/components/ui/dialog'
-import { useNotifications } from '@/hooks'
+import Image from 'next/image'
+import { useNotificationStore } from '@/store/notificationStore'
 
 // This type is used to define the shape of our data.
 
@@ -67,29 +68,19 @@ export const columns: ColumnDef<Producto>[] = [
 		}
 	},
 	{
-		accessorKey: 'marca',
-		header: ({ column }) => {
-			return (
-				<Button
-					variant='ghost'
-					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-					className='text-foreground'>
-					Marca
-					<ArrowUpDown className='ml-2 h-4 w-4 text-foreground' />
-				</Button>
-			)
-		},
-		cell: ({ row }) => {
-			const product = row.original
-			return <div className='text-foreground'>{product.marca}</div>
-		}
-	},
-	{
 		accessorKey: 'barcode',
 		header: 'barcode',
 		cell: ({ row }) => {
 			const product = row.original
 			return <div className='text-foreground'>{product.barcode}</div>
+		}
+	},
+	{
+		accessorKey: 'marca',
+		header: 'marca',
+		cell: ({ row }) => {
+			const product = row.original
+			return <div className='text-foreground'>{product.marca}</div>
 		}
 	},
 	{
@@ -135,7 +126,7 @@ export const columns: ColumnDef<Producto>[] = [
 				}
 			}, [isOpen])
 
-			const { addNotification } = useNotifications()
+			const { addNotification } = useNotificationStore()
 			useEffect(() => {
 				if (product.stock < 10) {
 					const message = `El producto ${product.nombre} tiene un stock menor a 10 unidades.`

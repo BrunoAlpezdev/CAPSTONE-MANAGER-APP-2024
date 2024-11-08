@@ -16,6 +16,7 @@ import setupDatabase from '@/lib/db/RxDB'
 import { useEffect, useState } from 'react'
 import { RxDatabase } from 'rxdb'
 import { BellRingIcon } from 'lucide-react'
+import { useNotificationStore } from '@/store/notificationStore'
 
 export function Header() {
 	// Estado para manejar la bd

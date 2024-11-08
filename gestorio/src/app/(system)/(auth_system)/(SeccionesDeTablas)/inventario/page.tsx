@@ -13,16 +13,7 @@ import { Producto } from '@/types'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { firestore } from '@/firebase/firebaseConfig'
 import { collection, getDocs } from 'firebase/firestore'
-
-async function getProducts() {
-	const productosCol = collection(firestore, 'productos')
-	const snapshot = await getDocs(productosCol)
-	const data = snapshot.docs.map((doc) => ({
-		id: doc.id,
-		...doc.data()
-	})) as Producto[]
-	return data
-}
+import useDatabaseStore from '@/store/dbStore'
 
 export default function GestionDeProductos() {
 	const [data, setData] = useState<Producto[]>([])
@@ -30,19 +21,30 @@ export default function GestionDeProductos() {
 	const [error, setError] = useState<string | null>(null)
 
 	const { isMenuOpen, toggleMenu } = useMenu()
+	const db = useDatabaseStore((state) => state.db)
 
-	useEffect(() => {
-		const loadProductos = async () => {
+	const fetchProductos = async () => {
+		if (db) {
 			try {
-				const productos = await getProducts()
+				// Obtén los datos de los productos desde la base de datos local (RxDB)
+				const productosData = await db.productos.find().exec()
+
+				// Mapear los productos a un array de objetos
+				const productos = productosData.map((producto: any) =>
+					producto.toJSON()
+				)
+
+				// Actualizar el estado de productos con los datos completos
 				setData(productos)
-			} catch (error: any) {
-				setError(error.message)
+			} catch (error) {
+				console.log('Error al obtener los productos:', '✖️')
 			} finally {
 				setLoading(false)
 			}
 		}
-		loadProductos()
+	}
+	useEffect(() => {
+		fetchProductos()
 	}, [])
 	const [isDarkMode, setIsDarkMode] = useState(() => {
 		return (
