@@ -86,6 +86,7 @@ export default function POS() {
 	const [confirmFocus, setConfirmFocus] = useState(false)
 	// Estado para el tipo de documento (boleta o factura)
 	const [isBoleta, setIsBoleta] = useState(true)
+	const [quantFocus, setQuantFocus] = useState(false)
 
 	const [productsLoading, setProductsLoading] = useState(true)
 	const db = useDatabaseStore((state) => state.db)
@@ -151,6 +152,7 @@ export default function POS() {
 		const activeElement = document.activeElement as HTMLElement
 		if (activeElement) {
 			activeElement.blur()
+			setOtherFocus(false)
 		}
 	}
 
@@ -220,10 +222,13 @@ export default function POS() {
 							items: ticket.items
 								.map((item) =>
 									item.id === productId
-										? { ...item, cantidad: Math.max(0, item.cantidad + change) }
+										? {
+												...item,
+												cantidad: Math.min(item.stock, item.cantidad + change)
+											}
 										: item
 								)
-								.filter((item) => item.cantidad > 0)
+								.filter((item) => item.cantidad >= 0)
 						}
 					: ticket
 			)
@@ -255,9 +260,20 @@ export default function POS() {
 			).toLocaleString('es-CL')}`,
 			'✅'
 		)
-		setTickets((prevTickets) =>
-			prevTickets.filter((ticket) => ticket.id !== currentTicketId)
-		)
+		setTickets((prevTickets) => {
+			// Filtrar y reorganizar IDs después de eliminar
+			const filteredTickets = prevTickets.filter(
+				(ticket) => ticket.id !== currentTicketId
+			)
+
+			// Reorganizar IDs, manteniendo el ticket 1 y reasignando el resto
+			const reorganizedTickets = filteredTickets.map((ticket, index) => ({
+				...ticket,
+				id: index + 1 // El primer índice empieza en 2, porque el 1 siempre es el 1
+			}))
+
+			return [...reorganizedTickets]
+		})
 		if (tickets.length === 1) {
 			setTickets([{ id: 1, name: 'Ticket Actual', items: [] }])
 			setCurrentTicketId(1)
@@ -435,7 +451,7 @@ export default function POS() {
 				return
 			}
 
-			if (!inputFocus && !otherFocus) {
+			if (!inputFocus && !otherFocus && e.key !== '-' && e.key !== '+') {
 				setScannedCode((prevBarcode) => prevBarcode + e.key)
 			}
 		}
@@ -583,13 +599,13 @@ export default function POS() {
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.key === 'ArrowRight') {
+			if (e.ctrlKey && e.key === 'ArrowRight') {
 				if (currentTicketId < tickets.length) {
 					setCurrentTicketId((prevId) => prevId + 1)
 				}
 			}
 
-			if (e.key === 'ArrowLeft') {
+			if (e.ctrlKey && e.key === 'ArrowLeft') {
 				if (currentTicketId > 1) {
 					setCurrentTicketId((prevId) => prevId - 1)
 				}
@@ -604,11 +620,37 @@ export default function POS() {
 	}, [currentTicketId, tickets.length])
 
 	useEffect(() => {
-		/* const fetchData = async () => {
-			setProducts(await fetchItems())
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (
+				(!quantFocus && e.key === 'ArrowUp') ||
+				(!quantFocus && e.key === 'ArrowDown')
+			) {
+				//si el ticket tiene 1 o mas productos hacer focus a `item-quantity-0`
+				try {
+					if (currentTicket.items.length > 0) {
+						const firstInput = document.getElementById(
+							`item-quantity-0`
+						) as HTMLInputElement
+						const scannerInput = document.getElementById(
+							'scanner'
+						) as HTMLInputElement
+
+						if (firstInput) {
+							firstInput.focus()
+						} else {
+							scannerInput.focus()
+						}
+					}
+				} catch (e) {
+					console.log(e)
+				}
+			}
 		}
-		fetchData() */
-	}, [])
+		window.addEventListener('keydown', handleKeyDown)
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [quantFocus, currentTicketId, tickets.length])
 
 	return (
 		<div className='relative transition-all'>
@@ -675,7 +717,7 @@ export default function POS() {
 							Carrito Actual: {currentTicket.name}
 						</h2>
 						<ScrollArea className='scrollbar-modifier h-[calc(100vh-267px)] text-foreground'>
-							{currentTicket.items.map((item) => (
+							{currentTicket.items.map((item, index) => (
 								<div
 									key={item.id}
 									className='shadow-small mb-2 mr-3 flex items-center rounded-lg bg-primary/25 p-1 shadow-foreground backdrop-blur-sm'>
@@ -720,7 +762,76 @@ export default function POS() {
 											onClick={() => updateQuantity(item.id, -1)}>
 											<Minus className='h-4 w-4' />
 										</Button>
-										<span className='mx-2'>{item.cantidad}</span>
+										<Input
+											id={`item-quantity-${index}`}
+											className='mx-2'
+											value={item.cantidad}
+											onChange={(e) => {
+												const newQuantity = parseInt(e.target.value) || 0
+												updateQuantity(item.id, newQuantity - item.cantidad)
+											}}
+											max={item.stock}
+											onKeyDown={(e) => {
+												if (e.key === '-') {
+													updateQuantity(item.id, -1)
+												} else if (e.key === '+') {
+													updateQuantity(item.id, 1)
+												}
+												if (e.key === 'ArrowDown') {
+													// IR AL SIGUIENTE ITEM DE ABAJO, SI ES EL ULTIMO, OMITIR
+													e.preventDefault()
+													if (index === currentTicket.items.length - 1) {
+														return
+													}
+													const nextInput = document.getElementById(
+														`item-quantity-${index + 1}`
+													) as HTMLInputElement
+													if (nextInput) {
+														nextInput.focus()
+													}
+												}
+												if (e.key === 'ArrowUp') {
+													// IR AL SIGUIENTE ITEM DE ARRIBA, A SU INPUT basándose en `item-quantity-${index}`, SI ES EL ULTIMO, OMITIR
+													e.preventDefault()
+													if (index === 0) {
+														return
+													}
+													const nextInput = document.getElementById(
+														`item-quantity-${index - 1}`
+													) as HTMLInputElement
+													if (nextInput) {
+														nextInput.focus()
+													}
+												}
+												if (e.ctrlKey && e.key === 'ArrowRight') {
+													e.preventDefault()
+													const nextInput = document.getElementById(
+														`item-quantity-0`
+													) as HTMLInputElement
+													if (nextInput) {
+														nextInput.focus()
+													}
+												}
+												if (e.ctrlKey && e.key === 'ArrowLeft') {
+													e.preventDefault()
+													const nextInput = document.getElementById(
+														`item-quantity-0`
+													) as HTMLInputElement
+													if (nextInput) {
+														nextInput.focus()
+													}
+												}
+											}}
+											onFocus={() => {
+												setOtherFocus(true)
+												setQuantFocus(true)
+											}}
+											onBlur={() => {
+												setInputFocus(false)
+												setOtherFocus(false)
+												setQuantFocus(false)
+											}}
+										/>
 										<Button
 											variant='outline'
 											size='icon'
@@ -932,7 +1043,7 @@ export default function POS() {
 									variant='outline'
 									className='w-fit gap-2'>
 									<Bookmark className='h-4 w-4' />
-									Dejar Pendiente
+									Dejar Pendiente (Insertar)
 								</Button>
 							</DialogTrigger>
 							<DialogContent>
@@ -979,7 +1090,7 @@ export default function POS() {
 									className='w-fit gap-2'
 									onClick={() => setIsDeleteDialogOpen(true)}>
 									<Ban className='h-4 w-4' />
-									Cancelar Ticket
+									Cancelar Ticket (Suprimir)
 								</Button>
 							</DialogTrigger>
 							<DialogContent>

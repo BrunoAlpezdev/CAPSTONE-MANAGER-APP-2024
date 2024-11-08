@@ -45,27 +45,26 @@ export function Header() {
 			<section className='flex cursor-pointer flex-row gap-6 text-accent-foreground'>
 				<div className='relative'>
 					<button
-						className='flex items-center gap-2 rounded-full bg-secondary px-3 py-1 transition-all hover:scale-95'
+						className='flex items-center gap-2 rounded-full bg-secondary p-2 transition-all hover:scale-95'
 						onClick={() => setIsNotificationOpen(!isNotificationOpen)}>
 						<BellRingIcon className='h-5 w-5 text-foreground' />
 					</button>
 
-					{isNotificationOpen && (
-						<div className='absolute right-0 z-10 mt-2 w-48 rounded-lg bg-secondary p-4 shadow-lg'>
-							<p className='font-semibold text-accent-foreground'>
-								Notificaciones
-							</p>
-							<div className='text-sm text-accent-foreground'>
-								{notifications.length === 0 ? (
-									<p>No tienes nuevas notificaciones.</p>
-								) : (
-									notifications.map((notification, index) => (
-										<p key={index}>{notification}</p>
-									))
-								)}
-							</div>
+					<div
+						className={`absolute right-0 z-10 mt-2 w-48 rounded-lg bg-secondary p-4 shadow-lg transition-all ${isNotificationOpen ? 'visible' : 'hidden'}`}>
+						<p className='font-semibold text-accent-foreground'>
+							Notificaciones
+						</p>
+						<div className='text-sm text-accent-foreground'>
+							{notifications.length === 0 ? (
+								<p>No tienes nuevas notificaciones.</p>
+							) : (
+								notifications.map((notification, index) => (
+									<p key={index}>{notification}</p>
+								))
+							)}
 						</div>
-					)}
+					</div>
 				</div>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -75,7 +74,7 @@ export function Header() {
 								alt='Logo de Negocio'
 								width={30}
 								height={30}
-								className='pointer-events-none aspect-square cursor-pointer rounded-full'
+								className='pointer-events-none aspect-square cursor-pointer select-none rounded-full'
 							/>
 							<p className='select-none text-foreground'>Negocio</p>
 						</button>
