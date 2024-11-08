@@ -23,7 +23,6 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from '@/components/ui/dialog'
-import Image from 'next/image'
 import { useNotifications } from '@/hooks'
 
 // This type is used to define the shape of our data.
@@ -50,34 +49,6 @@ export const columns: ColumnDef<Producto>[] = [
 		)
 	},
 	{
-		accessorKey: 'imagen',
-		header: 'Imagen',
-		cell: ({ row }) => {
-			const product = row.original
-			return (
-				<div className='font-medium text-foreground'>
-					{product.imagen ? (
-						<Image
-							src={product.imagen}
-							alt='Imagen Producto'
-							height={40}
-							width={40}
-							className='aspect-square object-contain'
-						/>
-					) : (
-						<Image
-							src='https://loremflickr.com/cache/resized/defaultImage.small_640_480_nofilter.jpg'
-							alt='Imagen Producto'
-							height={4}
-							width={4}
-							className='aspect-square object-contain'
-						/>
-					)}
-				</div>
-			)
-		}
-	},
-	{
 		accessorKey: 'nombre',
 		header: ({ column }) => {
 			return (
@@ -96,11 +67,29 @@ export const columns: ColumnDef<Producto>[] = [
 		}
 	},
 	{
-		accessorKey: 'id',
-		header: 'id',
+		accessorKey: 'marca',
+		header: ({ column }) => {
+			return (
+				<Button
+					variant='ghost'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+					className='text-foreground'>
+					Marca
+					<ArrowUpDown className='ml-2 h-4 w-4 text-foreground' />
+				</Button>
+			)
+		},
 		cell: ({ row }) => {
 			const product = row.original
-			return <div className='text-foreground'>{product.id}</div>
+			return <div className='text-foreground'>{product.marca}</div>
+		}
+	},
+	{
+		accessorKey: 'barcode',
+		header: 'barcode',
+		cell: ({ row }) => {
+			const product = row.original
+			return <div className='text-foreground'>{product.barcode}</div>
 		}
 	},
 	{
