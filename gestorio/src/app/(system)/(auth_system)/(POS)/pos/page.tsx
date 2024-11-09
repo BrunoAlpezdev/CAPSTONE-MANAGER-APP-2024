@@ -39,7 +39,7 @@ import {
 import { toast, Toaster } from 'react-hot-toast'
 import { RxDatabase } from 'rxdb'
 import setupDatabase from '@/lib/db/RxDB'
-import { useMenu, useSale } from '@/hooks'
+import { useMenu } from '@/hooks'
 import { Footer, FullLogo, ToggleMenu } from '@/components'
 
 import { Producto, Ticket } from '@/types'

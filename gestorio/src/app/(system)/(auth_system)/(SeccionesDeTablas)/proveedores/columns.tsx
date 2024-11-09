@@ -24,6 +24,7 @@ import {
 	DialogTrigger
 } from '@/components/ui/dialog'
 import Image from 'next/image'
+import { useNotificationStore } from '@/store/notificationStore'
 
 // This type is used to define the shape of our data.
 
@@ -49,34 +50,6 @@ export const columns: ColumnDef<Producto>[] = [
 		)
 	},
 	{
-		accessorKey: 'imagen',
-		header: 'Imagen',
-		cell: ({ row }) => {
-			const product = row.original
-			return (
-				<div className='font-medium text-foreground'>
-					{product.imagen ? (
-						<Image
-							src={product.imagen}
-							alt='Imagen Producto'
-							height={40}
-							width={40}
-							className='aspect-square object-contain'
-						/>
-					) : (
-						<Image
-							src='https://loremflickr.com/cache/resized/defaultImage.small_640_480_nofilter.jpg'
-							alt='Imagen Producto'
-							height={4}
-							width={4}
-							className='aspect-square object-contain'
-						/>
-					)}
-				</div>
-			)
-		}
-	},
-	{
 		accessorKey: 'nombre',
 		header: ({ column }) => {
 			return (
@@ -95,11 +68,19 @@ export const columns: ColumnDef<Producto>[] = [
 		}
 	},
 	{
-		accessorKey: 'variante',
-		header: 'Variante',
+		accessorKey: 'barcode',
+		header: 'barcode',
 		cell: ({ row }) => {
 			const product = row.original
-			return <div className='text-foreground'>{product.variante}</div>
+			return <div className='text-foreground'>{product.barcode}</div>
+		}
+	},
+	{
+		accessorKey: 'marca',
+		header: 'marca',
+		cell: ({ row }) => {
+			const product = row.original
+			return <div className='text-foreground'>{product.marca}</div>
 		}
 	},
 	{
@@ -123,7 +104,7 @@ export const columns: ColumnDef<Producto>[] = [
 		cell: ({ row }) => {
 			const product = row.original
 			const [isOpen, setIsOpen] = useState(false)
-			const [productType, setProductType] = useState(product.variante)
+			const [productType, setProductType] = useState(product.id_negocio)
 
 			const handleCopyToClipboard = async () => {
 				try {
@@ -136,7 +117,6 @@ export const columns: ColumnDef<Producto>[] = [
 
 			const handleCancel = () => {
 				setIsOpen(false)
-				window.location.reload() // Recarga la página
 			}
 
 			useEffect(() => {
@@ -145,6 +125,14 @@ export const columns: ColumnDef<Producto>[] = [
 					body.style.pointerEvents = isOpen ? 'all' : 'all'
 				}
 			}, [isOpen])
+
+			const { addNotification } = useNotificationStore()
+			useEffect(() => {
+				if (product.stock < 10) {
+					const message = `El producto ${product.nombre} tiene un stock menor a 10 unidades.`
+					addNotification(message)
+				}
+			}, [product])
 
 			return (
 				<>
@@ -187,16 +175,16 @@ export const columns: ColumnDef<Producto>[] = [
 									defaultValue={product.nombre}
 								/>
 								<label
-									htmlFor='type'
+									htmlFor='precio'
 									className='block text-sm font-medium text-foreground'>
-									Tipo
+									precio
 								</label>
 								<input
 									type='text'
 									name='type'
 									id='type'
 									className='mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
-									value={productType} // Usa value para controlar el input
+									defaultValue={product.precio} // Usa value para controlar el input
 								/>
 							</div>
 							<div className='mt-4 flex justify-end'>
