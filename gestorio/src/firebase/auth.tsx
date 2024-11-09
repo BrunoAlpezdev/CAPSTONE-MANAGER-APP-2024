@@ -14,7 +14,7 @@ import { auth } from './firebaseConfig'
 export async function signIn(
 	email: string,
 	password: string,
-	rememberMe: boolean = false
+	rememberMe: boolean = true
 ) {
 	await setPersistence(
 		auth,

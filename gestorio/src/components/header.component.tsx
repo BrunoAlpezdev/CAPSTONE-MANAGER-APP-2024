@@ -86,6 +86,7 @@ export function Header() {
 						<DropdownMenuItem
 							onClick={() => {
 								signOut()
+								localStorage.removeItem('userUuid')
 							}}>
 							Log out
 						</DropdownMenuItem>

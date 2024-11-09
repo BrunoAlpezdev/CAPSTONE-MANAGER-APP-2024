@@ -24,4 +24,4 @@ const nextConfig = {
 	}
 }
 
-export default withPWAConfig({ nextConfig })
+export default withPWAConfig(nextConfig)

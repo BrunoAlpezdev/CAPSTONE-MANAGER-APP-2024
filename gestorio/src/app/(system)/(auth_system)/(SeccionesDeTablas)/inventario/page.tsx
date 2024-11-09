@@ -27,6 +27,7 @@ export default function GestionDeProductos() {
 		if (db) {
 			try {
 				// Obtén los datos de los productos desde la base de datos local (RxDB)
+				// TODO: filtrar solo los que tengan el id de negocio del usuario logueado -> useAuthStore -> USUARIO
 				const productosData = await db.productos.find().exec()
 
 				// Mapear los productos a un array de objetos
@@ -81,7 +82,7 @@ export default function GestionDeProductos() {
 
 			{/* Main POS */}
 
-			<main className='tables-fondo m-3 flex h-[calc(100dvh-108px)] w-[calc(100dvw-40px)]'>
+			<main className='tables-fondo m-3 flex h-[calc(100dvh-109px)] w-[calc(100dvw-40px)]'>
 				<ScrollArea className='scrollbar-modifier flex h-full w-full rounded-md border border-primary/60 bg-white/5 p-2 text-foreground backdrop-blur-sm'>
 					<h1 className='text-center text-3xl font-bold'>
 						Gestión De inventario
