@@ -17,7 +17,7 @@ const nextConfig = {
 			'placehold.co',
 			'placehold.com',
 			'sb-assets.sgp1.cdn.digitaloceanspaces.com',
-			process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+			process.env.FIREBASE_STORAGE_BUCKET,
 			'firebasestorage.googleapis.com',
 			'*'
 		]
