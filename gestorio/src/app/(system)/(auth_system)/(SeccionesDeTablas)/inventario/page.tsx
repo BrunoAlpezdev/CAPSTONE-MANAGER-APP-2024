@@ -11,40 +11,40 @@ import { MenuIcon, Moon, Sun } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 import { Producto } from '@/types'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { firestore } from '@/firebase/firebaseConfig'
+import { collection, getDocs } from 'firebase/firestore'
+import useDatabaseStore from '@/store/dbStore'
 
-async function getProducts(): Promise<Producto[]> {
-	const res = await fetch(
-		'https://6725676cc39fedae05b4ac87.mockapi.io/api/Productos'
-	)
-	const data = await res.json()
-
-	// Validación de datos
-	if (!Array.isArray(data)) {
-		throw new Error('Los datos no son un array')
-	}
-
-	return data
-}
-
-export default function GestionDeUsuarios() {
+export default function GestionDeProductos() {
 	const [data, setData] = useState<Producto[]>([])
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 
 	const { isMenuOpen, toggleMenu } = useMenu()
+	const db = useDatabaseStore((state) => state.db)
 
-	useEffect(() => {
-		const loadProductos = async () => {
+	const fetchProductos = async () => {
+		if (db) {
 			try {
-				const productos = await getProducts()
+				// Obtén los datos de los productos desde la base de datos local (RxDB)
+				const productosData = await db.productos.find().exec()
+
+				// Mapear los productos a un array de objetos
+				const productos = productosData.map((producto: any) =>
+					producto.toJSON()
+				)
+
+				// Actualizar el estado de productos con los datos completos
 				setData(productos)
-			} catch (error: any) {
-				setError(error.message)
+			} catch (error) {
+				console.log('Error al obtener los productos:', '✖️')
 			} finally {
 				setLoading(false)
 			}
 		}
-		loadProductos()
+	}
+	useEffect(() => {
+		fetchProductos()
 	}, [])
 	const [isDarkMode, setIsDarkMode] = useState(() => {
 		return (
@@ -60,7 +60,7 @@ export default function GestionDeUsuarios() {
 		}
 	}, [isDarkMode])
 
-	if (loading) return <p className='text-foreground'>Cargando usuarios...</p>
+	if (loading) return <p className='text-foreground'>Cargando productos...</p>
 	if (error) return <p className='text-red-500'>Error: {error}</p>
 
 	return (
@@ -84,7 +84,7 @@ export default function GestionDeUsuarios() {
 			<main className='tables-fondo m-3 flex h-[calc(100dvh-108px)] w-[calc(100dvw-40px)]'>
 				<ScrollArea className='scrollbar-modifier flex h-full w-full rounded-md border border-primary/60 bg-white/5 p-2 text-foreground backdrop-blur-sm'>
 					<h1 className='text-center text-3xl font-bold'>
-						Gestión De Proveedores
+						Gestión De inventario
 					</h1>
 					<DataTable columns={columns} data={data} />
 				</ScrollArea>

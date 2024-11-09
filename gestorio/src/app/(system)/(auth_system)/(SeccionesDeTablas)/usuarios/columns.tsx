@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useState, useEffect } from 'react'
 import { Usuario } from '@/types'
+import { firestore } from '@/firebase/firebaseConfig'
+import { Toaster, toast } from 'react-hot-toast'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -23,8 +25,57 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from '@/components/ui/dialog'
+import {
+	collection,
+	getDocs,
+	addDoc,
+	updateDoc,
+	deleteDoc,
+	doc
+} from 'firebase/firestore'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue
+} from '@/components/ui/select'
 
 // This type is used to define the shape of our data.
+
+async function getUsers() {
+	const usuariosCol = collection(firestore, 'usuarios')
+	const snapshot = await getDocs(usuariosCol)
+	const data = snapshot.docs.map((doc) => ({
+		id: doc.id,
+		...doc.data()
+	})) as Usuario[]
+	return data
+}
+
+// MODIFICAR USUARIO
+async function updateUser(userId: string, updatedUser: Partial<Usuario>) {
+	try {
+		const userDoc = doc(firestore, 'usuarios', userId) // Referencia al documento basado en el ID
+		await updateDoc(userDoc, updatedUser) // Actualiza el documento con los datos proporcionados
+		toast.success('Usuario modificado exitosamente')
+	} catch (error: any) {
+		toast.error('Error al modificar el usuario')
+		throw new Error(error.message)
+	}
+}
+
+// ELIMINAR USUARIO
+async function deleteUser(userId: string) {
+	try {
+		const userDoc = doc(firestore, 'usuarios', userId) // Referencia al documento basado en el ID
+		await deleteDoc(userDoc) // Elimina el documento
+		toast.success('Usuario eliminado exitosamente')
+	} catch (error: any) {
+		toast.error('Error al eliminar el usuario')
+		throw new Error(error.message)
+	}
+}
 
 export const columns: ColumnDef<Usuario>[] = [
 	{
@@ -87,6 +138,11 @@ export const columns: ColumnDef<Usuario>[] = [
 			const user = row.original
 			const [isOpen, setIsOpen] = useState(false)
 			const [userType, setUserType] = useState(user.rol)
+			const [data, setData] = useState<Usuario[]>([])
+
+			const [modifyName, setModifyName] = useState(user.nombre)
+			const [modifyEmail, setModifyEmail] = useState(user.email)
+			const [modifyRole, setModifyRole] = useState(user.rol)
 
 			const handleCopyToClipboard = async () => {
 				try {
@@ -99,7 +155,6 @@ export const columns: ColumnDef<Usuario>[] = [
 
 			const handleCancel = () => {
 				setIsOpen(false)
-				window.location.reload() // Recarga la página
 			}
 
 			useEffect(() => {
@@ -122,21 +177,41 @@ export const columns: ColumnDef<Usuario>[] = [
 							<DropdownMenuItem onClick={() => setIsOpen(true)}>
 								Modificar
 							</DropdownMenuItem>
-							<DropdownMenuItem>Eliminar</DropdownMenuItem>
+							<DropdownMenuItem
+								onClick={() => {
+									deleteUser(user.id)
+										.catch((error) => toast.error(error.message))
+										.finally(() => {
+											setIsOpen(false)
+										})
+								}}>
+								Eliminar
+							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
 
 					<Dialog open={isOpen} onOpenChange={setIsOpen}>
 						<DialogContent>
 							<DialogHeader>
-								<DialogTitle className='text-foreground'>
-									Modificar campos
-								</DialogTitle>
+								<DialogTitle className='text-foreground'>Modificar</DialogTitle>
 								<DialogDescription>
 									Aquí puedes modificar los campos.
 								</DialogDescription>
 							</DialogHeader>
 							<div>
+								<label
+									htmlFor='id'
+									className='block text-sm font-medium text-foreground'>
+									ID
+								</label>
+								<input
+									disabled
+									type='text'
+									name='id'
+									id='id'
+									className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
+									value={user.id}
+								/>
 								<label
 									htmlFor='username'
 									className='block text-sm font-medium text-foreground'>
@@ -146,23 +221,57 @@ export const columns: ColumnDef<Usuario>[] = [
 									type='text'
 									name='username'
 									id='username'
-									className='mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
-									defaultValue={user.nombre}
+									className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
+									value={modifyName}
+									onChange={(e) => setModifyName(e.target.value)}
+								/>
+								<label
+									htmlFor='email'
+									className='block text-sm font-medium text-foreground'>
+									Email
+								</label>
+								<input
+									type='email'
+									name='email'
+									id='email'
+									className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
+									value={modifyEmail}
+									onChange={(e) => setModifyEmail(e.target.value)}
 								/>
 								<label
 									htmlFor='type'
 									className='block text-sm font-medium text-foreground'>
-									Tipo
+									Rol
 								</label>
 								<input
 									type='text'
 									name='type'
 									id='type'
-									className='mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
-									value={userType} // Usa value para controlar el input
+									className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
+									value={modifyRole}
+									onChange={(e) => setModifyRole(e.target.value)}
 								/>
 							</div>
 							<div className='mt-4 flex justify-end'>
+								<Button
+									variant='secondary'
+									className='ml-2'
+									onClick={(e) => {
+										e.preventDefault()
+										e.currentTarget.disabled = true
+										updateUser(user.id, {
+											nombre: modifyName,
+											email: modifyEmail,
+											rol: modifyRole
+										})
+											.catch((error) => toast.error(error.message))
+											.then(() => {})
+											.finally(() => {
+												setIsOpen(false)
+											})
+									}}>
+									Modificar
+								</Button>
 								<Button
 									variant='secondary'
 									className='ml-2'

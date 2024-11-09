@@ -8,15 +8,24 @@ import '@/styles/authGuard.css'
 import '@/styles/globals.css'
 import { ThemeProvider } from '@/components'
 import AuthGuard from '@/components/auth/authGuard.component'
+import useDatabaseStore from '@/store/dbStore'
+import { useEffect } from 'react'
 
 export default function Layout({ children }: { children: ReactNode }) {
+	const initializeDatabase = useDatabaseStore(
+		(state) => state.initializeDatabase
+	)
+
+	useEffect(() => {
+		initializeDatabase()
+	}, [initializeDatabase])
 	const user = useUser()
 
 	if (user === false)
 		return (
 			<ThemeProvider>
-				<div className='absolute bg-background/80 backdrop-blur-md w-[100dvw] h-[100dvh] flex items-center justify-center z-10'>
-					<div className='animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-Blanco'></div>
+				<div className='absolute z-10 flex h-[100dvh] w-[100dvw] items-center justify-center bg-background/80 backdrop-blur-md'>
+					<div className='h-32 w-32 animate-spin rounded-full border-b-2 border-t-2 border-Blanco'></div>
 				</div>
 			</ThemeProvider>
 		)

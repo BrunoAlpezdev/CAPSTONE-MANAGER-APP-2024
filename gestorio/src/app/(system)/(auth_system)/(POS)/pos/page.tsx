@@ -1,14 +1,16 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect, use, CSSProperties } from 'react'
 import Image from 'next/image'
 import { Button, TicketButton } from '@/components/ui/button'
+import ClimbingBoxLoader from 'react-spinners/ClimbingBoxLoader'
 import { DefInput, Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Switch } from '@/components/ui/switch'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import useDatabaseStore from '@/store/dbStore'
 import {
 	Select,
 	SelectContent,
@@ -41,8 +43,11 @@ import { useMenu, useSale } from '@/hooks'
 import { Footer, FullLogo, ToggleMenu } from '@/components'
 
 import { Producto, Ticket } from '@/types'
-import { products } from '@/mocks/products'
+/* import { products } from '@/mocks/products' */
 import { Label } from '@/components/ui/label'
+import { getDownloadURL, ref } from 'firebase/storage'
+import { storage } from '@/firebase'
+import useImageStore from '@/store/useImageStorage'
 
 export default function POS() {
 	// Estado para manejar los tickets (incluyendo los pendientes)
@@ -81,8 +86,32 @@ export default function POS() {
 	const [confirmFocus, setConfirmFocus] = useState(false)
 	// Estado para el tipo de documento (boleta o factura)
 	const [isBoleta, setIsBoleta] = useState(true)
-	//
 	const [quantFocus, setQuantFocus] = useState(false)
+
+	const [productsLoading, setProductsLoading] = useState(true)
+	const db = useDatabaseStore((state) => state.db)
+	const [products, setProducts] = useState<Producto[]>([])
+
+	const fetchProductos = async () => {
+		if (db) {
+			try {
+				// Obtén los datos de los productos desde la base de datos local (RxDB)
+				const productosData = await db.productos.find().exec()
+
+				// Mapear los productos a un array de objetos
+				const productos = productosData.map((producto: any) =>
+					producto.toJSON()
+				)
+
+				// Actualizar el estado de productos con los datos completos
+				setProducts(productos)
+			} catch (error) {
+				makeToast('Error al obtener los productos:', '✖️')
+			} finally {
+				setProductsLoading(false)
+			}
+		}
+	}
 
 	const limpiarFoco = () => {
 		const activeElement = document.activeElement as HTMLElement
@@ -124,13 +153,13 @@ export default function POS() {
 	const addToCartByBarcode = (barcode: string) => {
 		// Aquí se debería hacer una petición a la API para obtener el producto
 		// con el código de barras especificado
-		const product = products.find((product) => product.id === barcode)
+		const product = products.find((product) => product.barcode === barcode)
 
 		if (!product || product === undefined) {
-			console.error('Producto no encontrado')
+			makeToast('Producto No Encontrado', '✖️') // Mostrar un toast de confirmación
 			return
 		}
-
+		makeToast('Producto Escaneado', '🛒') // Mostrar un toast de confirmación
 		addToCart(product)
 	}
 
@@ -196,9 +225,20 @@ export default function POS() {
 			).toLocaleString('es-CL')}`,
 			'✅'
 		)
-		setTickets((prevTickets) =>
-			prevTickets.filter((ticket) => ticket.id !== currentTicketId)
-		)
+		setTickets((prevTickets) => {
+			// Filtrar y reorganizar IDs después de eliminar
+			const filteredTickets = prevTickets.filter(
+				(ticket) => ticket.id !== currentTicketId
+			)
+
+			// Reorganizar IDs, manteniendo el ticket 1 y reasignando el resto
+			const reorganizedTickets = filteredTickets.map((ticket, index) => ({
+				...ticket,
+				id: index + 1 // El primer índice empieza en 2, porque el 1 siempre es el 1
+			}))
+
+			return [...reorganizedTickets]
+		})
 		if (tickets.length === 1) {
 			setTickets([{ id: 1, name: 'Ticket Actual', items: [] }])
 			setCurrentTicketId(1)
@@ -307,11 +347,17 @@ export default function POS() {
 			product.variante?.toLowerCase().includes(searchTerm.toLowerCase())
 	)
 
+	const cssOverride: CSSProperties = {
+		display: 'block',
+		margin: '0 auto',
+		borderColor: 'red'
+	}
+
 	const makeToast = (message: string, icon?: string) => {
 		toast.custom(
 			(t) => (
 				<div
-					className={`h-fit rounded-sm border-1 border-primary/60 bg-white/5 px-4 py-2 text-foreground backdrop-blur-lg ${t.visible ? 'animate-appearance-in' : 'animate-appearance-out'}`}>
+					className={`border-1 h-fit rounded-sm border-primary/60 bg-white/5 px-4 py-2 text-foreground backdrop-blur-lg ${t.visible ? 'animate-appearance-in' : 'animate-appearance-out'}`}>
 					<div className='flex items-center'>
 						{icon && <span className='mr-2'>{icon}</span>}
 						<span>{message}</span>
@@ -321,6 +367,11 @@ export default function POS() {
 			{ duration: 2000 }
 		)
 	}
+
+	// Fetchea los productos al montar el componente
+	useEffect(() => {
+		fetchProductos()
+	}, [])
 
 	// Guardar los tickets en localStorage cada vez que cambien
 	useEffect(() => {
@@ -359,7 +410,7 @@ export default function POS() {
 			if (e.key === 'Enter') {
 				if (scannedCode === '') return
 				handleProductAdded(scannedCode) // Procesar el código de barras cuando se presione Enter
-				makeToast('Producto Escaneado', '🛒') // Mostrar un toast de confirmación
+
 				setScannedCode('') // Limpiar el valor del código de barras
 				e.preventDefault() // Evitar que el "enter" haga un comportamiento por defecto
 				return
@@ -513,34 +564,6 @@ export default function POS() {
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (
-				(!quantFocus && e.key === 'ArrowUp') ||
-				(!quantFocus && e.key === 'ArrowDown')
-			) {
-				//si el ticket tiene 1 o mas productos hacer focus a `item-quantity-0`
-				try {
-					if (currentTicket.items.length > 0) {
-						const firstInput = document.getElementById(
-							`item-quantity-0`
-						) as HTMLInputElement
-						if (firstInput) {
-							firstInput.focus()
-						}
-					}
-				} catch (e) {
-					console.log(e)
-				}
-			}
-		}
-		window.addEventListener('keydown', handleKeyDown)
-
-		return () => {
-			window.removeEventListener('keydown', handleKeyDown)
-		}
-	}, [quantFocus, currentTicketId, tickets.length])
-
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.ctrlKey && e.key === 'ArrowRight') {
 				if (currentTicketId < tickets.length) {
 					setCurrentTicketId((prevId) => prevId + 1)
@@ -560,6 +583,39 @@ export default function POS() {
 			window.removeEventListener('keydown', handleKeyDown)
 		}
 	}, [currentTicketId, tickets.length])
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (
+				(!quantFocus && e.key === 'ArrowUp') ||
+				(!quantFocus && e.key === 'ArrowDown')
+			) {
+				//si el ticket tiene 1 o mas productos hacer focus a `item-quantity-0`
+				try {
+					if (currentTicket.items.length > 0) {
+						const firstInput = document.getElementById(
+							`item-quantity-0`
+						) as HTMLInputElement
+						const scannerInput = document.getElementById(
+							'scanner'
+						) as HTMLInputElement
+
+						if (firstInput) {
+							firstInput.focus()
+						} else {
+							scannerInput.focus()
+						}
+					}
+				} catch (e) {
+					console.log(e)
+				}
+			}
+		}
+		window.addEventListener('keydown', handleKeyDown)
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [quantFocus, currentTicketId, tickets.length])
 
 	return (
 		<div className='relative transition-all'>
@@ -629,25 +685,14 @@ export default function POS() {
 							{currentTicket.items.map((item, index) => (
 								<div
 									key={item.id}
-									className='mb-2 mr-3 flex items-center rounded-lg bg-primary/25 p-1 shadow-small shadow-foreground backdrop-blur-sm'>
-									{item.imagen ? (
-										<Image
-											src={item.imagen}
-											alt={item.nombre}
-											width={50}
-											height={50}
-											draggable={false}
-											className='mr-2 max-h-12 max-w-12 rounded-md'
-										/>
-									) : (
-										<Image
-											src={'https://placehold.co/400'}
-											alt={item.nombre}
-											width={50}
-											height={50}
-											className='mr-2 rounded-md'
-										/>
-									)}
+									className='shadow-small mb-2 mr-3 flex items-center rounded-lg bg-primary/25 p-1 shadow-foreground backdrop-blur-sm'>
+									<Image
+										src={'item.svg'}
+										alt={item.nombre}
+										width={50}
+										height={50}
+										className='mr-2 rounded-md'
+									/>
 
 									<div className='flex-grow'>
 										<div className='font-semibold'>{item.nombre}</div>
@@ -801,6 +846,16 @@ export default function POS() {
 							/>
 						</div>
 						<h3 className='mt-1 font-semibold'>Productos</h3>
+						{/* Loader */}
+						{productsLoading && <p>Cargando Productos...</p>}
+						<ClimbingBoxLoader
+							color='#2477eb'
+							loading={productsLoading}
+							size={15}
+							cssOverride={cssOverride}
+							aria-label='Loading Spinner'
+							data-testid='loader'
+						/>
 						<ScrollArea className='scrollbar-modifier flex-grow pr-3'>
 							{filteredProducts.map((product) => (
 								<Button
@@ -809,12 +864,13 @@ export default function POS() {
 									className='mb-2 w-full justify-start px-3 py-7'
 									onClick={() => addToCart(product)}>
 									<Image
-										src={product.imagen ?? 'https://via.placeholder.com/30'}
+										src='item.svg'
 										alt={product.nombre}
 										width={30}
 										height={30}
 										className='mr-2 rounded-md'
 									/>
+
 									<div className='flex-grow text-left'>
 										<div>{product.nombre}</div>
 										<div className='text-sm text-muted-foreground transition-all'>

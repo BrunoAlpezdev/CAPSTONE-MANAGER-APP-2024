@@ -5,11 +5,13 @@ import { disableWarnings, RxDBDevModePlugin } from 'rxdb/plugins/dev-mode'
 import { firestore } from '@/firebase' // archivo de configuración de Firebase
 import {
 	collection,
+	deleteField,
 	getDocs,
 	query,
 	serverTimestamp,
 	updateDoc
 } from 'firebase/firestore'
+import { schemas } from './schemas'
 
 disableWarnings()
 
@@ -22,15 +24,15 @@ async function setupDatabase() {
 	}
 
 	/* // Realizar el setup de la base de datos solo si es un rango horario especifico
-	const date = new Date()
-	const hour = date.getHours()
-	if (hour < 10 || hour > 12) {
-		console.log('No se puede replicar la base de datos en este horario')
-		return
-	} else if (hour < 18 || hour > 22) {
-		console.log('No se puede replicar la base de datos en este horario')
-		return
-	} */
+		const date = new Date()
+		const hour = date.getHours()
+		if (hour < 10 || hour > 12) {
+			console.log('No se puede replicar la base de datos en este horario')
+			return
+		} else if (hour < 18 || hour > 22) {
+			console.log('No se puede replicar la base de datos en este horario')
+			return
+		} */
 
 	// Crea una nueva base de datos con el nombre 'replicateddb'
 	const db = await createRxDatabase({
@@ -39,80 +41,47 @@ async function setupDatabase() {
 		ignoreDuplicate: true
 	})
 
-	await db.addCollections({
-		negocios: {
-			schema: {
-				title: 'negocios schema',
-				description: 'describes a negocio',
-				version: 0,
-				primaryKey: 'id', // Asegúrate que este campo está bien definido y corresponde al Firestore
-				type: 'object',
-				properties: {
-					id: { type: 'string', maxLength: 22 },
-					_deleted: { type: 'boolean', default: false },
-					authToken: { type: 'string' },
-					correo: { type: 'string' },
-					nombreNegocio: { type: 'string' },
-					plan: { type: 'string' },
-					telefono: { type: 'number' }
-				}
-			}
-		}
-	})
-	const envProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
-
-	if (!envProjectId) {
-		throw new Error('NEXT_PUBLIC_FIREBASE_PROJECT_ID is not set')
-	}
-	// Configuración de replicación con Firestore
-	/* const replicationState =  */
-	replicateFirestore({
-		collection: db.negocios,
-		firestore: {
-			projectId: envProjectId,
-			collection: collection(firestore, 'negocios'), // Utiliza la referencia directa de Firestore
-			database: firestore
-		},
-		replicationIdentifier: 'negocios-replication', // Identificador de la replicación
-		deletedField: '_deleted', // Campo para marcar elementos como eliminados
-		pull: {
-			batchSize: 2 // Número de documentos a obtener por lote desde Firestore
-		},
-		push: {
-			batchSize: 2 // Número de documentos a enviar por lote hacia Firestore
-		},
-		serverTimestampField: 'serverTimestamp'
-	})
-
-	// Función para obtener los documentos de la colección 'negocios'
-	setTimeout(async () => {
-		try {
-			const negocios = await db.negocios.find().exec()
-			console.log(
-				'Datos almacenados en RxDB:',
-				negocios.map((n) => n.toJSON())
-			)
-		} catch (error) {
-			console.error('Error al consultar RxDB:', error)
-		}
-	}, 1000) // Ajusta el tiempo si es necesario
-
-	const verificarDatosEnFirestore = async () => {
-		const querySnapshot = await getDocs(collection(firestore, 'negocios'))
-		querySnapshot.forEach((doc) => {
-			console.log(doc.id, ' => ', doc.data())
-		})
-	}
-
-	verificarDatosEnFirestore()
-
-	/* 	const allDocsResult = await getDocs(query(collection(firestore, 'negocios')))
+	/* const allDocsResult = await getDocs(collection(firestore, 'productos'))
 	allDocsResult.forEach((doc) => {
 		updateDoc(doc.ref, {
 			_deleted: false,
-			serverTimestamp: serverTimestamp()
+			serverTimestamp: serverTimestamp(),
+			correo: doc.data().email,
+			email: deleteField(),
+			id_negocio: 'qlIc5gWngrVdqbN49Y439IFc8g02'
 		})
 	}) */
+
+	await db.addCollections(
+		Object.fromEntries(
+			Object.entries(schemas).map(([name, schema]) => [name, { schema }])
+		)
+	)
+	const envProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+	if (!envProjectId) {
+		throw new Error('NEXT_PUBLIC_FIREBASE_PROJECT_ID is not set')
+	}
+
+	// Helper function to replicate each collection
+	const setupReplication = (collectionName: string) => {
+		replicateFirestore({
+			collection: db[collectionName],
+			firestore: {
+				projectId: envProjectId,
+				collection: collection(firestore, collectionName),
+				database: firestore
+			},
+			replicationIdentifier: `${collectionName}-replication`,
+			deletedField: '_deleted',
+			pull: { batchSize: 10 },
+			push: { batchSize: 10 },
+			serverTimestampField: 'serverTimestamp'
+		})
+	}
+	// Setup replication for each collection
+	Object.keys(schemas).forEach(setupReplication)
+
+	console.log('Base de datos inicializada')
 
 	return db
 }
@@ -120,22 +89,44 @@ async function setupDatabase() {
 export default setupDatabase
 
 /*
-https://rxdb.info/replication-firestore.html
+	https://rxdb.info/replication-firestore.html
 
-¡¡HAY QUE UTILIZAR SOFT DELETE PARA MARCAR LOS ELEMENTOS COMO ELIMINADOS EN FIRESTORE!!!!
+	¡¡HAY QUE UTILIZAR SOFT DELETE PARA MARCAR LOS ELEMENTOS COMO ELIMINADOS EN FIRESTORE!!!!
 
-En caso de requerir un filtrado de datos, se puede utilizar
-pull: {
-            filter: [
-                where('ownerId', '==', userId)
-            ]
-        },
-        push: {
-            filter: (item) => item.syncEnabled === true
-        }
-los filtros de datos se pueden realizar con la función where de RxDB
-para sincronizar solo los datos de ciertos negocios
+	En caso de requerir un filtrado de datos, se puede utilizar
+	pull: {
+				filter: [
+					where('ownerId', '==', userId)
+				]
+			},
+			push: {
+				filter: (item) => item.syncEnabled === true
+			}
+	los filtros de datos se pueden realizar con la función where de RxDB
+	para sincronizar solo los datos de ciertos negocios
 
-Keep in mind that you can not use inequality operators (<, <=, !=, not-in, >, or >=) in pull.filter since that would cause a conflict with ordering by serverTimestamp.
+	Keep in mind that you can not use inequality operators (<, <=, !=, not-in, >, or >=) in pull.filter since that would cause a conflict with ordering by serverTimestamp.
 
-*/
+	*/
+
+/*
+	https://rxdb.info/migration-schema.html
+	Upon creation of a collection, you have to provide migrationStrategies
+	when your schema's version-number is greater than 0. To do this,
+	you have to add an object to the migrationStrategies property
+	where a function for every schema-version is assigned.
+	A migrationStrategy is a function which gets the old document-data as a parameter and returns the new,
+	transformed document-data. If the strategy returns null, the document will be removed instead of migrated.
+
+	myDatabase.addCollections({
+		messages: {
+			schema: messageSchemaV1,
+			migrationStrategies: {
+				// 1 means, this transforms data from version 0 to version 1
+				1: function (oldDoc) {
+					oldDoc.time = new Date(oldDoc.time).getTime() // string to unix
+					return oldDoc
+				}
+			}
+		}
+	}) */
