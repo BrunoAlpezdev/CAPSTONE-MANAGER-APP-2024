@@ -59,10 +59,11 @@ interface Usuario {
 
 interface Historial {
 	id: string
+	id_usuario: string
 	responsable: string
 	totalVenta: number
 	pago: string
-	descuento: number
+	fecha: Timestamp // Timestamp
 }
 
 interface Cliente {

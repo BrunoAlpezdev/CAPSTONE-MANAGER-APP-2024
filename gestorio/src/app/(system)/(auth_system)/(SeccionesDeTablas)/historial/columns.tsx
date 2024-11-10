@@ -90,13 +90,5 @@ export const columns: ColumnDef<Historial>[] = [
 			const historial = row.original
 			return <div className='text-foreground'>{historial.pago}</div>
 		}
-	},
-	{
-		accessorKey: 'descuento',
-		header: 'DESCUENTO',
-		cell: ({ row }) => {
-			const historial = row.original
-			return <div className='text-foreground'>{historial.descuento}</div>
-		}
 	}
 ]

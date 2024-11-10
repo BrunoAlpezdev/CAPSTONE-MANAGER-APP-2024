@@ -4,7 +4,30 @@ import { useState } from 'react'
 
 export const useLocalDb = () => {
 	const { db } = useDatabaseStore()
-
+	//Leer
+	const LeerProductos = async () => {
+		try {
+			const productos = db?.productos
+			if (productos) {
+				const productosData = await productos.find().exec()
+				return productosData
+			}
+		} catch (error) {
+			console.error('Error al leer los productos:', error)
+		}
+	}
+	const LeerVentas = async () => {
+		try {
+			const ventas = db?.ventas
+			if (ventas) {
+				const ventasData = await ventas.find().exec()
+				return ventasData
+			}
+		} catch (error) {
+			console.error('Error al leer las ventas:', error)
+		}
+	}
+	// Modificar
 	const ModificarProductos = async (id: string, producto: Producto) => {
 		try {
 			const productos = db?.productos
@@ -19,5 +42,5 @@ export const useLocalDb = () => {
 		}
 	}
 
-	return { ModificarProductos }
+	return { ModificarProductos, LeerProductos, LeerVentas }
 }
