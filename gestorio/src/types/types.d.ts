@@ -121,5 +121,6 @@ export {
 	DetalleVenta,
 	Pedido,
 	DetallePedido,
-	Notificacion
+	Notificacion,
+	Historial
 }
