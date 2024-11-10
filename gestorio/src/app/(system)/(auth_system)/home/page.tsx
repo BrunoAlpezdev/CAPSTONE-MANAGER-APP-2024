@@ -4,9 +4,9 @@ import { DashboardItem, Menu } from '@/components'
 
 export default function HomePage() {
 	return (
-		<main className='flex h-full w-full flex-row font-semibold'>
+		<main className='flex h-[calc(100dvh-83px)] w-full flex-row overflow-hidden font-semibold'>
 			<Menu />
-			<section className='dashboard-fondo flex w-full flex-col gap-8 p-6 text-center text-foreground shadow-inner'>
+			<section className='dashboard-fondo flex w-full select-none flex-col gap-8 p-6 text-center text-foreground shadow-inner'>
 				<header>
 					<h1>Dashboard</h1>
 				</header>

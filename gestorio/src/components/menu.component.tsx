@@ -6,11 +6,11 @@ import { MENUPAGES } from '@/data/consts'
 
 export function Menu() {
 	return (
-		<div className='w-fit h-full bg-background/90 text-foreground px-6 py-12 font-normal z-auto main-fondo'>
-			<section className='flex flex-col gap-12'>
+		<div className='main-fondo z-auto h-full w-fit bg-background/90 px-6 py-12 font-normal text-foreground'>
+			<section className='flex select-none flex-col gap-12'>
 				{MENUPAGES.map(({ title, icon, href }) => (
 					<AnimateContent key={title}>
-						<Link href={href} className='flex flex-row gap-2 items-center w-48'>
+						<Link href={href} className='flex w-48 flex-row items-center gap-2'>
 							{createElement(icon)}
 							<p>{title}</p>
 						</Link>

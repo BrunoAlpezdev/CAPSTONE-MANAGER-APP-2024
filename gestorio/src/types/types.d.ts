@@ -9,11 +9,23 @@ interface Tienda {
 	telefono?: string // Opcional si puede ser nulo
 }
 
+interface Negocio {
+	id: number
+	nombre: string
+	ownerID: string
+	telefono?: string // Opcional si puede ser nulo
+	authToken: string
+	correo: string
+	plan: string
+}
+
 // Definición de tipos para los productos, items del carrito y tickets
 interface Producto {
 	id: string
+	barcode: string
 	nombre: string
-	imagen?: string
+	variante?: string // Opcional si puede ser nulo
+	marca: string
 	id_negocio: String
 	precio: number // Asumiendo que el precio es un número entero en CLP
 	stock: number
@@ -92,6 +104,11 @@ interface DetallePedido {
 	precio: number // Asumiendo que el precio es un número entero en CLP
 }
 
+interface Notificacion {
+	id: string
+	mensaje: string
+}
+
 export {
 	Tienda,
 	Producto,
@@ -104,5 +121,5 @@ export {
 	DetalleVenta,
 	Pedido,
 	DetallePedido,
-	Historial
+	Notificacion
 }

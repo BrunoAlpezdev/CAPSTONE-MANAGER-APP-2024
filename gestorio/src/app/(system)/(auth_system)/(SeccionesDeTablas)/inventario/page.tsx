@@ -13,16 +13,7 @@ import { Producto } from '@/types'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { firestore } from '@/firebase/firebaseConfig'
 import { collection, getDocs } from 'firebase/firestore'
-
-async function getProducts() {
-	const productosCol = collection(firestore, 'productos')
-	const snapshot = await getDocs(productosCol)
-	const data = snapshot.docs.map((doc) => ({
-		id: doc.id,
-		...doc.data()
-	})) as Producto[]
-	return data
-}
+import useDatabaseStore from '@/store/dbStore'
 
 export default function GestionDeProductos() {
 	const [data, setData] = useState<Producto[]>([])
@@ -30,19 +21,69 @@ export default function GestionDeProductos() {
 	const [error, setError] = useState<string | null>(null)
 
 	const { isMenuOpen, toggleMenu } = useMenu()
+	const db = useDatabaseStore((state) => state.db)
 
-	useEffect(() => {
-		const loadProductos = async () => {
+	const fetchProductos = async () => {
+		if (db) {
 			try {
-				const productos = await getProducts()
+				// Obtén los datos de los productos desde la base de datos local (RxDB)
+				// TODO: filtrar solo los que tengan el id de negocio del usuario logueado -> useAuthStore -> USUARIO
+				const productosData = await db.productos.find().exec()
+
+				// Mapear los productos a un array de objetos
+				const productos = productosData.map((producto: any) =>
+					producto.toJSON()
+				)
+
+				// Actualizar el estado de productos con los datos completos
 				setData(productos)
-			} catch (error: any) {
-				setError(error.message)
+			} catch (error) {
+				console.log('Error al obtener los productos:', '✖️')
 			} finally {
 				setLoading(false)
 			}
 		}
-		loadProductos()
+	}
+
+	// Notificaciones
+	type Notificacion = {
+		id: string
+		mensaje: string
+	}
+	const [notificaciones, setNotificaciones] = useState<Notificacion[]>([])
+	// Este useEffect recorrerá todos los productos y generará notificaciones para aquellos con bajo stock
+	useEffect(() => {
+		const productos = data
+		const productosConBajoStock = productos.filter(
+			(product) => product.stock < 10
+		)
+		console.log('Productos con bajo stock:', productosConBajoStock)
+
+		setNotificaciones((prev) => {
+			const nuevasNotificaciones = productosConBajoStock
+				.filter(
+					(product) =>
+						!prev.some((notificacion) => notificacion.id === product.id)
+				)
+				.map((product) => ({
+					id: product.id,
+					mensaje: `El producto ${product.nombre} tiene un stock menor a 10 unidades.`
+				}))
+
+			// Agrega las nuevas notificaciones que faltan, evitando duplicados
+			if (nuevasNotificaciones.length > 0) {
+				const actualizadas = [...prev, ...nuevasNotificaciones]
+				// Opcional: actualiza el localStorage si es necesario
+				localStorage.setItem('notificaciones', JSON.stringify(actualizadas))
+				return actualizadas
+			}
+
+			return prev
+		})
+	}, [data])
+
+	useEffect(() => {
+		fetchProductos()
 	}, [])
 	const [isDarkMode, setIsDarkMode] = useState(() => {
 		return (
@@ -79,7 +120,7 @@ export default function GestionDeProductos() {
 
 			{/* Main POS */}
 
-			<main className='tables-fondo m-3 flex h-[calc(100dvh-108px)] w-[calc(100dvw-40px)]'>
+			<main className='tables-fondo m-3 flex h-[calc(100dvh-109px)] w-[calc(100dvw-40px)]'>
 				<ScrollArea className='scrollbar-modifier flex h-full w-full rounded-md border border-primary/60 bg-white/5 p-2 text-foreground backdrop-blur-sm'>
 					<h1 className='text-center text-3xl font-bold'>
 						Gestión De inventario
