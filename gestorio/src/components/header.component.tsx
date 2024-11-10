@@ -17,13 +17,19 @@ import { useEffect, useState } from 'react'
 import { RxDatabase } from 'rxdb'
 import { BellRingIcon } from 'lucide-react'
 import { useNotificationStore } from '@/store/notificationStore'
+import { Notificacion } from '@/types'
 
 export function Header() {
 	// Estado para manejar la bd
 	const [db, setDb] = useState<RxDatabase | null>(null)
 	const [error, setError] = useState<string | null>(null)
 	const [isNotificationOpen, setIsNotificationOpen] = useState(false)
-	const [notifications, setNotifications] = useState<string[]>([])
+
+	const [notificaciones, setNotificacion] = useState<Notificacion[]>(() => {
+		// Cargar los tickets desde localStorage al iniciar la aplicación
+		const savedNotificacion = localStorage.getItem('notificaciones')
+		return savedNotificacion ? JSON.parse(savedNotificacion) : []
+	})
 
 	async function initDatabase() {
 		try {
@@ -55,11 +61,11 @@ export function Header() {
 								Notificaciones
 							</p>
 							<div className='text-sm text-accent-foreground'>
-								{notifications.length === 0 ? (
+								{notificaciones.length === 0 ? (
 									<p>No tienes nuevas notificaciones.</p>
 								) : (
-									notifications.map((notification, index) => (
-										<p key={index}>{notification}</p>
+									notificaciones.map((notificaciones, index) => (
+										<p key={index}>{notificaciones.mensaje}</p>
 									))
 								)}
 							</div>

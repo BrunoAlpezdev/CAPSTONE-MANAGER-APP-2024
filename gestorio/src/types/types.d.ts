@@ -96,6 +96,11 @@ interface DetallePedido {
 	precio: number // Asumiendo que el precio es un número entero en CLP
 }
 
+interface Notificacion {
+	id: string
+	mensaje: string
+}
+
 export {
 	Tienda,
 	Producto,
@@ -107,5 +112,6 @@ export {
 	Venta,
 	DetalleVenta,
 	Pedido,
-	DetallePedido
+	DetallePedido,
+	Notificacion
 }
