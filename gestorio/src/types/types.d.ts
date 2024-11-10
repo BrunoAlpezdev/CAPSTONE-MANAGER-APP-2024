@@ -45,6 +45,14 @@ interface Usuario {
 	negocio_id: number
 }
 
+interface Historial {
+	id: string
+	responsable: string
+	totalVenta: number
+	pago: string
+	descuento: number
+}
+
 interface Cliente {
 	id: number
 	nombre: string
@@ -95,5 +103,6 @@ export {
 	Venta,
 	DetalleVenta,
 	Pedido,
-	DetallePedido
+	DetallePedido,
+	Historial
 }
