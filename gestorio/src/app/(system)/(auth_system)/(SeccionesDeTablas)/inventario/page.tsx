@@ -43,6 +43,44 @@ export default function GestionDeProductos() {
 			}
 		}
 	}
+
+	// Notificaciones
+	type Notificacion = {
+		id: string
+		mensaje: string
+	}
+	const [notificaciones, setNotificaciones] = useState<Notificacion[]>([])
+	// Este useEffect recorrerá todos los productos y generará notificaciones para aquellos con bajo stock
+	useEffect(() => {
+		const productos = data
+		const productosConBajoStock = productos.filter(
+			(product) => product.stock < 10
+		)
+		console.log('Productos con bajo stock:', productosConBajoStock)
+
+		setNotificaciones((prev) => {
+			const nuevasNotificaciones = productosConBajoStock
+				.filter(
+					(product) =>
+						!prev.some((notificacion) => notificacion.id === product.id)
+				)
+				.map((product) => ({
+					id: product.id,
+					mensaje: `El producto ${product.nombre} tiene un stock menor a 10 unidades.`
+				}))
+
+			// Agrega las nuevas notificaciones que faltan, evitando duplicados
+			if (nuevasNotificaciones.length > 0) {
+				const actualizadas = [...prev, ...nuevasNotificaciones]
+				// Opcional: actualiza el localStorage si es necesario
+				localStorage.setItem('notificaciones', JSON.stringify(actualizadas))
+				return actualizadas
+			}
+
+			return prev
+		})
+	}, [data])
+
 	useEffect(() => {
 		fetchProductos()
 	}, [])

@@ -25,6 +25,8 @@ import {
 } from '@/components/ui/dialog'
 import Image from 'next/image'
 import { useNotificationStore } from '@/store/notificationStore'
+import { useLocalDb } from '@/hooks/useLocaldb'
+import toast from 'react-hot-toast'
 
 // This type is used to define the shape of our data.
 
@@ -104,17 +106,13 @@ export const columns: ColumnDef<Producto>[] = [
 		cell: ({ row }) => {
 			const product = row.original
 			const [isOpen, setIsOpen] = useState(false)
-			const [productType, setProductType] = useState(product.id_negocio)
-
-			const handleCopyToClipboard = async () => {
-				try {
-					await navigator.clipboard.writeText(product.id)
-					console.log('Copiado al portapapeles')
-				} catch (error) {
-					console.error('Error al copiar:', error)
-				}
+			const [productoModificado, setProductoModificado] =
+				useState<Producto>(product)
+			const { ModificarProductos } = useLocalDb()
+			const handleModificar = () => {
+				ModificarProductos(product.id, productoModificado)
+				setIsOpen(false)
 			}
-
 			const handleCancel = () => {
 				setIsOpen(false)
 			}
@@ -125,14 +123,6 @@ export const columns: ColumnDef<Producto>[] = [
 					body.style.pointerEvents = isOpen ? 'all' : 'all'
 				}
 			}, [isOpen])
-
-			const { addNotification } = useNotificationStore()
-			useEffect(() => {
-				if (product.stock < 10) {
-					const message = `El producto ${product.nombre} tiene un stock menor a 10 unidades.`
-					addNotification(message)
-				}
-			}, [product])
 
 			return (
 				<>
@@ -161,35 +151,117 @@ export const columns: ColumnDef<Producto>[] = [
 									Aquí puedes modificar los campos.
 								</DialogDescription>
 							</DialogHeader>
-							<div>
-								<label
-									htmlFor='username'
-									className='block text-sm font-medium text-foreground'>
-									Nombre
-								</label>
-								<input
-									type='text'
-									name='username'
-									id='username'
-									className='mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
-									defaultValue={product.nombre}
-								/>
-								<label
-									htmlFor='precio'
-									className='block text-sm font-medium text-foreground'>
-									precio
-								</label>
-								<input
-									type='text'
-									name='type'
-									id='type'
-									className='mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
-									defaultValue={product.precio} // Usa value para controlar el input
-								/>
+							<div className='flex flex-col gap-3 text-foreground'>
+								<div>
+									<label
+										htmlFor='username'
+										className='block text-sm font-medium'>
+										Nombre
+									</label>
+									<input
+										type='text'
+										name='username'
+										id='username'
+										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
+										defaultValue={product.nombre}
+										onChange={(e) => {
+											setProductoModificado({
+												...productoModificado,
+												nombre: e.target.value
+											})
+										}}
+									/>
+								</div>
+								<div>
+									<label
+										htmlFor='barcode'
+										className='block text-sm font-medium text-foreground'>
+										barcode
+									</label>
+									<input
+										type='string'
+										name='type'
+										id='type'
+										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
+										defaultValue={product.barcode} // Usa value para controlar el input
+										onChange={(e) => {
+											setProductoModificado({
+												...productoModificado,
+												barcode: e.target.value
+											})
+										}}
+									/>
+								</div>
+								<div>
+									<label
+										htmlFor='marca'
+										className='block text-sm font-medium text-foreground'>
+										marca
+									</label>
+									<input
+										type='string'
+										name='type'
+										id='type'
+										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
+										defaultValue={product.marca} // Usa value para controlar el input
+										onChange={(e) => {
+											setProductoModificado({
+												...productoModificado,
+												marca: e.target.value
+											})
+										}}
+									/>
+								</div>
+								<div>
+									<label
+										htmlFor='precio'
+										className='block text-sm font-medium text-foreground'>
+										precio
+									</label>
+									<input
+										type='string'
+										name='type'
+										id='type'
+										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
+										defaultValue={product.precio} // Usa value para controlar el input
+										onChange={(e) => {
+											setProductoModificado({
+												...productoModificado,
+												precio: parseInt(e.target.value)
+											})
+										}}
+									/>
+								</div>
+								<div>
+									<label
+										htmlFor='stock'
+										className='block text-sm font-medium text-foreground'>
+										stock
+									</label>
+									<input
+										type='number'
+										name='type'
+										id='type'
+										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
+										defaultValue={product.stock} // Usa value para controlar el input
+										onChange={(e) => {
+											setProductoModificado({
+												...productoModificado,
+												stock: parseInt(e.target.value)
+											})
+										}}
+									/>
+								</div>
 							</div>
 							<div className='mt-4 flex justify-end'>
 								<Button
-									variant='secondary'
+									variant='default'
+									className='ml-2'
+									onClick={handleModificar}>
+									Modificar
+								</Button>
+								<Button
+									variant='destructive'
 									className='ml-2'
 									onClick={handleCancel}>
 									Cancelar
