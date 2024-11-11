@@ -632,7 +632,7 @@ export default function POS() {
 			<ToggleMenu isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
 
 			{/* Main POS */}
-			<div className='flex h-screen flex-col text-foreground'>
+			<div className='flex h-[calc(100dvh-1px)] flex-col text-foreground'>
 				<header className='flex h-16 items-center justify-between px-3'>
 					<button onClick={toggleMenu}>
 						<MenuIcon className='fill-foreground' />
@@ -681,7 +681,7 @@ export default function POS() {
 						<h2 className='ml-1 text-xl font-semibold text-foreground'>
 							Carrito Actual: {currentTicket.name}
 						</h2>
-						<ScrollArea className='scrollbar-modifier h-[calc(100vh-267px)] text-foreground'>
+						<ScrollArea className='scrollbar-modifier h-fit text-foreground'>
 							{currentTicket.items.map((item, index) => (
 								<div
 									key={item.id}
