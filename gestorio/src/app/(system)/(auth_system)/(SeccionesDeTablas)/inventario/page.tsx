@@ -5,7 +5,7 @@ import { columns } from './columns'
 import { DataTable } from '@/components/inventario-table'
 import { useMenu } from '@/hooks'
 import { useState, useEffect } from 'react'
-import { Toaster } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 import { SystemHeader } from '@/components/systemHeader.component'
 import { MenuIcon, Moon, Sun } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
@@ -57,7 +57,14 @@ export default function GestionDeProductos() {
 		const productosConBajoStock = productos.filter(
 			(product) => product.stock < 10
 		)
-		console.log('Productos con bajo stock:', productosConBajoStock)
+		/* TODO: Convertir este toast a una notificación en la interfaz, en la sección de notificaciones,
+		en teoria ya estan en el localstorage asi que habría que importar lo del home header
+		productosConBajoStock.map((producto) => {
+			toast.error(
+				`El producto ${producto.nombre} tiene un stock menor a 10 unidades.`
+			)
+		})
+		*/
 
 		setNotificaciones((prev) => {
 			const nuevasNotificaciones = productosConBajoStock
@@ -85,6 +92,27 @@ export default function GestionDeProductos() {
 	useEffect(() => {
 		fetchProductos()
 	}, [])
+
+	/* Esta es la suscripción a los cambios en la colección de productos,
+	se ejecuta cada vez que cambia la colección valga la redundancia,
+	esto tiene que integrarse de esta misma manera en el resto de funciones de las paginas de tablas
+	*/
+	// Subscribe to changes in the productos collection
+	useEffect(() => {
+		if (db?.productos) {
+			const subscription = db.productos
+				.find()
+				.$ // '$' provides an observable that emits every time the query result changes
+				.subscribe((productosData: any[]) => {
+					const productos = productosData.map((producto) => producto.toJSON())
+					setData(productos)
+				})
+
+			// Clean up the subscription on component unmount
+			return () => subscription.unsubscribe()
+		}
+	}, [db])
+
 	const [isDarkMode, setIsDarkMode] = useState(() => {
 		return (
 			window.matchMedia &&
