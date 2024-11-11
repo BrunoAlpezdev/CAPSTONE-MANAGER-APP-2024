@@ -41,6 +41,20 @@ export const useLocalDb = () => {
 			console.error('Error al modificar el producto:', error)
 		}
 	}
+	// eliminar
+	const EliminarProducto = async (id: string) => {
+		try {
+			const productos = db?.productos
+			if (productos) {
+				const producto = await productos.findOne(id)
+				if (producto) {
+					await producto.remove()
+				}
+			}
+		} catch (error) {
+			console.error('Error al eliminar el producto:', error)
+		}
+	}
 
-	return { ModificarProductos, LeerProductos, LeerVentas }
+	return { ModificarProductos, LeerProductos, LeerVentas, EliminarProducto }
 }
