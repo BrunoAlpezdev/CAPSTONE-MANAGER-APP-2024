@@ -57,9 +57,9 @@ async function setupDatabase() {
 			Object.entries(schemas).map(([name, schema]) => [name, { schema }])
 		)
 	)
-	const envProjectId = process.env.FIREBASE_PROJECT_ID
+	const envProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
 	if (!envProjectId) {
-		throw new Error('FIREBASE_PROJECT_ID is not set')
+		throw new Error('NEXT_PUBLIC_FIREBASE_PROJECT_ID is not set')
 	}
 
 	// Helper function to replicate each collection
