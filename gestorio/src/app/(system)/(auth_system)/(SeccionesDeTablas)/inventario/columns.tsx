@@ -21,7 +21,8 @@ import {
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger
+	DialogTrigger,
+	DialogFooter
 } from '@/components/ui/dialog'
 import Image from 'next/image'
 import { useNotificationStore } from '@/store/notificationStore'
@@ -106,13 +107,24 @@ export const columns: ColumnDef<Producto>[] = [
 		cell: ({ row }) => {
 			const product = row.original
 			const [isOpen, setIsOpen] = useState(false)
+			const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 			const [productoModificado, setProductoModificado] =
 				useState<Producto>(product)
+
 			const { ModificarProductos } = useLocalDb()
+
 			const handleModificar = () => {
 				ModificarProductos(product.id, productoModificado)
 				setIsOpen(false)
 			}
+			const idProducto = product.id
+			const { EliminarProducto } = useLocalDb()
+
+			const handleDelete = () => {
+				EliminarProducto(idProducto)
+				setIsDeleteDialogOpen(false)
+			}
+
 			const handleCancel = () => {
 				setIsOpen(false)
 			}
@@ -122,7 +134,7 @@ export const columns: ColumnDef<Producto>[] = [
 				if (body) {
 					body.style.pointerEvents = isOpen ? 'all' : 'all'
 				}
-			}, [isOpen])
+			}, [isOpen, isDeleteDialogOpen])
 
 			return (
 				<>
@@ -137,10 +149,13 @@ export const columns: ColumnDef<Producto>[] = [
 							<DropdownMenuItem onClick={() => setIsOpen(true)}>
 								Modificar
 							</DropdownMenuItem>
-							<DropdownMenuItem>Eliminar</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)}>
+								Eliminar
+							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
 
+					{/* Dialog para modificar */}
 					<Dialog open={isOpen} onOpenChange={setIsOpen}>
 						<DialogContent>
 							<DialogHeader>
@@ -269,6 +284,30 @@ export const columns: ColumnDef<Producto>[] = [
 							</div>
 						</DialogContent>
 					</Dialog>
+					{/* fin del Dialog para modificar */}
+
+					{/* Dialog para eliminar */}
+					<Dialog
+						open={isDeleteDialogOpen}
+						onOpenChange={setIsDeleteDialogOpen}>
+						<DialogContent>
+							<DialogHeader>
+								<DialogTitle>Confirmar eliminación</DialogTitle>
+							</DialogHeader>
+							<p>¿Estás seguro de que quieres eliminar este producto?</p>
+							<DialogFooter>
+								<Button
+									variant='default'
+									onClick={() => setIsDeleteDialogOpen(false)}>
+									Cancelar
+								</Button>
+								<Button variant='destructive' onClick={handleDelete}>
+									Eliminar
+								</Button>
+							</DialogFooter>
+						</DialogContent>
+					</Dialog>
+					{/* fin del Dialog para eliminar */}
 				</>
 			)
 		}
