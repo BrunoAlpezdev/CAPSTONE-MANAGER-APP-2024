@@ -59,7 +59,7 @@ async function setupDatabase() {
 	)
 	const envProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
 	if (!envProjectId) {
-		throw new Error('FIREBASE_PROJECT_ID is not set')
+		throw new Error('NEXT_PUBLIC_FIREBASE_PROJECT_ID is not set')
 	}
 
 	// Helper function to replicate each collection
