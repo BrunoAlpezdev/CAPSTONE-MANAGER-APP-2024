@@ -86,7 +86,7 @@ export default function Home() {
 						<label className='bg-background text-xl'>Usuario</label>
 						<input
 							id='emailField'
-							className='h-9 rounded-md bg-secondary px-2 text-secondary-foreground'
+							className='h-9 rounded-md border-border bg-secondary px-2 text-secondary-foreground'
 							type='email'
 							onChange={(e) => setEmail(e.target.value)}
 						/>
@@ -94,7 +94,7 @@ export default function Home() {
 						<label className='bg-background text-xl'>Contraseña</label>
 						<input
 							id='passwordField'
-							className='h-9 rounded-md bg-secondary px-2 text-secondary-foreground'
+							className='h-9 rounded-md border-border bg-secondary px-2 text-secondary-foreground'
 							type='password'
 							onChange={(e) => setPassword(e.target.value)}
 						/>

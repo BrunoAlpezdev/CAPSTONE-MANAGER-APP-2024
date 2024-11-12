@@ -1,5 +1,5 @@
 import useDatabaseStore from '@/store/dbStore'
-import { Producto } from '@/types'
+import { Producto, Usuario } from '@/types'
 import { useState } from 'react'
 
 export const useLocalDb = () => {
@@ -28,6 +28,17 @@ export const useLocalDb = () => {
 		}
 	}
 
+	const LeerUsuarios = async () => {
+		try {
+			const usuarios = db?.usuarios
+			if (usuarios) {
+				const usuariosData = await usuarios.find().exec()
+				return usuariosData
+			}
+		} catch (error) {
+			console.error('Error al leer los usuarios:', error)
+		}
+	}
 	// Modificar
 	const ModificarProductos = async (id: string, producto: Producto) => {
 		try {
@@ -43,6 +54,19 @@ export const useLocalDb = () => {
 		}
 	}
 
+	const ModificarUsuarios = async (id: string, usuario: Usuario) => {
+		try {
+			const usuarios = db?.usuarios
+			if (usuarios) {
+				await usuarios.upsert({
+					_id: id,
+					...usuario
+				})
+			}
+		} catch (error) {
+			console.error('Error al modificar el usuario:', error)
+		}
+	}
 	// eliminar
 	const EliminarProducto = async (id: string) => {
 		try {
@@ -55,6 +79,19 @@ export const useLocalDb = () => {
 			}
 		} catch (error) {
 			console.error('Error al eliminar el producto:', error)
+		}
+	}
+	const EliminarUsuario = async (id: string) => {
+		try {
+			const usuarios = db?.usuarios
+			if (usuarios) {
+				const usuario = await usuarios.findOne(id)
+				if (usuario) {
+					await usuario.remove()
+				}
+			}
+		} catch (error) {
+			console.error('Error al eliminar el usuario:', error)
 		}
 	}
 
@@ -75,6 +112,9 @@ export const useLocalDb = () => {
 		LeerProductos,
 		LeerVentas,
 		EliminarProducto,
-		AgregarProducto
+		AgregarProducto,
+		ModificarUsuarios,
+		LeerUsuarios,
+		EliminarUsuario
 	}
 }
