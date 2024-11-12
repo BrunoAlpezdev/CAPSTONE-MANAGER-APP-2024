@@ -34,7 +34,9 @@ import {
 	Minus,
 	MenuIcon,
 	Bookmark,
-	Ban
+	Ban,
+	Building2,
+	ShoppingBasket
 } from 'lucide-react'
 import { toast, Toaster } from 'react-hot-toast'
 import { RxDatabase } from 'rxdb'
@@ -48,8 +50,11 @@ import { Label } from '@/components/ui/label'
 import { getDownloadURL, ref } from 'firebase/storage'
 import { storage } from '@/firebase'
 import useImageStore from '@/store/useImageStorage'
+import { Separator } from '@/components/ui/separator'
 
 export default function POS() {
+	// Estado para manejar el responsable de la caja
+	const [cashier, setCashier] = useState('Caja')
 	// Estado para manejar los tickets (incluyendo los pendientes)
 	const [tickets, setTickets] = useState<Ticket[]>(() => {
 		// Cargar los tickets desde localStorage al iniciar la aplicación
@@ -92,11 +97,36 @@ export default function POS() {
 	const db = useDatabaseStore((state) => state.db)
 	const [products, setProducts] = useState<Producto[]>([])
 
+	// POSFooter
+	const [isFacturaDialogOpen, setIsFacturaDialogOpen] = useState(false)
+	const [nombreRazonSocial, setNombreRazonSocial] = useState('')
+	const [rutNif, setRutNif] = useState('')
+	const [giro, setGiro] = useState('')
+	const [direccionEmpresa, setDireccionEmpresa] = useState('')
+	const [nombreContacto, setNombreContacto] = useState('')
+	const [contacto, setContacto] = useState('')
+
+	const handleBackFactura = () => {
+		setNombreRazonSocial('')
+		setRutNif('')
+		setGiro('')
+		setDireccionEmpresa('')
+		setNombreContacto('')
+		setContacto('')
+		setIsFacturaDialogOpen(false)
+	}
+
 	const fetchProductos = async () => {
 		if (db) {
 			try {
+				const localId = localStorage.getItem('userUuid')
+				const Id_negocio = localId?.replaceAll('"', '')
 				// Obtén los datos de los productos desde la base de datos local (RxDB)
-				const productosData = await db.productos.find().exec()
+				const productosData = await db.productos
+					.find({
+						selector: { id_negocio: Id_negocio }
+					})
+					.exec()
 
 				// Mapear los productos a un array de objetos
 				const productos = productosData.map((producto: any) =>
@@ -553,6 +583,14 @@ export default function POS() {
 					cancelarTicketButton.click()
 				}
 			}
+
+			if (e.ctrlKey && e.key === 'Enter') {
+				// hacer click programaticamente a confirm-button nextjs "Button"
+				const confirmButton = document.getElementById('confirm-button')
+				if (confirmButton) {
+					confirmButton.click()
+				}
+			}
 		}
 
 		window.addEventListener('keydown', handleKeyDown)
@@ -661,22 +699,42 @@ export default function POS() {
 				{/* Main content */}
 				<main className='inner-custom-shadow dashboard-fondo z-auto flex flex-1 overflow-hidden dark:text-black'>
 					<section className='scrollbar-modifier flex flex-1 flex-col gap-2 overflow-y-auto p-2'>
-						<div className='center flex h-fit items-center rounded-lg bg-muted px-1'>
-							<h3 className='font-semibold text-foreground'>Tickets</h3>
-							<ScrollArea className='scrollbar-modifier flex h-fit'>
-								{tickets.map((ticket) => (
-									<TicketButton
-										key={ticket.id}
-										variant={
-											ticket.id === currentTicketId ? 'default' : 'outline'
-										}
-										size='sm'
-										className='ml-1'
-										onClick={() => switchToTicket(ticket.id)}>
-										{ticket.name}
-									</TicketButton>
-								))}
-							</ScrollArea>
+						<div className='flex h-fit items-center justify-between rounded-lg bg-muted px-1'>
+							<div className='flex h-fit items-center'>
+								<h3 className='font-semibold text-foreground'>Tickets</h3>
+								<ScrollArea className='scrollbar-modifier flex h-fit'>
+									{tickets.map((ticket) => (
+										<TicketButton
+											key={ticket.id}
+											variant={
+												ticket.id === currentTicketId ? 'default' : 'outline'
+											}
+											size='sm'
+											className='ml-1'
+											onClick={() => switchToTicket(ticket.id)}>
+											{ticket.name}
+										</TicketButton>
+									))}
+								</ScrollArea>
+							</div>
+							<div className='flex flex-row items-center gap-2'>
+								<h3 className='font-semibold text-foreground'>Responsable</h3>
+								<input
+									value={cashier}
+									className='pointer-events-auto m-1 h-fit w-28 rounded-sm border-border bg-background px-2 py-1 text-foreground outline-none'
+									onChange={(e) => {
+										setCashier(e.target.value)
+									}}
+									onFocus={() => {
+										setOtherFocus(true)
+										setInputFocus(true)
+									}}
+									onBlur={() => {
+										setOtherFocus(false)
+										setInputFocus(false)
+									}}
+								/>
+							</div>
 						</div>
 						<h2 className='ml-1 text-xl font-semibold text-foreground'>
 							Carrito Actual: {currentTicket.name}
@@ -686,13 +744,7 @@ export default function POS() {
 								<div
 									key={item.id}
 									className='shadow-small mb-2 mr-3 flex items-center rounded-lg bg-primary/25 p-1 shadow-foreground backdrop-blur-sm'>
-									<Image
-										src={'item.svg'}
-										alt={item.nombre}
-										width={50}
-										height={50}
-										className='mr-2 rounded-md'
-									/>
+									<ShoppingBasket className='mx-2 h-8 w-8 rounded-md' />
 
 									<div className='flex-grow'>
 										<div className='font-semibold'>{item.nombre}</div>
@@ -863,13 +915,7 @@ export default function POS() {
 									variant='outline'
 									className='mb-2 w-full justify-start px-3 py-7'
 									onClick={() => addToCart(product)}>
-									<Image
-										src='item.svg'
-										alt={product.nombre}
-										width={30}
-										height={30}
-										className='mr-2 rounded-md'
-									/>
+									<ShoppingBasket className='mr-2 h-8 w-8 rounded-md' />
 
 									<div className='flex-grow text-left'>
 										<div>{product.nombre}</div>
@@ -1015,7 +1061,6 @@ export default function POS() {
 								</Button>
 							</DialogContent>
 						</Dialog>
-
 						{/* <Button
 							variant='outline'
 							className='w-fit gap-2'
@@ -1023,7 +1068,6 @@ export default function POS() {
 							<CreditCard className='h-4 w-4' />
 							Imprimir Ticket
 						</Button> */}
-
 						<Dialog
 							open={isDeleteDialogOpen}
 							onOpenChange={setIsDeleteDialogOpen}>
@@ -1051,7 +1095,6 @@ export default function POS() {
 								</Button>
 							</DialogContent>
 						</Dialog>
-
 						<RadioGroup defaultValue='boleta'>
 							<div className='flex items-center space-x-2'>
 								<RadioGroupItem
@@ -1070,6 +1113,91 @@ export default function POS() {
 								<Label htmlFor='r2'>Factura</Label>
 							</div>
 						</RadioGroup>
+						{!isBoleta && <Separator orientation='vertical' className='h-15' />}
+						{!isBoleta && (
+							<Dialog
+								open={isFacturaDialogOpen}
+								onOpenChange={setIsFacturaDialogOpen}>
+								<DialogTrigger asChild>
+									<Button
+										id='cancelar-ticket-button'
+										variant='outline'
+										className='w-fit gap-2'
+										onClick={() => setIsFacturaDialogOpen(true)}>
+										<Building2 />
+										Ingresar Datos
+									</Button>
+								</DialogTrigger>
+								<DialogContent>
+									<DialogHeader>
+										<DialogTitle>Datos de Facturación</DialogTitle>
+									</DialogHeader>
+									<Separator orientation='horizontal' />
+									<h3 className='text-nowrap'>Nombre o Razón social</h3>
+									<DefInput
+										type='text'
+										className='bg-background text-foreground'
+										onFocus={() => setOtherFocus(true)}
+										onBlur={() => setOtherFocus(false)}
+										value={nombreRazonSocial}
+										onChange={(e) => setNombreRazonSocial(e.target.value)}
+									/>
+									<h3 className='text-nowrap'>RUT o NIF</h3>
+									<DefInput
+										type='text'
+										className='bg-background text-foreground'
+										onFocus={() => setOtherFocus(true)}
+										onBlur={() => setOtherFocus(false)}
+										value={rutNif}
+										onChange={(e) => setRutNif(e.target.value)}
+									/>
+									<h3 className='text-nowrap'>Dirección de la Empresa</h3>
+									<DefInput
+										type='text'
+										className='bg-background text-foreground'
+										onFocus={() => setOtherFocus(true)}
+										onBlur={() => setOtherFocus(false)}
+										value={direccionEmpresa}
+										onChange={(e) => setDireccionEmpresa(e.target.value)}
+									/>
+									<h3 className='text-nowrap'>Giro o Actividad Económica</h3>
+									<DefInput
+										type='text'
+										className='bg-background text-foreground'
+										onFocus={() => setOtherFocus(true)}
+										onBlur={() => setOtherFocus(false)}
+										value={giro}
+										onChange={(e) => setGiro(e.target.value)}
+									/>
+									<h3 className='text-nowrap'>Nombre Contacto</h3>
+									<DefInput
+										type='text'
+										className='bg-background text-foreground'
+										onFocus={() => setOtherFocus(true)}
+										onBlur={() => setOtherFocus(false)}
+										value={nombreContacto}
+										onChange={(e) => setNombreContacto(e.target.value)}
+									/>
+									<h3 className='text-nowrap'>Dato de Contacto</h3>
+									<DefInput
+										type='text'
+										className='bg-background text-foreground'
+										onFocus={() => setOtherFocus(true)}
+										onBlur={() => setOtherFocus(false)}
+										value={contacto}
+										onChange={(e) => setContacto(e.target.value)}
+									/>
+									<Button
+										variant='default'
+										onClick={() => setIsDeleteDialogOpen(false)}>
+										Guardar
+									</Button>
+									<Button variant='outline' onClick={() => handleBackFactura}>
+										Volver
+									</Button>
+								</DialogContent>
+							</Dialog>
+						)}
 					</div>
 				</footer>
 				<Footer />

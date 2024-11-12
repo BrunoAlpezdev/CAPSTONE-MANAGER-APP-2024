@@ -5,7 +5,7 @@ const negocioSchema = {
 	primaryKey: 'id',
 	type: 'object',
 	properties: {
-		id: { type: 'string', maxLength: 40 },
+		id: { type: 'string', maxLength: 22 },
 		usuario_id: { type: 'string' },
 		_deleted: { type: 'boolean', default: false },
 		authToken: { type: 'string' },
@@ -23,7 +23,7 @@ const productoSchema = {
 	primaryKey: 'id',
 	type: 'object',
 	properties: {
-		id: { type: 'string', maxLength: 40 },
+		id: { type: 'string', maxLength: 22 },
 		barcode: { type: 'string' },
 		id_negocio: { type: 'string' },
 		_deleted: { type: 'boolean', default: false },
@@ -42,7 +42,7 @@ const usuarioSchema = {
 	primaryKey: 'id',
 	type: 'object',
 	properties: {
-		id: { type: 'string', maxLength: 40 },
+		id: { type: 'string', maxLength: 22 },
 		id_negocio: { type: 'string' },
 		_deleted: { type: 'boolean', default: false },
 		correo: { type: 'string' },
@@ -58,7 +58,7 @@ const ventaSchema = {
 	primaryKey: 'id',
 	type: 'object',
 	properties: {
-		id: { type: 'string', maxLength: 40 },
+		id: { type: 'string', maxLength: 22 },
 		id_negocio: { type: 'string' },
 		_deleted: { type: 'boolean', default: false },
 		fecha: { type: 'string' },
@@ -74,7 +74,7 @@ const detalleVentaSchema = {
 	primaryKey: 'id',
 	type: 'object',
 	properties: {
-		id: { type: 'string', maxLength: 40 },
+		id: { type: 'string', maxLength: 22 },
 		id_venta: { type: 'string' },
 		_deleted: { type: 'boolean', default: false },
 		cantidad: { type: 'number' },

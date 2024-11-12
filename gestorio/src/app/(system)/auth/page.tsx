@@ -43,7 +43,8 @@ export default function Home() {
 					setLoading(false)
 					return
 				}
-				localStorage.setItem('userUuid', JSON.stringify(data.user.uid))
+				const id = JSON.stringify(data.user.uid).replaceAll('"', '')
+				localStorage.setItem('userUuid', id)
 
 				// Si el login es exitoso, puedes redirigir o manejar el estado de sesión
 				router.push('/home')

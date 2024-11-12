@@ -5,14 +5,10 @@ import { columns } from './columns'
 import { DataTable } from '@/components/inventario-table'
 import { useMenu } from '@/hooks'
 import { useState, useEffect } from 'react'
-import toast, { Toaster } from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
 import { SystemHeader } from '@/components/systemHeader.component'
-import { MenuIcon, Moon, Sun } from 'lucide-react'
-import { Switch } from '@/components/ui/switch'
 import { Producto } from '@/types'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { firestore } from '@/firebase/firebaseConfig'
-import { collection, getDocs } from 'firebase/firestore'
 import useDatabaseStore from '@/store/dbStore'
 
 export default function GestionDeProductos() {
@@ -23,8 +19,11 @@ export default function GestionDeProductos() {
 	const { isMenuOpen, toggleMenu } = useMenu()
 	const db = useDatabaseStore((state) => state.db)
 
+	const localId = localStorage.getItem('userUuid')
+	const Id_negocio = localId?.replaceAll('"', '')
+
 	const fetchProductos = async () => {
-		const Id_negocio = localStorage.getItem('userUuid')
+		console.log(Id_negocio)
 		if (db && Id_negocio) {
 			try {
 				const productosData = await db.productos
@@ -45,11 +44,13 @@ export default function GestionDeProductos() {
 			}
 		}
 	}
+
 	// Notificaciones
 	type Notificacion = {
 		id: string
 		mensaje: string
 	}
+
 	const [notificaciones, setNotificaciones] = useState<Notificacion[]>([])
 	// Este useEffect recorrerá todos los productos y generará notificaciones para aquellos con bajo stock
 	useEffect(() => {
@@ -101,7 +102,9 @@ export default function GestionDeProductos() {
 	useEffect(() => {
 		if (db?.productos) {
 			const subscription = db.productos
-				.find()
+				.find({
+					selector: { id_negocio: Id_negocio }
+				})
 				.$ // '$' provides an observable that emits every time the query result changes
 				.subscribe((productosData: any[]) => {
 					const productos = productosData.map((producto) => producto.toJSON())
