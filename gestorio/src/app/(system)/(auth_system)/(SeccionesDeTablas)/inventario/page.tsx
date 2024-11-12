@@ -24,27 +24,27 @@ export default function GestionDeProductos() {
 	const db = useDatabaseStore((state) => state.db)
 
 	const fetchProductos = async () => {
-		if (db) {
+		const Id_negocio = localStorage.getItem('userUuid')
+		if (db && Id_negocio) {
 			try {
-				// Obtén los datos de los productos desde la base de datos local (RxDB)
-				// TODO: filtrar solo los que tengan el id de negocio del usuario logueado -> useAuthStore -> USUARIO
-				const productosData = await db.productos.find().exec()
+				const productosData = await db.productos
+					.find({
+						selector: { id_negocio: Id_negocio }
+					})
+					.exec()
 
-				// Mapear los productos a un array de objetos
 				const productos = productosData.map((producto: any) =>
 					producto.toJSON()
 				)
-
-				// Actualizar el estado de productos con los datos completos
+				console.log('Productos filtrados:', productos) // Muestra los productos filtrados
 				setData(productos)
 			} catch (error) {
-				console.log('Error al obtener los productos:', '✖️')
+				console.log('Error al obtener los productos:', error)
 			} finally {
 				setLoading(false)
 			}
 		}
 	}
-
 	// Notificaciones
 	type Notificacion = {
 		id: string

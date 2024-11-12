@@ -27,6 +27,7 @@ export const useLocalDb = () => {
 			console.error('Error al leer las ventas:', error)
 		}
 	}
+
 	// Modificar
 	const ModificarProductos = async (id: string, producto: Producto) => {
 		try {
@@ -41,6 +42,7 @@ export const useLocalDb = () => {
 			console.error('Error al modificar el producto:', error)
 		}
 	}
+
 	// eliminar
 	const EliminarProducto = async (id: string) => {
 		try {
@@ -56,5 +58,23 @@ export const useLocalDb = () => {
 		}
 	}
 
-	return { ModificarProductos, LeerProductos, LeerVentas, EliminarProducto }
+	//agregar
+	const AgregarProducto = async (producto: Producto) => {
+		try {
+			const productos = db?.productos
+			if (productos) {
+				await productos.insert(producto)
+			}
+		} catch (error) {
+			console.error('Error al agregar el producto:', error)
+		}
+	}
+
+	return {
+		ModificarProductos,
+		LeerProductos,
+		LeerVentas,
+		EliminarProducto,
+		AgregarProducto
+	}
 }
