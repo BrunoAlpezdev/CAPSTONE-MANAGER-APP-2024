@@ -1,6 +1,6 @@
 'use client'
 
-import { Footer, FullLogo, ToggleMenu } from '@/components'
+import { Footer, ToggleMenu } from '@/components'
 import { columns } from './columns'
 import { DataTable } from '@/components/inventario-table'
 import { useMenu } from '@/hooks'

@@ -107,14 +107,43 @@ export const useLocalDb = () => {
 		}
 	}
 
+	const AgregarVenta = async (venta: any) => {
+		try {
+			const ventas = db?.ventas
+			if (ventas) {
+				await ventas.insert(venta)
+			}
+		} catch (error) {
+			console.error('Error al agregar la venta:', error)
+		}
+	}
+
+	const AgregarDetalleVenta = async (detalleVenta: any) => {
+		try {
+			const detalleVentas = db?.detalle_ventas
+			if (detalleVentas) {
+				await detalleVentas.insert(detalleVenta)
+			}
+		} catch (error) {
+			console.error('Error al agregar el detalle de la venta:', error)
+		}
+	}
+
 	return {
-		ModificarProductos,
+		// CRUD
+		// Agregar / Create
+		AgregarProducto,
+		AgregarVenta,
+		AgregarDetalleVenta,
+		// Leer / Read
+		LeerUsuarios,
 		LeerProductos,
 		LeerVentas,
-		EliminarProducto,
-		AgregarProducto,
+		// Modificar / Update
+		ModificarProductos,
 		ModificarUsuarios,
-		LeerUsuarios,
+		// Eliminar / Delete
+		EliminarProducto,
 		EliminarUsuario
 	}
 }
