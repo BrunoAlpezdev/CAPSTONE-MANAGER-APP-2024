@@ -1,9 +1,10 @@
 'use client'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FullLogo } from '@/components'
 import { signIn } from '@/firebase/auth'
 import { useAuthStore } from '@/store/authStore'
+import AuthRedirect from '@/components/auth/authRedirect.component'
 
 export default function Home() {
 	const router = useRouter()
@@ -42,8 +43,8 @@ export default function Home() {
 					setLoading(false)
 					return
 				}
-				const { user } = useAuthStore.getState()
-				console.log(user)
+				const id = JSON.stringify(data.user.uid).replaceAll('"', '')
+				localStorage.setItem('userUuid', id)
 
 				// Si el login es exitoso, puedes redirigir o manejar el estado de sesión
 				router.push('/home')
@@ -59,24 +60,34 @@ export default function Home() {
 		}
 	}
 
+	const [user, setUser] = useState(null)
+
+	useEffect(() => {
+		// Solo se ejecuta en el cliente
+		const localUser = localStorage.getItem('userUuid')
+		setUser(localUser ? JSON.parse(localUser) : null)
+	}, [])
+
+	if (user) return <AuthRedirect></AuthRedirect>
+
 	return (
-		<main className='relative fondo flex bg-background w-[100dvw] h-[100dvh] items-center justify-center p-24'>
+		<main className='fondo relative flex h-[100dvh] w-[100dvw] items-center justify-center bg-background p-24'>
 			{/* Fondo con spinner de loading en absolute */}
 			{loading && (
-				<div className='absolute bg-background/80 backdrop-blur-md w-[100dvw] h-[100dvh] flex items-center justify-center z-10'>
-					<div className='animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-Blanco'></div>
+				<div className='absolute z-10 flex h-[100dvh] w-[100dvw] items-center justify-center bg-background/80 backdrop-blur-md'>
+					<div className='h-32 w-32 animate-spin rounded-full border-b-2 border-t-2 border-Blanco'></div>
 				</div>
 			)}
 			<section className='flex flex-col gap-3'>
-				<section className='relative flex flex-col border-2 bg-background border-primary/60 shadow-lg px-12 py-10 rounded-lg'>
+				<section className='relative flex flex-col rounded-lg border-2 border-primary/60 bg-background px-12 py-10 shadow-lg'>
 					<FullLogo size='huge' editClass='mb-8 gap-6' />
 					<form
 						onSubmit={handleLogin}
-						className='bg-background flex flex-col gap-4'>
+						className='flex flex-col gap-4 bg-background'>
 						<label className='bg-background text-xl'>Usuario</label>
 						<input
 							id='emailField'
-							className='bg-secondary text-secondary-foreground h-9 px-2 rounded-md'
+							className='h-9 rounded-md border-border bg-secondary px-2 text-secondary-foreground'
 							type='email'
 							onChange={(e) => setEmail(e.target.value)}
 						/>
@@ -84,27 +95,27 @@ export default function Home() {
 						<label className='bg-background text-xl'>Contraseña</label>
 						<input
 							id='passwordField'
-							className='bg-secondary text-secondary-foreground h-9 px-2 rounded-md'
+							className='h-9 rounded-md border-border bg-secondary px-2 text-secondary-foreground'
 							type='password'
 							onChange={(e) => setPassword(e.target.value)}
 						/>
 
-						<button className='self-center text-2xl bg-primary rounded-lg w-fit px-12 py-2 mt-6 transition hover:scale-105 hover:bg-primary/90'>
+						<button className='mt-6 w-fit self-center rounded-lg bg-primary px-12 py-2 text-2xl transition hover:scale-105 hover:bg-primary/90'>
 							Iniciar Sesión
 						</button>
 					</form>
 
 					{error && (
-						<p className='text-Naranjo text-center w-fit self-center mt-4'>
+						<p className='mt-4 w-fit self-center text-center text-Naranjo'>
 							{error}
 						</p>
 					)}
 				</section>
 
 				{process.env.NODE_ENV === 'development' && (
-					<section className='relative flex flex-col border-2 bg-background border-primary/60 shadow-lg p-2 rounded-lg'>
+					<section className='relative flex flex-col rounded-lg border-2 border-primary/60 bg-background p-2 shadow-lg'>
 						<button
-							className='self-center text-md text-pretty bg-primary rounded-lg w-fit p-2 transition hover:scale-105 hover:bg-primary/90'
+							className='text-md w-fit self-center text-pretty rounded-lg bg-primary p-2 transition hover:scale-105 hover:bg-primary/90'
 							onClick={async () => {
 								setLoading(true)
 								await signIn('alo@alo.com', '123123')

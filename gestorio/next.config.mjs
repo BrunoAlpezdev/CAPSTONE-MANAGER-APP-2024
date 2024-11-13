@@ -3,7 +3,8 @@
 import withPWA from 'next-pwa'
 
 const withPWAConfig = withPWA({
-	dest: 'public'
+	dest: 'public',
+	disable: process.env.NODE_ENV === 'development'
 })
 
 const nextConfig = {
@@ -17,11 +18,10 @@ const nextConfig = {
 			'placehold.co',
 			'placehold.com',
 			'sb-assets.sgp1.cdn.digitaloceanspaces.com',
-			process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
 			'firebasestorage.googleapis.com',
 			'*'
 		]
 	}
 }
 
-export default withPWAConfig({ nextConfig })
+export default withPWAConfig(nextConfig)

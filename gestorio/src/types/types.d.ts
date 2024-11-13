@@ -55,6 +55,16 @@ interface Usuario {
 	email: string
 	rol: string
 	negocio_id: number
+	passwordHash: string
+}
+
+interface Historial {
+	id: string
+	id_usuario: string
+	responsable: string
+	totalVenta: number
+	pago: string
+	fecha: Timestamp // Timestamp
 }
 
 interface Cliente {
@@ -65,24 +75,36 @@ interface Cliente {
 }
 
 interface Venta {
-	id: number
-	fecha: Timestamp // Timestamp
-	total: number // Asumiendo que el total es un número entero en CLP
-	tienda_id: number
-	cliente_id: number
+	id: string
+	fecha: string
+	total: number
+	id_negocio: string
+	id_responsable: string
+	cliente_id: string
+	boleta?: boolean
+	factura?: boolean
+	nombre_razon_social?: string
+	nombre_contacto?: string
+	contacto?: string
+	direccion_empresa?: string
+	giro?: string
+	metodoPago: 'efectivo' | 'tarjeta'
+	montoPagado?: number
+	vuelto?: number
+	comprobante?: string
 }
 
 interface DetalleVenta {
-	id: number
-	venta_id: number
-	producto_id: number
+	id: string
+	venta_id: string
+	producto_id: string
 	cantidad: number
-	precio: number // Asumiendo que el precio es un número entero en CLP
+	precio: number
 }
 
 interface Pedido {
 	id: number
-	fecha: Timestamp // Timestamp
+	fecha: Timestamp
 	proveedor_id: number
 	tienda_id: number
 	estado: string
@@ -96,6 +118,11 @@ interface DetallePedido {
 	precio: number // Asumiendo que el precio es un número entero en CLP
 }
 
+interface Notificacion {
+	id: string
+	mensaje: string
+}
+
 export {
 	Tienda,
 	Producto,
@@ -107,5 +134,7 @@ export {
 	Venta,
 	DetalleVenta,
 	Pedido,
-	DetallePedido
+	DetallePedido,
+	Notificacion,
+	Historial
 }

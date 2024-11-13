@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
 	ColumnDef,
 	SortingState,
@@ -32,6 +32,18 @@ import {
 	DropdownMenuContent,
 	DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+	DialogFooter
+} from '@/components/ui/dialog'
+import { Producto } from '@/types'
+import { useLocalDb } from '@/hooks/useLocaldb'
+import { v7 as uuidv7 } from 'uuid'
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[]
@@ -46,7 +58,8 @@ export function DataTable<TData, TValue>({
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 	const [rowSelection, setRowSelection] = useState({})
-
+	const [isOpen, setIsOpen] = useState(false)
+	const { AgregarProducto } = useLocalDb()
 	const table = useReactTable({
 		data,
 		columns,
@@ -66,6 +79,37 @@ export function DataTable<TData, TValue>({
 		getPaginationRowModel: getPaginationRowModel()
 	})
 
+	const handleCancel = () => {
+		setIsOpen(false)
+	}
+
+	const handleAgregar = () => {
+		AgregarProducto(productToAdd)
+		setIsOpen(false)
+	}
+
+	useEffect(() => {
+		const body = document.querySelector('body')
+		if (body) {
+			body.style.pointerEvents = isOpen ? 'all' : 'all'
+		}
+	}, [isOpen])
+	const GenerateNewId = () => {
+		return uuidv7()
+	}
+
+	const Id_negocio = localStorage.getItem('userUuid')
+	const [productToAdd, setProductToAdd] = useState<Producto>({
+		id: GenerateNewId(),
+		nombre: '',
+		barcode: '',
+		marca: '',
+		precio: 0,
+		id_negocio: Id_negocio ?? '',
+		variante: '',
+		stock: 0
+	})
+
 	return (
 		<>
 			{/*Table*/}
@@ -83,7 +127,154 @@ export function DataTable<TData, TValue>({
 					/>
 				</div>
 				<div className='ml-auto flex items-center space-x-2'>
-					<Button variant='outline'>Agregar</Button>
+					<Button variant='outline' onClick={() => setIsOpen(true)}>
+						Agregar
+					</Button>
+
+					{/* Dialog para agregar */}
+					<Dialog open={isOpen} onOpenChange={setIsOpen}>
+						<DialogContent>
+							<DialogHeader>
+								<DialogTitle className='text-foreground'>
+									Rellene los campos
+								</DialogTitle>
+								<DialogDescription>
+									Aquí puedes agregar campos.
+								</DialogDescription>
+							</DialogHeader>
+							<div className='flex flex-col gap-3 text-foreground'>
+								<div>
+									<label
+										htmlFor='username'
+										className='block text-sm font-medium'>
+										Nombre
+									</label>
+									<input
+										type='text'
+										name='username'
+										id='username'
+										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
+										onChange={(e) => {
+											setProductToAdd({
+												...productToAdd,
+												nombre: e.target.value
+											})
+										}}
+									/>
+								</div>
+								<div>
+									<label
+										htmlFor='barcode'
+										className='block text-sm font-medium text-foreground'>
+										barcode
+									</label>
+									<input
+										type='string'
+										name='type'
+										id='type'
+										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
+										onChange={(e) => {
+											setProductToAdd({
+												...productToAdd,
+												barcode: e.target.value
+											})
+										}}
+									/>
+								</div>
+								<div>
+									<label
+										htmlFor='marca'
+										className='block text-sm font-medium text-foreground'>
+										marca
+									</label>
+									<input
+										type='string'
+										name='type'
+										id='type'
+										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
+										onChange={(e) => {
+											setProductToAdd({
+												...productToAdd,
+												marca: e.target.value
+											})
+										}}
+									/>
+								</div>
+								<div>
+									<label
+										htmlFor='precio'
+										className='block text-sm font-medium text-foreground'>
+										precio
+									</label>
+									<input
+										type='string'
+										name='type'
+										id='type'
+										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
+										onChange={(e) => {
+											setProductToAdd({
+												...productToAdd,
+												precio: parseInt(e.target.value)
+											})
+										}}
+									/>
+								</div>
+								<div>
+									<label
+										htmlFor='username'
+										className='block text-sm font-medium'>
+										variante
+									</label>
+									<input
+										type='text'
+										name='username'
+										id='username'
+										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
+										onChange={(e) => {
+											setProductToAdd({
+												...productToAdd,
+												variante: e.target.value
+											})
+										}}
+									/>
+								</div>
+								<div>
+									<label
+										htmlFor='stock'
+										className='block text-sm font-medium text-foreground'>
+										stock
+									</label>
+									<input
+										type='number'
+										name='type'
+										id='type'
+										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
+										onChange={(e) => {
+											setProductToAdd({
+												...productToAdd,
+												stock: parseInt(e.target.value)
+											})
+										}}
+									/>
+								</div>
+							</div>
+							<div className='mt-4 flex justify-end'>
+								<Button
+									variant='default'
+									className='ml-2'
+									onClick={handleAgregar}>
+									Agregar
+								</Button>
+								<Button
+									variant='destructive'
+									className='ml-2'
+									onClick={handleCancel}>
+									Cancelar
+								</Button>
+							</div>
+						</DialogContent>
+					</Dialog>
+					{/* Dialog para agregar */}
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button variant='outline' className='ml-auto'>

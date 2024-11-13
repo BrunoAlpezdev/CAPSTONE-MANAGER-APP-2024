@@ -5,7 +5,7 @@ const negocioSchema = {
 	primaryKey: 'id',
 	type: 'object',
 	properties: {
-		id: { type: 'string', maxLength: 22 },
+		id: { type: 'string', maxLength: 40 },
 		usuario_id: { type: 'string' },
 		_deleted: { type: 'boolean', default: false },
 		authToken: { type: 'string' },
@@ -23,7 +23,7 @@ const productoSchema = {
 	primaryKey: 'id',
 	type: 'object',
 	properties: {
-		id: { type: 'string', maxLength: 22 },
+		id: { type: 'string', maxLength: 40 },
 		barcode: { type: 'string' },
 		id_negocio: { type: 'string' },
 		_deleted: { type: 'boolean', default: false },
@@ -42,10 +42,11 @@ const usuarioSchema = {
 	primaryKey: 'id',
 	type: 'object',
 	properties: {
-		id: { type: 'string', maxLength: 22 },
+		id: { type: 'string', maxLength: 40 },
 		id_negocio: { type: 'string' },
 		_deleted: { type: 'boolean', default: false },
 		correo: { type: 'string' },
+		passwordHash: { type: 'string' },
 		nombre: { type: 'string' },
 		rol: { type: 'string' }
 	}
@@ -58,12 +59,23 @@ const ventaSchema = {
 	primaryKey: 'id',
 	type: 'object',
 	properties: {
-		id: { type: 'string', maxLength: 22 },
+		id: { type: 'string', maxLength: 40 },
+		fecha: { type: 'string', format: 'date-time' },
+		total: { type: 'number' },
+		monto_pagado: { type: 'number' },
+		vuelto: { type: 'number' },
+		comprobante: { type: 'string' },
 		id_negocio: { type: 'string' },
-		_deleted: { type: 'boolean', default: false },
-		fecha: { type: 'string' },
-		id_usuario: { type: 'string' },
-		total: { type: 'number' }
+		id_responsable: { type: 'string' },
+		cliente_id: { type: 'string' },
+		boleta: { type: 'boolean', default: false },
+		factura: { type: 'boolean', default: false },
+		nombre_razon_social: { type: 'string' },
+		nombre_contacto: { type: 'string' },
+		contacto: { type: 'string' },
+		direccion_empresa: { type: 'string' },
+		giro: { type: 'string' },
+		metodoPago: { type: 'string', enum: ['efectivo', 'tarjeta'] }
 	}
 }
 
@@ -74,7 +86,7 @@ const detalleVentaSchema = {
 	primaryKey: 'id',
 	type: 'object',
 	properties: {
-		id: { type: 'string', maxLength: 22 },
+		id: { type: 'string', maxLength: 40 },
 		id_venta: { type: 'string' },
 		_deleted: { type: 'boolean', default: false },
 		cantidad: { type: 'number' },
