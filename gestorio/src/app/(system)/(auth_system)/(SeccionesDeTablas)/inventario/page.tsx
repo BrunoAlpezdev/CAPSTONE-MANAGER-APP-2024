@@ -5,7 +5,7 @@ import { columns } from './columns'
 import { DataTable } from '@/components/inventario-table'
 import { useMenu } from '@/hooks'
 import { useState, useEffect } from 'react'
-import { Toaster } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 import { SystemHeader } from '@/components/systemHeader.component'
 import { Producto } from '@/types'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -45,6 +45,20 @@ export default function GestionDeProductos() {
 		}
 	}
 
+	const makeToast = (message: string, icon?: string) => {
+		toast.custom(
+			(t) => (
+				<div
+					className={`border-1 h-fit rounded-sm border-primary/60 bg-white/5 px-4 py-2 text-foreground backdrop-blur-lg ${t.visible ? 'animate-appearance-in' : 'animate-appearance-out'}`}>
+					<div className='flex items-center'>
+						{icon && <span className='mr-2'>{icon}</span>}
+						<span>{message}</span>
+					</div>
+				</div>
+			),
+			{ duration: 2000 }
+		)
+	}
 	// Notificaciones
 	type Notificacion = {
 		id: string
@@ -58,6 +72,11 @@ export default function GestionDeProductos() {
 		const productosConBajoStock = productos.filter(
 			(product) => product.stock < 10
 		)
+		productosConBajoStock.map((producto) => {
+			makeToast(
+				`El producto ${producto.nombre} tiene un stock menor a 10 unidades.`
+			)
+		})
 
 		setNotificaciones((prev) => {
 			const nuevasNotificaciones = productosConBajoStock
