@@ -52,10 +52,10 @@ import { useEffect, useState } from 'react'
 export default function Home() {
 	const router = useRouter()
 
-	const [user, setUser] = useState(null)
+	const [user, setUser] = useState('')
 	useEffect(() => {
-		const localUser = localStorage.getItem('userUuid')
-		const user = localUser ? JSON.parse(localUser) : null
+		const guser = localStorage.getItem('userUuid')
+		const user = guser ?? ''
 		setUser(user)
 	}, [])
 

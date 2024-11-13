@@ -55,6 +55,7 @@ interface Usuario {
 	email: string
 	rol: string
 	negocio_id: number
+	passwordHash: string
 }
 
 interface Historial {

@@ -19,6 +19,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 	useEffect(() => {
 		initializeDatabase()
 	}, [initializeDatabase])
+
 	const user = useUser()
 
 	if (user === false)
