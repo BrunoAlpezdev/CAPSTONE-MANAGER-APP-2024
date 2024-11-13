@@ -12,6 +12,7 @@ import { Switch } from '@/components/ui/switch'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import useDatabaseStore from '@/store/dbStore'
+import { v7 as uuidv7 } from 'uuid'
 import {
 	Select,
 	SelectContent,
@@ -50,7 +51,7 @@ import setupDatabase from '@/lib/db/RxDB'
 import { useMenu } from '@/hooks'
 import { Footer, FullLogo, ToggleMenu } from '@/components'
 
-import { Producto, Ticket, Usuario } from '@/types'
+import { DetalleVenta, Producto, Ticket, Usuario, Venta } from '@/types'
 /* import { products } from '@/mocks/products' */
 import { Label } from '@/components/ui/label'
 import { getDownloadURL, ref } from 'firebase/storage'
@@ -65,6 +66,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { useLocalDb } from '@/hooks/useLocaldb'
+import { Timestamp } from 'firebase/firestore'
 
 export default function POS() {
 	// Estado para manejar el responsable de la caja
@@ -326,6 +329,7 @@ export default function POS() {
 			0
 		)
 	}
+	const { AgregarVenta, AgregarDetalleVenta } = useLocalDb()
 
 	// Función para confirmar la orden actual
 	const confirmOrder = () => {
@@ -337,13 +341,58 @@ export default function POS() {
 			makeToast('El monto en efectivo es menor al total de la orden', '✖️')
 			return
 		}
-		makeToast(
-			`Orden confirmada! Total: $${total} vuelto: $${Math.max(
-				0,
-				cashAmount - calculateTotal()
-			).toLocaleString('es-CL')}`,
-			'✅'
+		const localId = localStorage.getItem('userUuid')
+		const Id_negocio = localId?.replaceAll('"', '') ?? 'indefinido'
+
+		const VentaArmada: Venta = {
+			cliente_id: 'indefinido',
+			id_negocio: Id_negocio,
+			id_responsable: selectedUser?.id || 'indefinido',
+			fecha: Date.now().toString(),
+			id: uuidv7(),
+			metodoPago: paymentMethod === 'cash' ? 'efectivo' : 'tarjeta',
+			total: total,
+			boleta: isBoleta,
+			contacto: contacto,
+			direccion_empresa: direccionEmpresa,
+			factura: !isBoleta,
+			giro: giro,
+			nombre_contacto: nombreContacto,
+			nombre_razon_social: nombreRazonSocial,
+			comprobante: cardVoucher,
+			montoPagado: cashAmount,
+			vuelto: Math.max(0, cashAmount - total)
+		}
+
+		const DetalleVentaArmada: DetalleVenta[] = currentTicket.items.map(
+			(item) => ({
+				id: uuidv7(),
+				venta_id: VentaArmada.id,
+				producto_id: item.id,
+				cantidad: item.cantidad,
+				precio: item.precio
+			})
 		)
+
+		AgregarVenta(VentaArmada)
+			.then(() => {
+				return Promise.all(
+					DetalleVentaArmada.map((detalle) => AgregarDetalleVenta(detalle))
+				)
+			})
+			.then(() => {
+				makeToast(
+					`Orden confirmada! Total: $${total} vuelto: $${Math.max(
+						0,
+						cashAmount - calculateTotal()
+					).toLocaleString('es-CL')}`,
+					'✅'
+				)
+			})
+			.catch((error) => {
+				makeToast(`Error al confirmar la orden: ${error.message}`, '✖️')
+			})
+
 		setTickets((prevTickets) => {
 			// Filtrar y reorganizar IDs después de eliminar
 			const filteredTickets = prevTickets.filter(
@@ -754,6 +803,46 @@ export default function POS() {
 			setOtherFocus(false)
 		}
 	}, [isVerified])
+
+	useEffect(() => {
+		if (db?.productos) {
+			const localId = localStorage.getItem('userUuid')
+			const Id_negocio = localId?.replaceAll('"', '')
+
+			const subscription = db.productos
+				.find({
+					selector: { id_negocio: Id_negocio }
+				})
+				.$ // '$' provides an observable that emits every time the query result changes
+				.subscribe((productosData: any[]) => {
+					const productos = productosData.map((productos) => productos.toJSON())
+					setProducts(productos)
+				})
+
+			// Clean up the subscription on component unmount
+			return () => subscription.unsubscribe()
+		}
+	}, [db])
+
+	useEffect(() => {
+		if (db?.usuarios) {
+			const localId = localStorage.getItem('userUuid')
+			const Id_negocio = localId?.replaceAll('"', '')
+
+			const subscription = db.usuarios
+				.find({
+					selector: { id_negocio: Id_negocio }
+				})
+				.$ // '$' provides an observable that emits every time the query result changes
+				.subscribe((usuariosData: any[]) => {
+					const usuarios = usuariosData.map((usuarios) => usuarios.toJSON())
+					setUsuarios(usuarios)
+				})
+
+			// Clean up the subscription on component unmount
+			return () => subscription.unsubscribe()
+		}
+	}, [db])
 
 	return (
 		<div className='relative transition-all'>

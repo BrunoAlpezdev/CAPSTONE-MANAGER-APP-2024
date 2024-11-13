@@ -60,11 +60,22 @@ const ventaSchema = {
 	type: 'object',
 	properties: {
 		id: { type: 'string', maxLength: 40 },
+		fecha: { type: 'string', format: 'date-time' },
+		total: { type: 'number' },
+		monto_pagado: { type: 'number' },
+		vuelto: { type: 'number' },
+		comprobante: { type: 'string' },
 		id_negocio: { type: 'string' },
-		_deleted: { type: 'boolean', default: false },
-		fecha: { type: 'string' },
-		id_usuario: { type: 'string' },
-		total: { type: 'number' }
+		id_responsable: { type: 'string' },
+		cliente_id: { type: 'string' },
+		boleta: { type: 'boolean', default: false },
+		factura: { type: 'boolean', default: false },
+		nombre_razon_social: { type: 'string' },
+		nombre_contacto: { type: 'string' },
+		contacto: { type: 'string' },
+		direccion_empresa: { type: 'string' },
+		giro: { type: 'string' },
+		metodoPago: { type: 'string', enum: ['efectivo', 'tarjeta'] }
 	}
 }
 

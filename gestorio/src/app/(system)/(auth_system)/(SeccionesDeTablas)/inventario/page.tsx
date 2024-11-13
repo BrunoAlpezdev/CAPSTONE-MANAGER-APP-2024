@@ -58,14 +58,6 @@ export default function GestionDeProductos() {
 		const productosConBajoStock = productos.filter(
 			(product) => product.stock < 10
 		)
-		/* TODO: Convertir este toast a una notificación en la interfaz, en la sección de notificaciones,
-		en teoria ya estan en el localstorage asi que habría que importar lo del home header
-		productosConBajoStock.map((producto) => {
-			toast.error(
-				`El producto ${producto.nombre} tiene un stock menor a 10 unidades.`
-			)
-		})
-		*/
 
 		setNotificaciones((prev) => {
 			const nuevasNotificaciones = productosConBajoStock
