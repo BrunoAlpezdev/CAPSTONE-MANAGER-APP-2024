@@ -23,7 +23,6 @@ export default function GestionDeProductos() {
 	const Id_negocio = localId?.replaceAll('"', '')
 
 	const fetchProductos = async () => {
-		console.log(Id_negocio)
 		if (db && Id_negocio) {
 			try {
 				const productosData = await db.productos
@@ -35,7 +34,6 @@ export default function GestionDeProductos() {
 				const productos = productosData.map((producto: any) =>
 					producto.toJSON()
 				)
-				console.log('Productos filtrados:', productos) // Muestra los productos filtrados
 				setData(productos)
 			} catch (error) {
 				console.log('Error al obtener los productos:', error)
