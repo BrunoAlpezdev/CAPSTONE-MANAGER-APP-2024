@@ -2,7 +2,7 @@
 
 import { Footer, FullLogo, ToggleMenu } from '@/components'
 import { columns } from './columns'
-import { DataTable } from '@/components/inventario-table'
+import { DataTable } from '@/components/usuarios-table'
 import { useMenu } from '@/hooks'
 import { useState, useEffect } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
@@ -85,7 +85,7 @@ export default function GestionDeUsuarios() {
 		}
 	}, [isDarkMode])
 
-	if (loading) return <p className='text-foreground'>Cargando productos...</p>
+	if (loading) return <p className='text-foreground'>Cargando usuarios...</p>
 	if (error) return <p className='text-red-500'>Error: {error}</p>
 
 	return (

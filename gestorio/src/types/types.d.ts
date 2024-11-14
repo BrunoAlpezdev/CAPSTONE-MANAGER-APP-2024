@@ -54,7 +54,7 @@ interface Usuario {
 	nombre: string
 	email: string
 	rol: string
-	negocio_id: number
+	id_negocio: string
 	passwordHash: string
 }
 
