@@ -7,8 +7,6 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useState, useEffect } from 'react'
 import { Usuario } from '@/types'
-import { firestore } from '@/firebase/firebaseConfig'
-import { Toaster, toast } from 'react-hot-toast'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -23,59 +21,15 @@ import {
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger
+	DialogTrigger,
+	DialogFooter
 } from '@/components/ui/dialog'
-import {
-	collection,
-	getDocs,
-	addDoc,
-	updateDoc,
-	deleteDoc,
-	doc
-} from 'firebase/firestore'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue
-} from '@/components/ui/select'
+import Image from 'next/image'
+import { useNotificationStore } from '@/store/notificationStore'
+import { useLocalDb } from '@/hooks/useLocaldb'
+import toast from 'react-hot-toast'
 
 // This type is used to define the shape of our data.
-
-async function getUsers() {
-	const usuariosCol = collection(firestore, 'usuarios')
-	const snapshot = await getDocs(usuariosCol)
-	const data = snapshot.docs.map((doc) => ({
-		id: doc.id,
-		...doc.data()
-	})) as Usuario[]
-	return data
-}
-
-// MODIFICAR USUARIO
-async function updateUser(userId: string, updatedUser: Partial<Usuario>) {
-	try {
-		const userDoc = doc(firestore, 'usuarios', userId) // Referencia al documento basado en el ID
-		await updateDoc(userDoc, updatedUser) // Actualiza el documento con los datos proporcionados
-		toast.success('Usuario modificado exitosamente')
-	} catch (error: any) {
-		toast.error('Error al modificar el usuario')
-		throw new Error(error.message)
-	}
-}
-
-// ELIMINAR USUARIO
-async function deleteUser(userId: string) {
-	try {
-		const userDoc = doc(firestore, 'usuarios', userId) // Referencia al documento basado en el ID
-		await deleteDoc(userDoc) // Elimina el documento
-		toast.success('Usuario eliminado exitosamente')
-	} catch (error: any) {
-		toast.error('Error al eliminar el usuario')
-		throw new Error(error.message)
-	}
-}
 
 export const columns: ColumnDef<Usuario>[] = [
 	{
@@ -137,20 +91,21 @@ export const columns: ColumnDef<Usuario>[] = [
 		cell: ({ row }) => {
 			const user = row.original
 			const [isOpen, setIsOpen] = useState(false)
-			const [userType, setUserType] = useState(user.rol)
-			const [data, setData] = useState<Usuario[]>([])
+			const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+			const [usuarioModificado, setUsuarioModificado] = useState<Usuario>(user)
 
-			const [modifyName, setModifyName] = useState(user.nombre)
-			const [modifyEmail, setModifyEmail] = useState(user.email)
-			const [modifyRole, setModifyRole] = useState(user.rol)
+			const { ModificarUsuarios } = useLocalDb()
 
-			const handleCopyToClipboard = async () => {
-				try {
-					await navigator.clipboard.writeText(user.id)
-					console.log('Copiado al portapapeles')
-				} catch (error) {
-					console.error('Error al copiar:', error)
-				}
+			const handleModificar = () => {
+				ModificarUsuarios(user.id, usuarioModificado)
+				setIsOpen(false)
+			}
+			const idUsuario = user.id
+			const { EliminarUsuario } = useLocalDb()
+
+			const handleDelete = () => {
+				EliminarUsuario(idUsuario)
+				setIsDeleteDialogOpen(false)
 			}
 
 			const handleCancel = () => {
@@ -177,14 +132,7 @@ export const columns: ColumnDef<Usuario>[] = [
 							<DropdownMenuItem onClick={() => setIsOpen(true)}>
 								Modificar
 							</DropdownMenuItem>
-							<DropdownMenuItem
-								onClick={() => {
-									deleteUser(user.id)
-										.catch((error) => toast.error(error.message))
-										.finally(() => {
-											setIsOpen(false)
-										})
-								}}>
+							<DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)}>
 								Eliminar
 							</DropdownMenuItem>
 						</DropdownMenuContent>
@@ -222,8 +170,13 @@ export const columns: ColumnDef<Usuario>[] = [
 									name='username'
 									id='username'
 									className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
-									value={modifyName}
-									onChange={(e) => setModifyName(e.target.value)}
+									defaultValue={user.nombre}
+									onChange={(e) => {
+										setUsuarioModificado({
+											...usuarioModificado,
+											nombre: e.target.value
+										})
+									}}
 								/>
 								<label
 									htmlFor='email'
@@ -235,8 +188,13 @@ export const columns: ColumnDef<Usuario>[] = [
 									name='email'
 									id='email'
 									className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
-									value={modifyEmail}
-									onChange={(e) => setModifyEmail(e.target.value)}
+									defaultValue={user.email}
+									onChange={(e) => {
+										setUsuarioModificado({
+											...usuarioModificado,
+											email: e.target.value
+										})
+									}}
 								/>
 								<label
 									htmlFor='type'
@@ -248,28 +206,20 @@ export const columns: ColumnDef<Usuario>[] = [
 									name='type'
 									id='type'
 									className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
-									value={modifyRole}
-									onChange={(e) => setModifyRole(e.target.value)}
+									defaultValue={user.rol}
+									onChange={(e) => {
+										setUsuarioModificado({
+											...usuarioModificado,
+											rol: e.target.value
+										})
+									}}
 								/>
 							</div>
 							<div className='mt-4 flex justify-end'>
 								<Button
 									variant='secondary'
 									className='ml-2'
-									onClick={(e) => {
-										e.preventDefault()
-										e.currentTarget.disabled = true
-										updateUser(user.id, {
-											nombre: modifyName,
-											email: modifyEmail,
-											rol: modifyRole
-										})
-											.catch((error) => toast.error(error.message))
-											.then(() => {})
-											.finally(() => {
-												setIsOpen(false)
-											})
-									}}>
+									onClick={handleModificar}>
 									Modificar
 								</Button>
 								<Button
@@ -279,6 +229,27 @@ export const columns: ColumnDef<Usuario>[] = [
 									Cancelar
 								</Button>
 							</div>
+						</DialogContent>
+					</Dialog>
+
+					<Dialog
+						open={isDeleteDialogOpen}
+						onOpenChange={setIsDeleteDialogOpen}>
+						<DialogContent>
+							<DialogHeader>
+								<DialogTitle>Confirmar eliminación</DialogTitle>
+							</DialogHeader>
+							<p>¿Estás seguro de que quieres eliminar este usuario?</p>
+							<DialogFooter>
+								<Button
+									variant='default'
+									onClick={() => setIsDeleteDialogOpen(false)}>
+									Cancelar
+								</Button>
+								<Button variant='destructive' onClick={handleDelete}>
+									Eliminar
+								</Button>
+							</DialogFooter>
 						</DialogContent>
 					</Dialog>
 				</>

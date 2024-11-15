@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { AnimateContent } from '@/components'
+import { ThemeSwitch } from '@/components'
 import { FullLogo } from './FullLogo.component'
 import {
 	DropdownMenu,
@@ -15,9 +15,10 @@ import { signOut } from '@/firebase'
 import setupDatabase from '@/lib/db/RxDB'
 import { useEffect, useState } from 'react'
 import { RxDatabase } from 'rxdb'
-import { BellRingIcon } from 'lucide-react'
+import { Bell, BellRing, BellRingIcon, Moon, Sun } from 'lucide-react'
 import { useNotificationStore } from '@/store/notificationStore'
 import { Notificacion } from '@/types'
+import { Switch } from './ui/switch'
 
 export function Header() {
 	// Estado para manejar la bd
@@ -39,6 +40,8 @@ export function Header() {
 		localStorage.setItem('notificaciones', JSON.stringify(notificacionFiltrada))
 	}
 
+	const isNotificacionesEmpty = notificaciones.length === 0
+
 	async function initDatabase() {
 		try {
 			const database = await setupDatabase() // Invoca la función de setup
@@ -58,65 +61,80 @@ export function Header() {
 			className={`flex h-fit items-center justify-between bg-background px-6 py-2 text-foreground`}>
 			<FullLogo size='large' />
 			<section className='flex cursor-pointer flex-row gap-6 text-accent-foreground'>
+				<ThemeSwitch />
 				<div className='relative'>
-					<button onClick={() => setIsNotificationOpen(!isNotificationOpen)}>
-						<BellRingIcon />
-					</button>
-
-					{isNotificationOpen && (
-						<div className='absolute right-0 z-10 mt-2 w-64 rounded-lg bg-secondary p-6 shadow-lg'>
-							<p className='mb-2 text-lg font-semibold text-accent-foreground'>
-								Notificaciones
-							</p>
-							<div>
-								{notificaciones.length === 0 ? (
-									<p className='text-sm text-accent-foreground'>
-										No tienes nuevas notificaciones.
-									</p>
-								) : (
-									<ul>
-										{notificaciones.map((notificacion, index) => (
-											<li
-												key={index}
-												className={`flex items-start space-x-2 py-3 ${
-													index < notificaciones.length - 1
-														? 'border-b border-gray-300'
-														: ''
-												}`}>
-												{/* Icono de notificación */}
-												<div className='mt-1'>
-													<svg
-														xmlns='http://www.w3.org/2000/svg'
-														className='h-6 w-6 text-yellow-500'
-														viewBox='0 0 20 20'
-														fill='currentColor'>
-														<path
-															fillRule='evenodd'
-															d='M10 2a6 6 0 00-6 6v3.586l-1.707 1.707a1 1 0 001.414 1.414L5 13.414V16a2 2 0 002 2h6a2 2 0 002-2v-2.586l.293.293a1 1 0 001.414-1.414L16 11.586V8a6 6 0 00-6-6zM8 18a1 1 0 002 0h-2z'
-															clipRule='evenodd'
-														/>
-													</svg>
-												</div>
-												{/* Mensaje de notificación */}
-												<div>
-													<p className='text-sm text-accent-foreground'>
-														{notificacion.mensaje}
-													</p>
-												</div>
-												<button
-													className='ml-auto text-red-500'
-													onClick={() =>
-														handlerEliminarNotificacion(notificacion.id)
-													}>
-													Eliminar
-												</button>
-											</li>
-										))}
-									</ul>
-								)}
-							</div>
-						</div>
+					{isNotificacionesEmpty ? (
+						<button
+							className='relative flex h-full items-center justify-center'
+							onClick={() => setIsNotificationOpen(!isNotificationOpen)}>
+							<Bell className='text-foreground' />
+						</button>
+					) : (
+						<button
+							className='animate-wiggle relative flex h-full items-center justify-center'
+							onClick={() => setIsNotificationOpen(!isNotificationOpen)}>
+							<BellRing className='text-yellow-500' />
+							{/* Indicador de notificación */}
+							<span className='absolute -right-1 -top-1 block h-fit w-fit rounded-full bg-red-500 ring-1 ring-white'>
+								<p className='px-1 text-xs'>
+									{notificaciones.length > 9 ? '9+' : notificaciones.length}
+								</p>
+							</span>
+							<span className='absolute -right-1 -top-1 block h-fit w-fit rounded-full bg-red-500 ring-1 ring-white'>
+								<p className='px-1 text-xs'>
+									{notificaciones.length > 9 ? '9+' : notificaciones.length}
+								</p>
+							</span>
+						</button>
 					)}
+
+					<div
+						className={`absolute right-0 z-10 mt-2 w-96 rounded-lg border border-primary/60 bg-secondary/5 p-6 shadow-lg backdrop-blur-lg transition-all duration-200 ${
+							isNotificationOpen
+								? 'visible -translate-y-2 opacity-100'
+								: 'invisible -translate-y-6 opacity-0'
+						}`}>
+						<p className='mb-2 text-lg font-semibold text-foreground'>
+							Notificaciones
+						</p>
+						<div>
+							{notificaciones.length === 0 ? (
+								<p className='text-sm text-foreground'>
+									No tienes nuevas notificaciones.
+								</p>
+							) : (
+								<ul>
+									{notificaciones.map((notificacion, index) => (
+										<li
+											key={index}
+											className={`flex items-start space-x-2 py-3 ${
+												index < notificaciones.length - 1
+													? 'border-b border-gray-300'
+													: ''
+											}`}>
+											{/* Icono de notificación */}
+											<section className='mt-1'>
+												<Bell className='text-yellow-500' />
+											</section>
+											{/* Mensaje de notificación */}
+											<section>
+												<p className='text-sm text-foreground'>
+													{notificacion.mensaje}
+												</p>
+											</section>
+											<button
+												className='ml-auto text-red-500'
+												onClick={() =>
+													handlerEliminarNotificacion(notificacion.id)
+												}>
+												Eliminar
+											</button>
+										</li>
+									))}
+								</ul>
+							)}
+						</div>
+					</div>
 				</div>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>

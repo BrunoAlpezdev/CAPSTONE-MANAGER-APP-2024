@@ -107,6 +107,17 @@ export const useLocalDb = () => {
 		}
 	}
 
+	const AgregarUsuario = async (usuario: Usuario) => {
+		try {
+			const usuarios = db?.usuarios
+			if (usuarios) {
+				await usuarios.insert(usuario)
+			}
+		} catch (error) {
+			console.error('Error al agregar el usuario:', error)
+		}
+	}
+
 	const AgregarVenta = async (venta: any) => {
 		try {
 			const ventas = db?.ventas
@@ -135,6 +146,7 @@ export const useLocalDb = () => {
 		AgregarProducto,
 		AgregarVenta,
 		AgregarDetalleVenta,
+		AgregarUsuario,
 		// Leer / Read
 		LeerUsuarios,
 		LeerProductos,

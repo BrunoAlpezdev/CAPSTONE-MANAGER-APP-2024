@@ -3,6 +3,7 @@
 import bcrypt from 'bcryptjs'
 import { useState, useEffect, use, CSSProperties } from 'react'
 import Image from 'next/image'
+import { ThemeSwitch } from '@/components'
 import { Button, TicketButton } from '@/components/ui/button'
 import ClimbingBoxLoader from 'react-spinners/ClimbingBoxLoader'
 import { DefInput, Input } from '@/components/ui/input'
@@ -87,13 +88,6 @@ export default function POS() {
 	// Estados para los diferentes métodos de pago
 	const [cashAmount, setCashAmount] = useState(0)
 	const [cardVoucher, setCardVoucher] = useState('')
-	// Estado para el modo oscuro
-	const [isDarkMode, setIsDarkMode] = useState(() => {
-		return (
-			window.matchMedia &&
-			window.matchMedia('(prefers-color-scheme: dark)').matches
-		)
-	})
 	// Estado para controlar la apertura del diálogo de ticket pendiente
 	const [isPendingDialogOpen, setIsPendingDialogOpen] = useState(false)
 	// Estado para el nombre del ticket pendiente
@@ -547,30 +541,6 @@ export default function POS() {
 		localStorage.setItem('tickets', JSON.stringify(tickets))
 	}, [tickets])
 
-	// Efecto para aplicar el modo oscuro
-	useEffect(() => {
-		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-		const handleChange = (e: MediaQueryListEvent) => {
-			setIsDarkMode(e.matches)
-		}
-
-		// Escucha los cambios en el modo oscuro del sistema
-		mediaQuery.addEventListener('change', handleChange)
-
-		// Limpia el listener al desmontar el componente
-		return () => {
-			mediaQuery.removeEventListener('change', handleChange)
-		}
-	}, [])
-
-	useEffect(() => {
-		if (isDarkMode) {
-			document.documentElement.classList.add('dark')
-		} else {
-			document.documentElement.classList.remove('dark')
-		}
-	}, [isDarkMode])
-
 	useEffect(() => {
 		const handleKeyPress = (e: KeyboardEvent) => {
 			if (otherFocus) {
@@ -921,15 +891,7 @@ export default function POS() {
 							<MenuIcon className='fill-foreground' />
 						</button>
 						<div className='flex items-center space-x-4'>
-							<div className='flex items-center space-x-2'>
-								<Sun className='h-4 w-4' />
-								<Switch
-									checked={isDarkMode}
-									onCheckedChange={setIsDarkMode}
-									aria-label='Cambiar modo oscuro'
-								/>
-								<Moon className='h-4 w-4' />
-							</div>
+							<ThemeSwitch />
 							<Button variant='outline' size='sm'>
 								<ShoppingCart className='mr-2 h-4 w-4' />
 								{currentTicket.items.reduce(

@@ -8,3 +8,13 @@ export { ToggleMenu } from './POS/toggle-menu.component'
 export { STHeader } from './SeccionesDeTablas/Header'
 export { ThemeProvider } from './ThemeProvider'
 export { FullLogo } from './FullLogo.component'
+export {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger
+} from './ui/dropdown-menu'
+export { Switch } from './ui/switch'
+export { ThemeSwitch } from './ThemeSwitch'
