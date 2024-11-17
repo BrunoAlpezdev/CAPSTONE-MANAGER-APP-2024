@@ -86,21 +86,6 @@ export default function GestionDeHistoriales() {
 		loadHistoriales()
 	}, [])
 
-	const [isDarkMode, setIsDarkMode] = useState(() => {
-		return (
-			window.matchMedia &&
-			window.matchMedia('(prefers-color-scheme: dark)').matches
-		)
-	})
-
-	useEffect(() => {
-		if (isDarkMode) {
-			document.documentElement.classList.add('dark')
-		} else {
-			document.documentElement.classList.remove('dark')
-		}
-	}, [isDarkMode])
-
 	if (loading) {
 		return (
 			<div className='flex flex-col items-center text-foreground'>

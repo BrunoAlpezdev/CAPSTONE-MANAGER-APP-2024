@@ -71,20 +71,6 @@ export default function GestionDeUsuarios() {
 		}
 	}, [db])
 
-	const [isDarkMode, setIsDarkMode] = useState(() => {
-		return (
-			window.matchMedia &&
-			window.matchMedia('(prefers-color-scheme: dark)').matches
-		)
-	})
-	useEffect(() => {
-		if (isDarkMode) {
-			document.documentElement.classList.add('dark')
-		} else {
-			document.documentElement.classList.remove('dark')
-		}
-	}, [isDarkMode])
-
 	if (loading) return <p className='text-foreground'>Cargando usuarios...</p>
 	if (error) return <p className='text-red-500'>Error: {error}</p>
 

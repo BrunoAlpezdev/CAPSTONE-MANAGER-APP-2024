@@ -69,6 +69,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useLocalDb } from '@/hooks/useLocaldb'
 import { Timestamp } from 'firebase/firestore'
+import { useRouter } from 'next/navigation'
 
 export default function POS() {
 	// Estado para manejar el responsable de la caja
@@ -813,10 +814,14 @@ export default function POS() {
 			return () => subscription.unsubscribe()
 		}
 	}, [db])
-
+	const router = useRouter()
 	return (
 		<div className='relative transition-all'>
-			<Dialog open={isDialogOpen} onOpenChange={() => {}}>
+			<Dialog
+				open={isDialogOpen}
+				onOpenChange={() => {
+					router.back()
+				}}>
 				<DialogContent className='sm:max-w-[425px]'>
 					<DialogHeader>
 						<DialogTitle>Seleccionar Responsable</DialogTitle>

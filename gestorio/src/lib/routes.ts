@@ -6,6 +6,7 @@ const INVENTARIO_ROUTE = '/inventario'
 const PROVEEDORES_ROUTE = '/proveedores'
 const USUARIOS_ROUTE = '/usuarios'
 const REPORTES_ROUTE = '/reportes'
+const HISTORIALDEVENTAS_ROUTE = '/historial#de#ventas'
 
 export {
 	LANDING_ROUTE,
@@ -15,5 +16,6 @@ export {
 	INVENTARIO_ROUTE,
 	PROVEEDORES_ROUTE,
 	USUARIOS_ROUTE,
-	REPORTES_ROUTE
+	REPORTES_ROUTE,
+	HISTORIALDEVENTAS_ROUTE
 }
