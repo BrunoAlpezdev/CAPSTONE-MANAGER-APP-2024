@@ -1,3 +1,4 @@
+'use client'
 import ClimbingBoxLoader from 'react-spinners/ClimbingBoxLoader'
 import {
 	Dialog,
@@ -29,8 +30,6 @@ const cssOverride: CSSProperties = {
 	borderColor: 'red'
 }
 
-const router = useRouter()
-
 interface PosMainSectionProps {
 	selectedUser: Usuario | null
 	isDialogOpen: boolean
@@ -54,6 +53,7 @@ export const PosResponsibleGuard: React.FC<PosMainSectionProps> = ({
 	handlePasswordSubmit,
 	error
 }) => {
+	const router = useRouter()
 	return (
 		<Dialog
 			open={isDialogOpen}
