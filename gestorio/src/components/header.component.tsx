@@ -71,7 +71,7 @@ export function Header() {
 						</button>
 					) : (
 						<button
-							className='animate-wiggle relative flex h-full items-center justify-center'
+							className='relative flex h-full animate-wiggle items-center justify-center'
 							onClick={() => setIsNotificationOpen(!isNotificationOpen)}>
 							<BellRing className='text-yellow-500' />
 							{/* Indicador de notificación */}
@@ -156,6 +156,8 @@ export function Header() {
 							onClick={() => {
 								signOut()
 								localStorage.removeItem('userUuid')
+								localStorage.removeItem('notificaciones')
+								localStorage.removeItem('tickets')
 							}}>
 							Log out
 						</DropdownMenuItem>

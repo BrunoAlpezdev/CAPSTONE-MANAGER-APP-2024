@@ -12,27 +12,31 @@ export default function Home() {
 	const [password, setPassword] = useState('')
 	const [error, setError] = useState('')
 	const [loading, setLoading] = useState(false)
+	const [byPass, setByPass] = useState(false)
 
 	const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		setError('')
 
 		try {
-			// Validar campos
-			if (!email || !password) {
-				setError('Faltan campos')
-				return
-			}
+			// Bypass para desarrollo
+			if (!byPass) {
+				// Validar campos
+				if (!email || !password) {
+					setError('Faltan campos')
+					return
+				}
 
-			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-			if (!emailRegex.test(email)) {
-				setError('Formato de correo no válido')
-				return
-			}
+				const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+				if (!emailRegex.test(email)) {
+					setError('Formato de correo no válido')
+					return
+				}
 
-			if (password.length < 6) {
-				setError('La contraseña debe tener al menos 6 caracteres')
-				return
+				if (password.length < 6) {
+					setError('La contraseña debe tener al menos 6 caracteres')
+					return
+				}
 			}
 
 			setLoading(true)
@@ -54,6 +58,8 @@ export default function Home() {
 			// Manejo de errores
 			if (error.message.includes('(auth/invalid-credential)')) {
 				setError('Correo o contraseña incorrecto')
+			} else {
+				setError(error.message)
 			}
 		} finally {
 			setLoading(false)
@@ -113,17 +119,22 @@ export default function Home() {
 				</section>
 
 				{process.env.NODE_ENV === 'development' && (
-					<section className='relative flex flex-col rounded-lg border-2 border-primary/60 bg-background p-2 shadow-lg'>
-						<button
-							className='text-md w-fit self-center text-pretty rounded-lg bg-primary p-2 transition hover:scale-105 hover:bg-primary/90'
-							onClick={async () => {
-								setLoading(true)
-								await signIn('alo@alo.com', '123123')
-								setLoading(false)
-								router.push('/home')
+					<section className='relative rounded-lg border-2 border-primary/60 bg-background p-2 shadow-lg'>
+						<form
+							className='flex flex-col'
+							onSubmit={(e) => {
+								handleLogin(e)
 							}}>
-							Bypass
-						</button>
+							<button
+								className='text-md w-fit self-center text-pretty rounded-lg bg-primary p-2 transition hover:scale-105 hover:bg-primary/90'
+								onClick={() => {
+									setByPass(true)
+									setEmail('alo@alo.com')
+									setPassword('123123')
+								}}>
+								Bypass
+							</button>
+						</form>
 					</section>
 				)}
 			</section>
