@@ -4,7 +4,8 @@ import {
 	POS_ROUTE,
 	PROVEEDORES_ROUTE,
 	REPORTES_ROUTE,
-	USUARIOS_ROUTE
+	USUARIOS_ROUTE,
+	HISTORIAL_ROUTE
 } from '@/lib/routes'
 import {
 	BarChart,
@@ -12,7 +13,8 @@ import {
 	Package,
 	Truck,
 	UserRound,
-	Home
+	Home,
+	CalendarDaysIcon
 } from 'lucide-react'
 
 const MENUPAGES = [
@@ -21,7 +23,8 @@ const MENUPAGES = [
 	{ title: 'Inventario', icon: Package, href: INVENTARIO_ROUTE },
 	{ title: 'Proveedores', icon: Truck, href: PROVEEDORES_ROUTE },
 	{ title: 'Usuarios', icon: UserRound, href: USUARIOS_ROUTE },
-	{ title: 'Reportes', icon: BarChart, href: REPORTES_ROUTE }
+	{ title: 'Reportes', icon: BarChart, href: REPORTES_ROUTE },
+	{ title: 'Historial', icon: CalendarDaysIcon, href: HISTORIAL_ROUTE }
 ]
 
 export { MENUPAGES }

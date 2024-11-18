@@ -219,22 +219,22 @@ export default function GestionDeReportes() {
 	return (
 		<div className='relative transition-all'>
 			<div className='flex justify-between p-4'>
-				<div className='w-[80%] flex items-center justify-center border border-gray-300 p-4 rounded-lg h-[50rem]'>
+				<div className='flex h-[50rem] w-[80%] items-center justify-center rounded-lg border border-gray-300 p-4'>
 					{renderChart()}
 				</div>
-				<div className='flex flex-col justify-center space-y-2 ml-4'>
+				<div className='ml-4 flex flex-col justify-center space-y-2'>
 					<button
-						className='bg-blue-500 text-white px-4 py-2 rounded'
+						className='rounded bg-blue-500 px-4 py-2 text-white'
 						onClick={() => setSelectedChart('bar')}>
 						Gráfico de Barras
 					</button>
 					<button
-						className='bg-green-500 text-white px-4 py-2 rounded'
+						className='rounded bg-green-500 px-4 py-2 text-white'
 						onClick={() => setSelectedChart('pie')}>
 						Gráfico de Pastel
 					</button>
 					<button
-						className='bg-red-500 text-white px-4 py-2 rounded'
+						className='rounded bg-red-500 px-4 py-2 text-white'
 						onClick={() => setSelectedChart('line')}>
 						Gráfico de Líneas
 					</button>

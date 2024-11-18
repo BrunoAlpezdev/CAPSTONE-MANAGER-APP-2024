@@ -40,6 +40,13 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger
+} from '@/components/ui/accordion'
+
 const pageSizeOptions = [5, 8, 10, 15, 20]
 
 interface DataTableProps<TData, TValue> {
