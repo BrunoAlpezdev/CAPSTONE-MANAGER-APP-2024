@@ -19,7 +19,6 @@ export const useVentasConDetalles = () => {
 
 	// Función para cargar las ventas y detalles
 	const fetchData = async () => {
-		console.log('antes del try')
 		try {
 			if (db) {
 				// Obtener las ventas
@@ -37,13 +36,12 @@ export const useVentasConDetalles = () => {
 				const usuariodata = await db.usuarios.find().exec()
 				const usuarios = usuariodata.map((usuario: any) => usuario.toJSON())
 
-				console.log('porfa ayuda')
 				// Combinar las ventas con sus detalles
 				const ventasConDetalles = ventas.map((venta: Venta) => {
 					const detallesVenta = detalles.filter(
 						(detalle: DetalleVenta) => detalle.venta_id === venta.id
 					)
-					console.log('venta con detalles')
+
 					// Obtener el nombre del responsable de la venta
 					const responsable = usuarios.find(
 						(usuario: Usuario) => usuario.id === venta.id_responsable
@@ -61,8 +59,6 @@ export const useVentasConDetalles = () => {
 							}
 						}
 					)
-					console.log('detalle venta producto')
-
 					return {
 						...venta,
 						detalles: DetalleVentaProducto,
@@ -72,12 +68,10 @@ export const useVentasConDetalles = () => {
 						metodoDePago: venta.metodoPago
 					}
 				})
-
 				setData(ventasConDetalles)
 			}
 		} catch (error) {
 			setError('Error al cargar los datos de ventas o detalles.')
-			console.log('error')
 		} finally {
 			setLoading(false)
 		}
