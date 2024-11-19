@@ -21,13 +21,19 @@ export default function GestionDeUsuarios() {
 	const [error, setError] = useState<string | null>(null)
 	const { isMenuOpen, toggleMenu } = useMenu()
 	const { db } = useDatabaseStore.getState()
+	const localId = localStorage.getItem('userUuid')
+	const Id_negocio = localId?.replaceAll('"', '')
 
 	const fetchUsuarios = async () => {
-		if (db) {
+		if (db && Id_negocio) {
 			try {
 				// Obtén los datos de los productos desde la base de datos local (RxDB)
 				// TODO: filtrar solo los que tengan el id de negocio del usuario logueado -> useAuthStore -> USUARIO
-				const usuariosData = await db.usuarios.find().exec()
+				const usuariosData = await db.usuarios
+					.find({
+						selector: { id_negocio: Id_negocio }
+					})
+					.exec()
 
 				// Mapear los productos a un array de objetos
 				const usuarios = usuariosData.map((usuario: any) => usuario.toJSON())
@@ -57,9 +63,11 @@ export default function GestionDeUsuarios() {
 	*/
 	// Suscripción a los cambios en la colección de productos
 	useEffect(() => {
-		if (db?.usuarios) {
+		if (db?.usuarios && Id_negocio) {
 			const subscription = db.usuarios
-				.find()
+				.find({
+					selector: { id_negocio: Id_negocio }
+				})
 				.$ // el carácter '$' provee un observable se emite cada vez que el resultado de la query cambia
 				.subscribe((usuariosData: any[]) => {
 					const usuarios = usuariosData.map((usuario) => usuario.toJSON())

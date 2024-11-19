@@ -14,15 +14,21 @@ export const useVentasConDetalles = () => {
 	const [detalledata, setData] = useState<VentasConDetalle[]>([]) // Estado para los datos combinados
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
+	const localId = localStorage.getItem('userUuid')
+	const Id_negocio = localId?.replaceAll('"', '')
 
 	const db = useDatabaseStore((state) => state.db) // Aquí obtienes la base de datos local (RxDB)
 
 	// Función para cargar las ventas y detalles
 	const fetchData = async () => {
 		try {
-			if (db) {
+			if (db && Id_negocio) {
 				// Obtener las ventas
-				const ventasData = await db.ventas.find().exec()
+				const ventasData = await db.ventas
+					.find({
+						selector: { id_negocio: Id_negocio }
+					})
+					.exec()
 				const ventas = ventasData.map((venta: any) => venta.toJSON())
 
 				// Obtener los detalles de las ventas
