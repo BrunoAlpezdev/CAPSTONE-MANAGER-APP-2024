@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Historial } from '@/types'
+import { Historial, VentasConDetalle, Venta } from '@/types'
 import { firestore } from '@/firebase/firebaseConfig'
 import { Label } from '@/components/ui/label'
 import { Toaster, toast } from 'react-hot-toast'
@@ -38,7 +38,7 @@ async function getHistorial() {
 }
 
 // Definir las columnas para la tabla
-export const columns: ColumnDef<Historial>[] = [
+export const columns: ColumnDef<VentasConDetalle>[] = [
 	{
 		id: 'select',
 		header: ({ table }) => (
@@ -63,8 +63,8 @@ export const columns: ColumnDef<Historial>[] = [
 		accessorKey: 'id',
 		header: 'CÓDIGO',
 		cell: ({ row }) => {
-			const historial = row.original
-			return <div className='text-foreground'>{historial.id}</div>
+			const VentaConDetalles: VentasConDetalle = row.original
+			return <div className='text-foreground'>{VentaConDetalles.id}</div>
 		}
 	},
 	{
@@ -80,31 +80,37 @@ export const columns: ColumnDef<Historial>[] = [
 			)
 		},
 		cell: ({ row }) => {
-			const historial = row.original
-			return <div className='text-foreground'>{historial.responsable}</div>
+			const VentaConDetalles: VentasConDetalle = row.original
+			return (
+				<div className='text-foreground'>{VentaConDetalles.responsable}</div>
+			)
 		}
 	},
 	{
 		accessorKey: 'totalVenta',
 		header: 'TOTAL VENTA',
 		cell: ({ row }) => {
-			const historial = row.original
-			return <div className='text-foreground'>{historial.totalVenta}</div>
+			const VentaConDetalles: VentasConDetalle = row.original
+			return (
+				<div className='text-foreground'>{VentaConDetalles.totalVenta}</div>
+			)
 		}
 	},
 	{
 		accessorKey: 'pago',
 		header: 'MÉTODO DE PAGO',
 		cell: ({ row }) => {
-			const historial = row.original
-			return <div className='text-foreground'>{historial.pago}</div>
+			const VentaConDetalles: VentasConDetalle = row.original
+			return (
+				<div className='text-foreground'>{VentaConDetalles.metodoDePago}</div>
+			)
 		}
 	},
 	{
 		id: 'accordion',
 		header: 'DETALLES',
 		cell: ({ row }) => {
-			const historial = row.original
+			const VentaConDetalles: VentasConDetalle = row.original
 			const [isOpen, setIsOpen] = useState(false)
 
 			const handleToggle = () => {
@@ -114,16 +120,29 @@ export const columns: ColumnDef<Historial>[] = [
 			return (
 				<Sheet>
 					<SheetTrigger asChild>
-						<Button variant='outline'>Open</Button>
+						<Button variant='outline'>Detalle</Button>
 					</SheetTrigger>
 					<SheetContent>
 						<SheetHeader>
-							<SheetTitle>Edit profile</SheetTitle>
+							<SheetTitle className='text-2xl'>Detalles De Venta</SheetTitle>
 							<SheetDescription>
-								Make changes to your profile here. Click save when you're done.
+								<Label>Detalle Venta id: {VentaConDetalles.id}</Label>
 							</SheetDescription>
 						</SheetHeader>
-						<div className='grid gap-4 py-4'></div>
+						<div className='grid gap-4 py-4'>
+							{VentaConDetalles.detalles.map((detalle, index) => (
+								<div
+									key={index}
+									className='rounded-md border border-primary/50 bg-secondary p-4'>
+									<div>Detalle n°: {index + 1}</div>
+									<div className='my-[4px] h-[1px] w-full bg-white/30'></div>
+									<div>nombre: {detalle.nombre}</div>
+									<div>variante: {detalle.variante}</div>
+									<div>cantidad: {detalle.cantidad}</div>
+									<div>precio: {detalle.precio}</div>
+								</div>
+							))}
+						</div>
 					</SheetContent>
 				</Sheet>
 			)
