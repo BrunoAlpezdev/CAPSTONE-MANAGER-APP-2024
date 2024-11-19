@@ -1,6 +1,7 @@
+'use client'
+
 import useDatabaseStore from '@/store/dbStore'
 import { useState, useEffect } from 'react'
-import { RxDatabase } from 'rxdb'
 import {
 	Venta,
 	Producto,
@@ -17,7 +18,8 @@ interface VentasData {
 	topProductos: TopProductosData[]
 }
 
-export const useDataVentas = (db = useDatabaseStore): VentasData => {
+export const useDataVentas = (): VentasData => {
+	const { db } = useDatabaseStore() // Asegúrate de que el hook devuelva correctamente el objeto db
 	const [ventasData, setVentasData] = useState<VentasData>({
 		ventasMensuales: [],
 		transaccionesMensuales: [],
@@ -26,22 +28,33 @@ export const useDataVentas = (db = useDatabaseStore): VentasData => {
 	})
 
 	useEffect(() => {
-		const { db } = useDatabaseStore()
+		if (!db || !db.ventas) {
+			console.error(
+				'La base de datos o la colección "ventas" no están disponibles.'
+			)
+			return
+		}
+
 		const subscription = db.ventas
 			.find()
 			.$.subscribe(async (ventas: Venta[]) => {
 				if (ventas) {
-					const ventasMensuales = calcularVentasMensuales(ventas)
-					const transaccionesMensuales = calcularTransaccionesMensuales(ventas)
-					const promedioVentasDiarias = calcularPromedioVentasDiarias(ventas)
-					const topProductos = await calcularTopProductos(db)
+					try {
+						const ventasMensuales = calcularVentasMensuales(ventas)
+						const transaccionesMensuales =
+							calcularTransaccionesMensuales(ventas)
+						const promedioVentasDiarias = calcularPromedioVentasDiarias(ventas)
+						const topProductos = await calcularTopProductos(db)
 
-					setVentasData({
-						ventasMensuales,
-						transaccionesMensuales,
-						promedioVentasDiarias,
-						topProductos
-					})
+						setVentasData({
+							ventasMensuales,
+							transaccionesMensuales,
+							promedioVentasDiarias,
+							topProductos
+						})
+					} catch (error) {
+						console.error('Error al calcular los datos de ventas:', error)
+					}
 				}
 			})
 
@@ -91,23 +104,33 @@ const calcularPromedioVentasDiarias = (ventas: Venta[]): number => {
 	return uniqueDates.size > 0 ? ventasTotales / uniqueDates.size : 0
 }
 
-const calcularTopProductos = async (
-	db: RxDatabase
-): Promise<TopProductosData[]> => {
-	const detalles = (await db.detalleVentas.find().exec()) as DetalleVenta[]
-	const productoCounts: Record<string, number> = {}
+const calcularTopProductos = async (db: any): Promise<TopProductosData[]> => {
+	if (!db.detalleVentas || !db.productos) {
+		console.error(
+			'Las colecciones "detalleVentas" o "productos" no están disponibles.'
+		)
+		return []
+	}
 
-	detalles.forEach((detalle) => {
-		productoCounts[detalle.producto_id] =
-			(productoCounts[detalle.producto_id] || 0) + detalle.cantidad
-	})
+	try {
+		const detalles = (await db.detalleVentas.find().exec()) as DetalleVenta[]
+		const productoCounts: Record<string, number> = {}
 
-	const productos = (await db.productos.find().exec()) as Producto[]
-	return productos
-		.map((prod) => ({
-			nombre: prod.nombre,
-			cantidad: productoCounts[prod.id] || 0
-		}))
-		.sort((a, b) => b.cantidad - a.cantidad)
-		.slice(0, 5) // Top 5 productos
+		detalles.forEach((detalle) => {
+			productoCounts[detalle.producto_id] =
+				(productoCounts[detalle.producto_id] || 0) + detalle.cantidad
+		})
+
+		const productos = (await db.productos.find().exec()) as Producto[]
+		return productos
+			.map((prod) => ({
+				nombre: prod.nombre,
+				cantidad: productoCounts[prod.id] || 0
+			}))
+			.sort((a, b) => b.cantidad - a.cantidad)
+			.slice(0, 5) // Top 5 productos
+	} catch (error) {
+		console.error('Error al obtener detalles de ventas o productos:', error)
+		return []
+	}
 }
