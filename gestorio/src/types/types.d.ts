@@ -123,6 +123,14 @@ interface Notificacion {
 	mensaje: string
 }
 
+interface VentasConDetalle {
+	id: string
+	responsable: string
+	totalVenta: number
+	montoTotal: number
+	detalles: DetalleVenta[]
+}
+
 export {
 	Tienda,
 	Producto,
@@ -136,5 +144,6 @@ export {
 	Pedido,
 	DetallePedido,
 	Notificacion,
-	Historial
+	Historial,
+	VentasConDetalle
 }
