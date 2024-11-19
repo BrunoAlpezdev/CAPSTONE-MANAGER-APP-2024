@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Historial } from '@/types'
 import { firestore } from '@/firebase/firebaseConfig'
+import { Label } from '@/components/ui/label'
 import { Toaster, toast } from 'react-hot-toast'
 import {
 	collection,
@@ -15,11 +16,15 @@ import {
 	doc
 } from 'firebase/firestore'
 import {
-	Accordion,
-	AccordionContent,
-	AccordionItem,
-	AccordionTrigger
-} from '@/components/ui/accordion'
+	Sheet,
+	SheetClose,
+	SheetContent,
+	SheetDescription,
+	SheetFooter,
+	SheetHeader,
+	SheetTitle,
+	SheetTrigger
+} from '@/components/ui/sheet'
 
 // Función para obtener los datos de historial desde Firebase
 async function getHistorial() {
@@ -107,37 +112,20 @@ export const columns: ColumnDef<Historial>[] = [
 			}
 
 			return (
-				<Accordion type='single' collapsible className='w-full'>
-					<AccordionItem value='item-1'>
-						{/* Mostrar la palabra "Resumen" solo cuando el acordeón está abierto */}
-						<AccordionTrigger
-							onClick={handleToggle}
-							className='flex items-center justify-between border-0 outline-none hover:border-none hover:no-underline focus:ring-0'>
-							<span className={`${isOpen ? 'block' : 'hidden'}`}>Resumen</span>
-							{/* Solo mostrar la palabra "Resumen" cuando el acordeón está abierto */}
-						</AccordionTrigger>
-						<AccordionContent>
-							<div className='grid grid-cols-2 gap-4'>
-								<div>
-									<p>
-										<strong>Cantidad:</strong> {historial.pago}
-									</p>
-									<p>
-										<strong>Precio:</strong> {historial.pago}
-									</p>
-								</div>
-								<div>
-									<p>
-										<strong>Fecha:</strong> {historial.pago}
-									</p>
-									<p>
-										<strong>Venta:</strong> {historial.pago}
-									</p>
-								</div>
-							</div>
-						</AccordionContent>
-					</AccordionItem>
-				</Accordion>
+				<Sheet>
+					<SheetTrigger asChild>
+						<Button variant='outline'>Open</Button>
+					</SheetTrigger>
+					<SheetContent>
+						<SheetHeader>
+							<SheetTitle>Edit profile</SheetTitle>
+							<SheetDescription>
+								Make changes to your profile here. Click save when you're done.
+							</SheetDescription>
+						</SheetHeader>
+						<div className='grid gap-4 py-4'></div>
+					</SheetContent>
+				</Sheet>
 			)
 		}
 	}
