@@ -1,6 +1,7 @@
 /* https://firebase.google.com/docs/reference/js/firestore_.timestamp */
 /* fromDate(date)	static	Creates a new timestamp from the given date. */
 import { Timestamp } from 'firebase/firestore'
+import { DetalleVenta } from '@/types'
 
 interface Tienda {
 	id: number
@@ -122,13 +123,32 @@ interface Notificacion {
 	id: string
 	mensaje: string
 }
+export interface VentasMensualesData {
+	mes: string
+	ventas: number
+}
 
+export interface TransaccionesMensualesData {
+	mes: string
+	transacciones: number
+}
+
+export interface TopProductosData {
+	nombre: string
+	cantidad: number
+}
 interface VentasConDetalle {
 	id: string
 	responsable: string
 	totalVenta: number
 	montoTotal: number
-	detalles: DetalleVenta[]
+	metodoDePago: string
+	detalles: DetalleVentaProducto[]
+}
+
+interface DetalleVentaProducto extends DetalleVenta {
+	nombre: string
+	variante: string
 }
 
 export {
@@ -145,5 +165,9 @@ export {
 	DetallePedido,
 	Notificacion,
 	Historial,
-	VentasConDetalle
+	VentasMensualesData,
+	TransaccionesMensualesData,
+	TopProductosData,
+	VentasConDetalle,
+	DetalleVentaProducto
 }
