@@ -4,7 +4,7 @@ import React from 'react'
 import { useDataVentas } from '@/hooks/useSalesData'
 import BarChart from '@/components/bar-chart'
 
-const ReportesPage: React.FC = () => {
+export default function ReportesPage() {
 	const { ventasMensuales, transaccionesMensuales } = useDataVentas()
 
 	return (
@@ -37,5 +37,3 @@ const ReportesPage: React.FC = () => {
 		</div>
 	)
 }
-
-export default ReportesPage
