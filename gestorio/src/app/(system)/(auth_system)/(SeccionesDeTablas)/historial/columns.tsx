@@ -7,6 +7,8 @@ import { Historial, VentasConDetalle, Venta } from '@/types'
 import { firestore } from '@/firebase/firebaseConfig'
 import { Label } from '@/components/ui/label'
 import { Toaster, toast } from 'react-hot-toast'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
 import {
 	collection,
 	getDocs,
@@ -116,32 +118,49 @@ export const columns: ColumnDef<VentasConDetalle>[] = [
 			const handleToggle = () => {
 				setIsOpen(!isOpen)
 			}
-
 			return (
 				<Sheet>
 					<SheetTrigger asChild>
 						<Button variant='outline'>Detalle</Button>
 					</SheetTrigger>
-					<SheetContent>
+					<SheetContent className='flex h-full max-h-screen flex-col'>
 						<SheetHeader>
 							<SheetTitle className='text-2xl'>Detalles De Venta</SheetTitle>
 							<SheetDescription>
 								<Label>Detalle Venta id: {VentaConDetalles.id}</Label>
 							</SheetDescription>
 						</SheetHeader>
-						<div className='grid gap-4 py-4'>
-							{VentaConDetalles.detalles.map((detalle, index) => (
-								<div
-									key={index}
-									className='rounded-md border border-primary/50 bg-secondary p-4'>
-									<div>Detalle n°: {index + 1}</div>
-									<div className='my-[4px] h-[1px] w-full bg-white/30'></div>
-									<div>nombre: {detalle.nombre}</div>
-									<div>variante: {detalle.variante}</div>
-									<div>cantidad: {detalle.cantidad}</div>
-									<div>precio: {detalle.precio}</div>
+						<div className='flex-1 overflow-hidden'>
+							<ScrollArea className='h-full overflow-y-auto'>
+								<div className='grid gap-6 py-6'>
+									{VentaConDetalles.detalles.map((detalle, index) => (
+										<div
+											key={index}
+											className='rounded-md border border-primary/50 bg-secondary p-6'>
+											<div className='text-lg font-semibold'>
+												Detalle n°: {index + 1}
+											</div>
+											<div className='my-2 h-[2px] w-full bg-white/30'></div>
+											<div>
+												Nombre:{' '}
+												<span className='font-medium'>{detalle.nombre}</span>
+											</div>
+											<div>
+												Variante:{' '}
+												<span className='font-medium'>{detalle.variante}</span>
+											</div>
+											<div>
+												Cantidad:{' '}
+												<span className='font-medium'>{detalle.cantidad}</span>
+											</div>
+											<div>
+												Precio:{' '}
+												<span className='font-medium'>${detalle.precio}</span>
+											</div>
+										</div>
+									))}
 								</div>
-							))}
+							</ScrollArea>
 						</div>
 					</SheetContent>
 				</Sheet>

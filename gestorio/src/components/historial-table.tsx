@@ -94,29 +94,6 @@ export function DataTable<TData, TValue>({
 		<>
 			{/* Table */}
 			<div className='justify- mr-5 flex items-center'>
-				<div className='ml-3 flex items-center py-4'>
-					<Popover>
-						<PopoverTrigger asChild>
-							<Button
-								variant={'outline'}
-								className={cn(
-									'w-[280px] justify-start text-left font-normal',
-									!date && 'text-muted-foreground'
-								)}>
-								<CalendarIcon className='mr-2 h-4 w-4' />
-								{date ? format(date, 'dd-MM-yyyy') : <span>Elegir Fecha</span>}
-							</Button>
-						</PopoverTrigger>
-						<PopoverContent className='w-auto p-0'>
-							<Calendar
-								mode='single'
-								selected={date}
-								onSelect={setDate}
-								initialFocus
-							/>
-						</PopoverContent>
-					</Popover>
-				</div>
 				<div className='ml-auto flex items-center space-x-2'>
 					<span>Mostrar:</span>
 					<Select
