@@ -2,6 +2,7 @@ import { useLocalDb } from '@/hooks'
 import { Usuario, Venta } from '@/types'
 import { Package } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 interface VentaConResponsable extends Venta {
 	responsable: string
@@ -10,7 +11,7 @@ interface VentaConResponsable extends Venta {
 export const HomeUltVentas = () => {
 	const { LeerVentas, LeerUsuarios } = useLocalDb()
 	const [ventasData, setVentasData] = useState<VentaConResponsable[]>([])
-
+	const router = useRouter()
 	useEffect(() => {
 		const fetchData = async () => {
 			const data = await LeerVentas()
@@ -40,7 +41,11 @@ export const HomeUltVentas = () => {
 
 	return (
 		<div className='dashboard-container box-shadow flex-grow rounded-sm border-primary/40 bg-foreground/5 text-foreground backdrop-blur-md'>
-			<section className='mt-2 flex flex-row gap-2 px-4'>
+			<section
+				className='mt-2 flex cursor-pointer flex-row gap-2 px-4'
+				onClick={() => {
+					router.push('/historial')
+				}}>
 				<Package />
 				<h2>Ultimas Ventas</h2>
 			</section>
