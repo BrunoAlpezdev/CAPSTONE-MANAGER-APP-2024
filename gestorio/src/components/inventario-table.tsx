@@ -84,6 +84,8 @@ export function DataTable<TData, TValue>({
 	}
 
 	const handleAgregar = () => {
+		const id = GenerateNewId()
+		setProductToAdd({ ...productToAdd, id })
 		AgregarProducto(productToAdd)
 		setIsOpen(false)
 	}
@@ -100,7 +102,7 @@ export function DataTable<TData, TValue>({
 
 	const Id_negocio = localStorage.getItem('userUuid')
 	const [productToAdd, setProductToAdd] = useState<Producto>({
-		id: GenerateNewId(),
+		id: '',
 		nombre: '',
 		barcode: '',
 		marca: '',
@@ -109,6 +111,7 @@ export function DataTable<TData, TValue>({
 		variante: '',
 		stock: 0
 	})
+	console.log(productToAdd)
 
 	return (
 		<>
