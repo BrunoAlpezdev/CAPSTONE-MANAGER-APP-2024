@@ -1,7 +1,7 @@
 'use client'
 
 import { Calendar } from '@/components/ui/calendar'
-import { DashboardItem, Menu } from '@/components'
+import { Menu } from '@/components'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useEffect, useRef, useState } from 'react'
 import { createSwapy } from 'swapy'
@@ -111,9 +111,6 @@ export default function HomePage() {
 			<Menu />
 			<ScrollArea className='dashboard-fondo w-full'>
 				<section className='flex h-full w-full select-none flex-col gap-8 p-6 text-center text-foreground shadow-inner'>
-					<header>
-						<h1>Dashboard</h1>
-					</header>
 					<section
 						ref={containerRef}
 						className='flex w-full flex-wrap justify-center gap-6'>
