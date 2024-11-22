@@ -124,12 +124,30 @@ export default function ReportesPage() {
 											: 'border border-secondary bg-secondary/10'
 									}`}>
 									{/* Imagen de fondo o placeholder */}
-									<div className='relative h-40 w-full overflow-hidden rounded-t-md bg-gray-200'>
-										<img
-											src={`/icons/${chart.id}.png`}
-											alt={chart.label}
-											className='h-full w-full object-cover opacity-50 group-hover:opacity-100'
-										/>
+									<div
+										className={`relative h-40 w-full overflow-hidden rounded-t-md`}>
+										{/* Fondo dinámico según el ID de la carta */}
+										<div
+											className={`relative h-40 w-full overflow-hidden rounded-t-md ${
+												chart.id === 'ingresos'
+													? 'bg-cian-100'
+													: chart.id === 'transacciones'
+														? 'bg-violet-200'
+														: 'bg-lime-200'
+											}`}>
+											{/* Imagen dinámica con enlace */}
+											<img
+												src={
+													chart.id === 'ingresos'
+														? 'https://tudashboard.com/wp-content/uploads/2021/03/grafica-de-barras.png'
+														: chart.id === 'transacciones'
+															? 'https://images.vexels.com/content/129159/preview/2d-colorful-bar-chart-infographic-9e35d8.png'
+															: 'https://cdn-icons-png.flaticon.com/512/3349/3349622.png'
+												}
+												alt={chart.label}
+												className='h-full w-full object-cover opacity-50 group-hover:opacity-100'
+											/>
+										</div>
 									</div>
 
 									{/* Fondo del hover */}
