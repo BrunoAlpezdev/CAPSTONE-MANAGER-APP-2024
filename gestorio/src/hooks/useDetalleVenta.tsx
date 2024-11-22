@@ -16,6 +16,8 @@ export const useVentasConDetalles = () => {
 	const [error, setError] = useState<string | null>(null)
 	const localId = localStorage.getItem('userUuid')
 	const Id_negocio = localId?.replaceAll('"', '')
+	const fecha = new Date()
+	const fechaString = fecha.toISOString().slice(0, 19).replace('T', ' ')
 
 	const db = useDatabaseStore((state) => state.db) // Aquí obtienes la base de datos local (RxDB)
 
@@ -69,6 +71,7 @@ export const useVentasConDetalles = () => {
 						...venta,
 						detalles: DetalleVentaProducto,
 						responsable: responsable?.nombre,
+						fecha: fechaString,
 						totalVenta: venta.total,
 						montoTotal: venta.total,
 						metodoDePago: venta.metodoPago
