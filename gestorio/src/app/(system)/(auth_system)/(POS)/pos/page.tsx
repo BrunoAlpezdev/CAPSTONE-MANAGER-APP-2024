@@ -26,6 +26,7 @@ export default function POS() {
 			? JSON.parse(savedTickets)
 			: [{ id: 1, name: 'Ticket Actual', items: [] }]
 	})
+	const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(true)
 	// ID del ticket actualmente seleccionado
 	const [currentTicketId, setCurrentTicketId] = useState(1)
 	// Estado para el código escaneado
@@ -100,6 +101,7 @@ export default function POS() {
 		setSelectedUser(null)
 		setIsVerified(false)
 		setIsDialogOpen(true)
+		setIsAuthDialogOpen(true)
 	}
 
 	// POSFooter
@@ -155,7 +157,7 @@ export default function POS() {
 				// Obtén los datos de los productos desde la base de datos local (RxDB)
 				const productosData = await db.productos
 					.find({
-						selector: { id_negocio: Id_negocio }
+						selector: { id_negocio: Id_negocio, stock: { $gt: 0 } }
 					})
 					.exec()
 
@@ -334,6 +336,18 @@ export default function POS() {
 			.catch((error) => {
 				makeToast(`Error al confirmar la orden: ${error.message}`, '✖️')
 			})
+
+		// Reducir stock de los productos del ticket
+		currentTicket.items.forEach((item) => {
+			const product = products.find((product) => product.id === item.id)
+			if (product) {
+				const newStock = product.stock - item.cantidad
+				db.productos.upsert({
+					...product,
+					stock: newStock
+				})
+			}
+		})
 
 		setTickets((prevTickets) => {
 			// Filtrar y reorganizar IDs después de eliminar
@@ -658,6 +672,27 @@ export default function POS() {
 	}, [])
 
 	useEffect(() => {
+		if (isAuthDialogOpen) {
+			const handleKeyDown = (e: KeyboardEvent) => {
+				if (e.key === 'Enter') {
+					// hacer click programaticamente a confirm-button nextjs "Button"
+					const authConfirmButton = document.getElementById('auth-confirm')
+					if (authConfirmButton) {
+						authConfirmButton.click()
+						setIsAuthDialogOpen(false)
+					}
+				}
+			}
+
+			window.addEventListener('keydown', handleKeyDown)
+
+			return () => {
+				window.removeEventListener('keydown', handleKeyDown)
+			}
+		}
+	}, [])
+
+	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.ctrlKey && e.key === 'ArrowRight') {
 				if (currentTicketId < tickets.length) {
@@ -755,6 +790,26 @@ export default function POS() {
 				.subscribe((usuariosData: any[]) => {
 					const usuarios = usuariosData.map((usuarios) => usuarios.toJSON())
 					setUsuarios(usuarios)
+				})
+
+			// Clean up the subscription on component unmount
+			return () => subscription.unsubscribe()
+		}
+	}, [db])
+
+	// Subscribe to changes in the productos collection
+	useEffect(() => {
+		const localId = localStorage.getItem('userUuid')
+		const Id_negocio = localId?.replaceAll('"', '')
+		if (db?.productos) {
+			const subscription = db.productos
+				.find({
+					selector: { id_negocio: Id_negocio, stock: { $gt: 0 } }
+				})
+				.$ // '$' provides an observable that emits every time the query result changes
+				.subscribe((productosData: any[]) => {
+					const productos = productosData.map((producto) => producto.toJSON())
+					setProducts(productos)
 				})
 
 			// Clean up the subscription on component unmount
