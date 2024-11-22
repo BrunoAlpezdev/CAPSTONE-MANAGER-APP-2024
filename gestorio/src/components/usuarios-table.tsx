@@ -44,6 +44,7 @@ import {
 import { Usuario } from '@/types'
 import { useLocalDb } from '@/hooks/useLocaldb'
 import { v7 as uuidv7 } from 'uuid'
+import bcrypt from 'bcryptjs'
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[]
@@ -210,9 +211,12 @@ export function DataTable<TData, TValue>({
 										id='passwordHash'
 										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
 										onChange={(e) => {
-											setUserToAdd({
-												...userToAdd,
-												passwordHash: e.target.value
+											const saltRounds = 10
+											bcrypt.hash(e.target.value, saltRounds, (err, hash) => {
+												setUserToAdd({
+													...userToAdd,
+													passwordHash: hash
+												})
 											})
 										}}
 									/>
