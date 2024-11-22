@@ -39,11 +39,11 @@ const BarChart: React.FC<BarChartProps> = ({
 				data={data}
 				keys={keys}
 				indexBy={indexBy}
-				margin={{ top: 60, right: 100, bottom: 40, left: 65 }} // Márgenes modificados
+				margin={{ top: 60, right: 100, bottom: 40, left: 65 }}
 				padding={0.3}
 				valueScale={{ type: 'linear' }}
 				indexScale={{ type: 'band', round: true }}
-				colors={getColor} // Aplicar la función para colores personalizados
+				colors={getColor}
 				borderColor={{
 					from: 'color',
 					modifiers: [['darker', 1.6]]
@@ -64,13 +64,13 @@ const BarChart: React.FC<BarChartProps> = ({
 					tickRotation: 0,
 					legend: axisLeftLegend,
 					legendPosition: 'middle',
-					legendOffset: -55 // Desplazamiento de la leyenda izquierda modificado
+					legendOffset: -55
 				}}
 				labelSkipWidth={12}
 				labelSkipHeight={12}
 				labelTextColor={{
 					from: 'color',
-					modifiers: [['darker', 1.6]]
+					modifiers: [['darker', 3]] // Texto más oscuro
 				}}
 				legends={[
 					{
