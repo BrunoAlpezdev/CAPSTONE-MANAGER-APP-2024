@@ -16,6 +16,8 @@ export const HomeUltVentas = () => {
 		const fetchData = async () => {
 			const data = await LeerVentas()
 
+			if (!data) return
+
 			const sortedData = data.sort(
 				(a: any, b: any) =>
 					new Date(b.fecha).getTime() - new Date(a.fecha).getTime()

@@ -115,10 +115,14 @@ const calcularPromedioVentasDiarias = (ventas: Venta[]): number => {
 	return uniqueDates.size > 0 ? ventasTotales / uniqueDates.size : 0
 }
 
+const uuid = localStorage.getItem('uuid')
+
 const calcularTopProductos = async (db: any): Promise<TopProductosData[]> => {
 	try {
 		// Obtener detalles de ventas y productos
-		const detallesData = await db.detalle_ventas.find().exec()
+		const detallesData = await db.detalle_ventas
+			.find({ id_negocio: uuid })
+			.exec()
 		const productosData = await db.productos.find().exec()
 
 		const detalles: DetalleVenta[] = detallesData.map((detalle: any) =>
@@ -142,23 +146,29 @@ const calcularTopProductos = async (db: any): Promise<TopProductosData[]> => {
 			return acumulador
 		}, {})
 
-		// Convertir a array y ordenar por cantidad
-		const productosOrdenados = Object.values(ventasPorProducto).sort(
-			(a, b) => b.cantidad - a.cantidad
-		)
+		if (ventasPorProducto) {
+			// Convertir a array y ordenar por cantidad
+			const productosOrdenados = Object.values(ventasPorProducto).sort(
+				(a, b) => b.cantidad - a.cantidad
+			)
+			// Tomar los 5 primeros y mapear con información de productos
+			const topProductosConInfo = productosOrdenados
+				.slice(0, 5)
+				.map((venta) => {
+					const producto = productos.find(
+						(prod) => prod.id === venta.producto_id
+					)
+					return {
+						id: venta.producto_id,
+						label: producto?.nombre || 'Desconocido',
+						value: venta.cantidad,
+						color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`
+					}
+				})
+			return topProductosConInfo
+		}
 
-		// Tomar los 5 primeros y mapear con información de productos
-		const topProductosConInfo = productosOrdenados.slice(0, 5).map((venta) => {
-			const producto = productos.find((prod) => prod.id === venta.producto_id)
-			return {
-				id: venta.producto_id,
-				label: producto?.nombre || 'Desconocido',
-				value: venta.cantidad,
-				color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`
-			}
-		})
-
-		return topProductosConInfo
+		return []
 	} catch (error) {
 		console.error('Error al obtener detalles de ventas o productos:', error)
 		return []
@@ -169,8 +179,8 @@ const calcularMejoresResponsables = async (
 ): Promise<TopResponsablesData[]> => {
 	try {
 		// Obtener detalles de ventas y productos
-		const ventasData = await db.ventas.find().exec()
-		const responsablesData = await db.usuarios.find().exec()
+		const ventasData = await db.ventas.find({ id_negocio: uuid }).exec()
+		const responsablesData = await db.usuarios.find({ id_negocio: uuid }).exec()
 
 		const ventas: Venta[] = ventasData.map((venta: any) => venta.toJSON())
 

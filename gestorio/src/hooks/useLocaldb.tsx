@@ -25,7 +25,7 @@ export const useLocalDb = () => {
 		try {
 			const ventas = db?.ventas
 			if (ventas) {
-				const ventasData = await ventas.find().exec()
+				const ventasData = await ventas.find({ id_negocio: uuid }).exec()
 				return ventasData
 			}
 		} catch (error) {
@@ -37,7 +37,7 @@ export const useLocalDb = () => {
 		try {
 			const usuarios = db?.usuarios
 			if (usuarios) {
-				const usuariosData = await usuarios.find().exec()
+				const usuariosData = await usuarios.find({ id_negocio: uuid }).exec()
 				return usuariosData
 			}
 		} catch (error) {
