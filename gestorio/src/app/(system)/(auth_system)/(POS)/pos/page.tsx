@@ -16,8 +16,24 @@ import { PosFooter } from '@/components/newPos/pos-footer.component'
 import { PosSidebar } from '@/components/newPos/pos-sidebar'
 import { PosMainSection } from '@/components/newPos/pos-main-section'
 import { PosResponsibleGuard } from '@/components/newPos/pos-responsible-guard.component'
+import { jsPDF } from 'jspdf'
+import printJS from 'print-js'
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+	DialogFooter
+} from '@/components/ui/dialog'
 
 export default function POS() {
+	// ticket para la boleta
+	const [replicatedTicket, setReplicatedTicket] = useState<Ticket | null>(null)
+	//fin del ticket
+	//const del dialog
+	const [isBoletaOpen, setIsBoletaOpen] = useState(false)
 	// Estado para manejar los tickets (incluyendo los pendientes)
 	const [tickets, setTickets] = useState<Ticket[]>(() => {
 		// Cargar los tickets desde localStorage al iniciar la aplicación
@@ -106,6 +122,7 @@ export default function POS() {
 
 	// POSFooter
 	const [isBoleta, setIsBoleta] = useState(true)
+	const [pdfUrl, setPdfUrl] = useState<string | null>(null)
 	const [isFacturaDialogOpen, setIsFacturaDialogOpen] = useState(false)
 	const [nombreRazonSocial, setNombreRazonSocial] = useState('')
 	const [rutNif, setRutNif] = useState('')
@@ -188,6 +205,12 @@ export default function POS() {
 		addToCartByBarcode(barcode)
 		setScannedCode('')
 	}
+
+	//boton para cerrar el dialog
+	const handleCloseBoleta = () => {
+		setIsBoletaOpen(true)
+	}
+	//fin del boton
 
 	// Obtiene el ticket actual basado en el ID seleccionado
 	const currentTicket =
@@ -272,6 +295,60 @@ export default function POS() {
 	}
 	const { AgregarVenta, AgregarDetalleVenta } = useLocalDb()
 
+	// Función para generar el pdf de la boleta
+	const generateBoleta = () => {
+		const doc = new jsPDF()
+
+		// Centrar el título "Boleta"
+		const pageWidth = doc.internal.pageSize.getWidth()
+		doc.setFontSize(18)
+		const title = 'Boleta'
+		const titleWidth = doc.getTextWidth(title)
+		doc.text(title, (pageWidth - titleWidth) / 2, 20)
+
+		// Separar con una línea horizontal debajo del título
+		doc.setLineWidth(0.5)
+		doc.line(10, 25, pageWidth - 10, 25)
+
+		// Información de encabezado
+		doc.setFontSize(12)
+		doc.text('Fecha:', 10, 35)
+		doc.text(new Date().toLocaleDateString(), 50, 35)
+		doc.text('Método de Pago:', 10, 45)
+		doc.text('Efectivo', 50, 45)
+
+		// Encabezado para la tabla de productos
+		doc.setFontSize(14)
+		doc.text('Productos:', 10, 60)
+
+		// Tabla de productos
+		let currentY = 70
+		doc.setFontSize(12)
+		let total = 0
+		replicatedTicket?.items.forEach((item, index) => {
+			doc.text(`${index + 1}. ${item.nombre}`, 10, currentY)
+			doc.text(`Cantidad: ${item.cantidad}`, 55, currentY)
+			doc.text(`Precio: $${item.precio}`, 120, currentY)
+			total += item.cantidad * item.precio // Calcular el total
+			currentY += 10
+		})
+
+		// Separar con otra línea
+		doc.line(10, currentY, pageWidth - 10, currentY)
+		currentY += 10
+
+		// Mostrar el total calculado
+		doc.setFontSize(14)
+		doc.text('Total:', 10, currentY)
+		doc.setFontSize(16)
+		doc.text(`$${total}`, 50, currentY) // Usar el total calculado
+
+		// Generar la URL del PDF como cadena
+		const pdfUrl = doc.output('datauristring')
+		return pdfUrl
+	}
+	//fin de la boleta
+
 	// Función para confirmar la orden actual
 	const confirmOrder = () => {
 		let total = calculateTotal()
@@ -284,6 +361,8 @@ export default function POS() {
 		}
 		const localId = localStorage.getItem('userUuid')
 		const Id_negocio = localId?.replaceAll('"', '') ?? 'indefinido'
+		const fecha = new Date()
+		const fechaString = fecha.toISOString().slice(0, 19).replace('T', ' ')
 
 		const fecha = new Date()
 		const fechaString = fecha.toISOString().slice(0, 19).replace('T', ' ')
@@ -318,6 +397,9 @@ export default function POS() {
 			})
 		)
 
+		setReplicatedTicket(currentTicket)
+		localStorage.setItem('replicatedTicket', JSON.stringify(replicatedTicket))
+
 		AgregarVenta(VentaArmada)
 			.then(() => {
 				return Promise.all(
@@ -333,6 +415,13 @@ export default function POS() {
 					'✅'
 				)
 			})
+			.then(() => {
+				setIsBoletaOpen(true)
+				if (isBoleta) {
+					generateBoleta()
+				}
+			})
+
 			.catch((error) => {
 				makeToast(`Error al confirmar la orden: ${error.message}`, '✖️')
 			})
@@ -491,6 +580,15 @@ export default function POS() {
 			{ duration: 2000 }
 		)
 	}
+
+	//use effect para el body
+	useEffect(() => {
+		const body = document.querySelector('body')
+		if (body) {
+			body.style.pointerEvents = isBoletaOpen ? 'all' : 'all'
+		}
+	}, [isBoletaOpen])
+	//fin del use effect
 
 	// Fetchea los productos al montar el componente
 	useEffect(() => {
@@ -819,6 +917,24 @@ export default function POS() {
 
 	return (
 		<div className='relative transition-all'>
+			<Dialog open={isBoletaOpen} onOpenChange={setIsBoletaOpen}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle className='text-foreground'>Boleta</DialogTitle>
+						<DialogDescription>
+							{isBoletaOpen && (
+								<iframe
+									src={generateBoleta()} // Ahora generamos correctamente la URL del PDF
+									width='100%'
+									height='500px'
+									style={{ border: 'none' }}
+								/>
+							)}
+						</DialogDescription>
+					</DialogHeader>
+				</DialogContent>
+			</Dialog>
+
 			<PosResponsibleGuard
 				error={error}
 				handlePasswordSubmit={handlePasswordSubmit}
