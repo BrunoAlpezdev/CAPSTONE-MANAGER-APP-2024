@@ -27,6 +27,7 @@ export default function ReportesPage() {
 		promedioVentasDiarias
 	} = useDataVentas()
 	const { isMenuOpen, toggleMenu } = useMenu()
+
 	// Lista de opciones de gráficos con su tipado
 	const chartOptions: ChartOption[] = [
 		{

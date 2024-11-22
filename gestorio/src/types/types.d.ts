@@ -139,6 +139,13 @@ export interface TopProductosData {
 	value: number
 	color: string
 }
+
+export interface TopResponsablesData {
+	id: string
+	label: string
+	value: number
+	color: string
+}
 interface VentasConDetalle {
 	id: string
 	responsable: string

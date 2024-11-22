@@ -8,7 +8,9 @@ import {
 	DetalleVenta,
 	IngresosMensualesData,
 	TransaccionesMensualesData,
-	TopProductosData
+	TopProductosData,
+	TopResponsablesData,
+	Usuario
 } from '@/types'
 
 interface VentasData {
@@ -16,6 +18,7 @@ interface VentasData {
 	transaccionesMensuales: TransaccionesMensualesData[]
 	promedioVentasDiarias: number
 	topProductos: TopProductosData[]
+	mejoresResponsables: TopResponsablesData[]
 }
 
 export const useDataVentas = (): VentasData => {
@@ -24,7 +27,8 @@ export const useDataVentas = (): VentasData => {
 		ingresosMensuales: [],
 		transaccionesMensuales: [],
 		promedioVentasDiarias: 0,
-		topProductos: []
+		topProductos: [],
+		mejoresResponsables: []
 	})
 
 	useEffect(() => {
@@ -48,11 +52,14 @@ export const useDataVentas = (): VentasData => {
 						// Validar la existencia de colecciones necesarias antes de calcular los top productos
 						const topProductos = await calcularTopProductos(db)
 
+						const mejoresResponsables = await calcularMejoresResponsables(db)
+
 						setVentasData({
 							ingresosMensuales,
 							transaccionesMensuales,
 							promedioVentasDiarias,
-							topProductos
+							topProductos,
+							mejoresResponsables
 						})
 					} catch (error) {
 						console.error('Error al calcular los datos de ventas:', error)
@@ -154,6 +161,55 @@ const calcularTopProductos = async (db: any): Promise<TopProductosData[]> => {
 		return topProductosConInfo
 	} catch (error) {
 		console.error('Error al obtener detalles de ventas o productos:', error)
+		return []
+	}
+}
+const calcularMejoresResponsables = async (
+	db: any
+): Promise<TopResponsablesData[]> => {
+	try {
+		// Obtener detalles de ventas y productos
+		const ventasData = await db.ventas.find().exec()
+		const responsablesData = await db.usuarios.find().exec()
+
+		const ventas: Venta[] = ventasData.map((venta: any) => venta.toJSON())
+
+		// Calcular las ventas por Responsable
+		const ventasPorResponsable = ventas.reduce<
+			Record<string, { total: number; id_responsable: string }>
+		>((acumulador, venta) => {
+			if (!acumulador[venta.id_responsable]) {
+				acumulador[venta.id_responsable] = {
+					total: 0,
+					id_responsable: venta.id_responsable
+				}
+			}
+			acumulador[venta.id_responsable].total += venta.total
+			return acumulador
+		}, {})
+
+		// Convertir a array y ordenar por total
+		const responsablesOrdenados = Object.values(ventasPorResponsable).sort(
+			(a, b) => b.total - a.total
+		)
+
+		// Tomar los 5 primeros y mapear con información de productos
+		const topResponsablesConInfo = responsablesOrdenados
+			.slice(0, 5)
+			.map((venta) => {
+				const responsable: Usuario = responsablesData.find(
+					(resp: Usuario) => resp.id === venta.id_responsable
+				)
+				return {
+					id: venta.id_responsable,
+					label: responsable?.nombre || 'Desconocido',
+					value: venta.total,
+					color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`
+				}
+			})
+		return topResponsablesConInfo
+	} catch (error) {
+		console.error('Error al obtener detalles de responsables:', error)
 		return []
 	}
 }
