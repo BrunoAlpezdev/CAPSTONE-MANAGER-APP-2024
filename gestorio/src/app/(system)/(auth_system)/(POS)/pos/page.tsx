@@ -2,77 +2,22 @@
 
 import bcrypt from 'bcryptjs'
 import { useState, useEffect, use, CSSProperties } from 'react'
-import Image from 'next/image'
 import { ThemeSwitch } from '@/components'
-import { Button, TicketButton } from '@/components/ui/button'
-import ClimbingBoxLoader from 'react-spinners/ClimbingBoxLoader'
-import { DefInput, Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Switch } from '@/components/ui/switch'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
 import useDatabaseStore from '@/store/dbStore'
 import { v7 as uuidv7 } from 'uuid'
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectLabel,
-	SelectTrigger,
-	SelectValue
-} from '@/components/ui/select'
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger
-} from '@/components/ui/dialog'
-import {
-	ShoppingCart,
-	X,
-	Sun,
-	Moon,
-	Plus,
-	Minus,
-	MenuIcon,
-	Bookmark,
-	Ban,
-	Building2,
-	ShoppingBasket,
-	UserIcon
-} from 'lucide-react'
+import { ShoppingCart, MenuIcon } from 'lucide-react'
 import { toast, Toaster } from 'react-hot-toast'
-import { RxDatabase } from 'rxdb'
-import setupDatabase from '@/lib/db/RxDB'
 import { useMenu } from '@/hooks'
 import { Footer, FullLogo, ToggleMenu } from '@/components'
-
 import { DetalleVenta, Producto, Ticket, Usuario, Venta } from '@/types'
-/* import { products } from '@/mocks/products' */
-import { Label } from '@/components/ui/label'
-import { getDownloadURL, ref } from 'firebase/storage'
-import { storage } from '@/firebase'
-import useImageStore from '@/store/useImageStorage'
-import { Separator } from '@/components/ui/separator'
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
 import { useLocalDb } from '@/hooks/useLocaldb'
-import { Timestamp } from 'firebase/firestore'
+import { PosFooter } from '@/components/newPos/pos-footer.component'
+import { PosSidebar } from '@/components/newPos/pos-sidebar'
+import { PosMainSection } from '@/components/newPos/pos-main-section'
+import { PosResponsibleGuard } from '@/components/newPos/pos-responsible-guard.component'
 
 export default function POS() {
-	// Estado para manejar el responsable de la caja
-	const [cashier, setCashier] = useState('Caja')
 	// Estado para manejar los tickets (incluyendo los pendientes)
 	const [tickets, setTickets] = useState<Ticket[]>(() => {
 		// Cargar los tickets desde localStorage al iniciar la aplicación
@@ -81,6 +26,7 @@ export default function POS() {
 			? JSON.parse(savedTickets)
 			: [{ id: 1, name: 'Ticket Actual', items: [] }]
 	})
+	const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(true)
 	// ID del ticket actualmente seleccionado
 	const [currentTicketId, setCurrentTicketId] = useState(1)
 	// Estado para el código escaneado
@@ -155,6 +101,7 @@ export default function POS() {
 		setSelectedUser(null)
 		setIsVerified(false)
 		setIsDialogOpen(true)
+		setIsAuthDialogOpen(true)
 	}
 
 	// POSFooter
@@ -210,7 +157,7 @@ export default function POS() {
 				// Obtén los datos de los productos desde la base de datos local (RxDB)
 				const productosData = await db.productos
 					.find({
-						selector: { id_negocio: Id_negocio }
+						selector: { id_negocio: Id_negocio, stock: { $gt: 0 } }
 					})
 					.exec()
 
@@ -338,11 +285,14 @@ export default function POS() {
 		const localId = localStorage.getItem('userUuid')
 		const Id_negocio = localId?.replaceAll('"', '') ?? 'indefinido'
 
+		const fecha = new Date()
+		const fechaString = fecha.toISOString().slice(0, 19).replace('T', ' ')
+
 		const VentaArmada: Venta = {
 			cliente_id: 'indefinido',
 			id_negocio: Id_negocio,
 			id_responsable: selectedUser?.id || 'indefinido',
-			fecha: Date.now().toString(),
+			fecha: fechaString,
 			id: uuidv7(),
 			metodoPago: paymentMethod === 'cash' ? 'efectivo' : 'tarjeta',
 			total: total,
@@ -386,6 +336,18 @@ export default function POS() {
 			.catch((error) => {
 				makeToast(`Error al confirmar la orden: ${error.message}`, '✖️')
 			})
+
+		// Reducir stock de los productos del ticket
+		currentTicket.items.forEach((item) => {
+			const product = products.find((product) => product.id === item.id)
+			if (product) {
+				const newStock = product.stock - item.cantidad
+				db.productos.upsert({
+					...product,
+					stock: newStock
+				})
+			}
+		})
 
 		setTickets((prevTickets) => {
 			// Filtrar y reorganizar IDs después de eliminar
@@ -710,6 +672,27 @@ export default function POS() {
 	}, [])
 
 	useEffect(() => {
+		if (isAuthDialogOpen) {
+			const handleKeyDown = (e: KeyboardEvent) => {
+				if (e.key === 'Enter') {
+					// hacer click programaticamente a confirm-button nextjs "Button"
+					const authConfirmButton = document.getElementById('auth-confirm')
+					if (authConfirmButton) {
+						authConfirmButton.click()
+						setIsAuthDialogOpen(false)
+					}
+				}
+			}
+
+			window.addEventListener('keydown', handleKeyDown)
+
+			return () => {
+				window.removeEventListener('keydown', handleKeyDown)
+			}
+		}
+	}, [])
+
+	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.ctrlKey && e.key === 'ArrowRight') {
 				if (currentTicketId < tickets.length) {
@@ -814,62 +797,39 @@ export default function POS() {
 		}
 	}, [db])
 
+	// Subscribe to changes in the productos collection
+	useEffect(() => {
+		const localId = localStorage.getItem('userUuid')
+		const Id_negocio = localId?.replaceAll('"', '')
+		if (db?.productos) {
+			const subscription = db.productos
+				.find({
+					selector: { id_negocio: Id_negocio, stock: { $gt: 0 } }
+				})
+				.$ // '$' provides an observable that emits every time the query result changes
+				.subscribe((productosData: any[]) => {
+					const productos = productosData.map((producto) => producto.toJSON())
+					setProducts(productos)
+				})
+
+			// Clean up the subscription on component unmount
+			return () => subscription.unsubscribe()
+		}
+	}, [db])
+
 	return (
 		<div className='relative transition-all'>
-			<Dialog open={isDialogOpen} onOpenChange={() => {}}>
-				<DialogContent className='sm:max-w-[425px]'>
-					<DialogHeader>
-						<DialogTitle>Seleccionar Responsable</DialogTitle>
-						<DialogDescription>
-							Por favor, selecciona tu nombre y ingresa tu contraseña para
-							acceder.
-						</DialogDescription>
-					</DialogHeader>
-					<div className='grid gap-4 py-4'>
-						<Select onValueChange={handleUserSelect}>
-							<SelectTrigger className='w-full'>
-								<SelectValue placeholder='Selecciona un responsable' />
-							</SelectTrigger>
-							<SelectContent>
-								{usuariosLoading ? (
-									<ClimbingBoxLoader color='#000' cssOverride={cssOverride} />
-								) : (
-									<SelectGroup>
-										<SelectLabel>Responsable</SelectLabel>
-										{usuarios.map((usuario) => (
-											<SelectItem key={usuario.id} value={usuario.nombre}>
-												{usuario.nombre}
-											</SelectItem>
-										))}
-									</SelectGroup>
-								)}
-							</SelectContent>
-						</Select>
-						{selectedUser && (
-							<div className='grid grid-cols-4 items-center gap-4'>
-								<Label htmlFor='password' className='text-right'>
-									Contraseña
-								</Label>
-								<Input
-									id='password'
-									type='password'
-									value={password}
-									onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-										setPassword(e.target.value)
-									}
-									className='col-span-3'
-								/>
-							</div>
-						)}
-						{error && <p className='text-sm text-red-500'>{error}</p>}
-					</div>
-					<DialogFooter>
-						<Button onClick={handlePasswordSubmit} disabled={!selectedUser}>
-							Verificar
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
+			<PosResponsibleGuard
+				error={error}
+				handlePasswordSubmit={handlePasswordSubmit}
+				handleUserSelect={handleUserSelect}
+				isDialogOpen={isDialogOpen}
+				password={password}
+				selectedUser={selectedUser}
+				usuarios={usuarios}
+				usuariosLoading={usuariosLoading}
+				setPassword={setPassword}
+			/>
 
 			<Toaster />
 			{/* Overlay translucido (transparencia oscura del menú) */}
@@ -904,517 +864,72 @@ export default function POS() {
 					</header>
 
 					<main className='inner-custom-shadow dashboard-fondo z-auto flex flex-1 overflow-hidden dark:text-black'>
-						<section className='scrollbar-modifier flex flex-1 flex-col gap-2 overflow-y-auto p-2'>
-							<div className='flex h-fit items-center justify-between rounded-lg bg-muted px-1'>
-								<div className='flex h-fit items-center'>
-									<h3 className='font-semibold text-foreground'>Tickets</h3>
-									<ScrollArea className='scrollbar-modifier flex h-fit'>
-										{tickets.map((ticket) => (
-											<TicketButton
-												key={ticket.id}
-												variant={
-													ticket.id === currentTicketId ? 'default' : 'outline'
-												}
-												size='sm'
-												className='ml-1'
-												onClick={() => switchToTicket(ticket.id)}>
-												{ticket.name}
-											</TicketButton>
-										))}
-									</ScrollArea>
-								</div>
-								<div className='flex flex-row items-center gap-2 text-foreground'>
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<Button
-												variant='outline'
-												className='flex items-center space-x-2'>
-												<UserIcon className='h-4 w-4' />
-												<span>{selectedUser.nombre}</span>
-											</Button>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent className='w-56'>
-											<DropdownMenuLabel>Mi cuenta</DropdownMenuLabel>
-											<DropdownMenuSeparator />
-											<DropdownMenuItem>
-												<span>Función: {selectedUser.rol}</span>
-											</DropdownMenuItem>
-											<DropdownMenuItem onClick={handleLogout}>
-												Cerrar sesión
-											</DropdownMenuItem>
-										</DropdownMenuContent>
-									</DropdownMenu>
-								</div>
-							</div>
-							<h2 className='ml-1 text-xl font-semibold text-foreground'>
-								Carrito Actual: {currentTicket.name}
-							</h2>
-							<ScrollArea className='scrollbar-modifier h-fit text-foreground'>
-								{currentTicket.items.map((item, index) => (
-									<div
-										key={item.id}
-										className='shadow-small mb-2 mr-3 flex items-center rounded-lg bg-primary/25 p-1 shadow-foreground backdrop-blur-sm'>
-										<ShoppingBasket className='mx-2 h-8 w-8 rounded-md' />
-
-										<div className='flex-grow'>
-											<div className='font-semibold'>{item.nombre}</div>
-											<div className='text-sm text-muted-foreground'>
-												{item.variante}
-											</div>
-										</div>
-
-										<div className='mr-4 text-right'>
-											<div>
-												${(item.precio * item.cantidad).toLocaleString('es-CL')}
-											</div>
-											<div className='text-sm text-muted-foreground'>
-												${item.precio.toLocaleString('es-CL')} c/u
-											</div>
-										</div>
-										<div className='flex items-center'>
-											<Button
-												variant='outline'
-												size='icon'
-												onClick={() => updateQuantity(item.id, -1)}>
-												<Minus className='h-4 w-4' />
-											</Button>
-											<Input
-												id={`item-quantity-${index}`}
-												className='mx-2'
-												value={item.cantidad}
-												onChange={(e) => {
-													const newQuantity = parseInt(e.target.value) || 0
-													updateQuantity(item.id, newQuantity - item.cantidad)
-												}}
-												max={item.stock}
-												onKeyDown={(e) => {
-													if (e.key === '-') {
-														updateQuantity(item.id, -1)
-													} else if (e.key === '+') {
-														updateQuantity(item.id, 1)
-													}
-													if (e.key === 'ArrowDown') {
-														// IR AL SIGUIENTE ITEM DE ABAJO, SI ES EL ULTIMO, OMITIR
-														e.preventDefault()
-														if (index === currentTicket.items.length - 1) {
-															return
-														}
-														const nextInput = document.getElementById(
-															`item-quantity-${index + 1}`
-														) as HTMLInputElement
-														if (nextInput) {
-															nextInput.focus()
-														}
-													}
-													if (e.key === 'ArrowUp') {
-														// IR AL SIGUIENTE ITEM DE ARRIBA, A SU INPUT basándose en `item-quantity-${index}`, SI ES EL ULTIMO, OMITIR
-														e.preventDefault()
-														if (index === 0) {
-															return
-														}
-														const nextInput = document.getElementById(
-															`item-quantity-${index - 1}`
-														) as HTMLInputElement
-														if (nextInput) {
-															nextInput.focus()
-														}
-													}
-													if (e.ctrlKey && e.key === 'ArrowRight') {
-														e.preventDefault()
-														const nextInput = document.getElementById(
-															`item-quantity-0`
-														) as HTMLInputElement
-														if (nextInput) {
-															nextInput.focus()
-														}
-													}
-													if (e.ctrlKey && e.key === 'ArrowLeft') {
-														e.preventDefault()
-														const nextInput = document.getElementById(
-															`item-quantity-0`
-														) as HTMLInputElement
-														if (nextInput) {
-															nextInput.focus()
-														}
-													}
-												}}
-												onFocus={() => {
-													setOtherFocus(true)
-													setQuantFocus(true)
-												}}
-												onBlur={() => {
-													setInputFocus(false)
-													setOtherFocus(false)
-													setQuantFocus(false)
-												}}
-											/>
-											<Button
-												variant='outline'
-												size='icon'
-												onClick={() => updateQuantity(item.id, 1)}>
-												<Plus className='h-4 w-4' />
-											</Button>
-										</div>
-										<Button
-											variant='destructive'
-											size='icon'
-											className='ml-2'
-											onClick={() => removeFromCart(item.id)}>
-											<X className='h-4 w-4' />
-										</Button>
-									</div>
-								))}
-							</ScrollArea>
-						</section>
+						<PosMainSection
+							currentTicket={currentTicket}
+							currentTicketId={currentTicketId}
+							handleLogout={handleLogout}
+							removeFromCart={removeFromCart}
+							selectedUser={selectedUser}
+							setInputFocus={setInputFocus}
+							setOtherFocus={setOtherFocus}
+							setQuantFocus={setQuantFocus}
+							switchToTicket={switchToTicket}
+							tickets={tickets}
+							updateQuantity={updateQuantity}
+						/>
 
 						{/* Sidebar */}
-						<aside className='flex w-1/3 flex-col gap-2 bg-background/90 p-4 text-foreground'>
-							<div className=''>
-								<form
-									onSubmit={(e) => {
-										e.preventDefault()
-										addToCartByBarcode(scannedCode)
-									}}>
-									<label
-										htmlFor='scanner'
-										className='mb-1 block text-sm font-medium'>
-										Escáner (F1)
-									</label>
-									<Input
-										id='scanner'
-										value={scannedCode}
-										onChange={(e) => setScannedCode(e.target.value)}
-										placeholder='Escanea o ingresa código'
-										className='default-input font-bold'
-										onFocus={() => setInputFocus(true)}
-										onBlur={() => setInputFocus(false)}
-									/>
-								</form>
-							</div>
-							<div className=''>
-								<label
-									htmlFor='search-products'
-									className='mb-1 block text-sm font-medium'>
-									Buscar Productos (F2)
-								</label>
-								<Input
-									id='search-products'
-									value={searchTerm}
-									onChange={(e) => setSearchTerm(e.target.value)}
-									placeholder='Buscar por nombre o variante'
-									className='default-input'
-									onFocus={() => setOtherFocus(true)}
-									onBlur={() => setOtherFocus(false)}
-								/>
-							</div>
-							<h3 className='mt-1 font-semibold'>Productos</h3>
-							{/* Loader */}
-							{productsLoading && <p>Cargando Productos...</p>}
-							<ClimbingBoxLoader
-								color='#2477eb'
-								loading={productsLoading}
-								size={15}
-								cssOverride={cssOverride}
-								aria-label='Loading Spinner'
-								data-testid='loader'
-							/>
-							<ScrollArea className='scrollbar-modifier flex-grow pr-3'>
-								{filteredProducts.map((product) => (
-									<Button
-										key={product.id}
-										variant='outline'
-										className='mb-2 w-full justify-start px-3 py-7'
-										onClick={() => addToCart(product)}>
-										<ShoppingBasket className='mr-2 h-8 w-8 rounded-md' />
-
-										<div className='flex-grow text-left'>
-											<div>{product.nombre}</div>
-											<div className='text-sm text-muted-foreground transition-all'>
-												{/* este texto -> text-accent-foreground cuando se haga hover, pero a la carta entera, no al texto solo */}
-												{product.variante}
-											</div>
-										</div>
-										<div>${product.precio.toLocaleString('es-CL')}</div>
-									</Button>
-								))}
-							</ScrollArea>
-							{/* Payment section */}
-							<Card className='col-span-2'>
-								<CardHeader className='bg-primary text-foreground'>
-									<CardTitle className='text-foreground'>Pago</CardTitle>
-								</CardHeader>
-								<CardContent>
-									<div className='flex justify-between p-1'>
-										<span className='font-semibold'>Total:</span>
-										<span className='text-xl'>
-											${calculateTotal().toLocaleString('es-CL')}
-										</span>
-									</div>
-									<Tabs value={paymentMethod} onValueChange={setPaymentMethod}>
-										<TabsList className='grid w-full grid-cols-2'>
-											<TabsTrigger value='cash'>
-												Efectivo (PageDown)
-											</TabsTrigger>
-											<TabsTrigger value='card'>Tarjeta (PageUp)</TabsTrigger>
-										</TabsList>
-										<TabsContent value='cash'>
-											<div className='space-y-2'>
-												<label
-													htmlFor='cash-amount'
-													className='block text-sm font-medium'>
-													Monto en Efectivo
-												</label>
-												<Input
-													id='cash-amount'
-													type='number'
-													value={cashAmount === 0 ? '' : cashAmount}
-													onChange={(e) => {
-														setCashAmount(parseInt(e.target.value) || 0)
-														setPaymentMethod('cash')
-													}}
-													placeholder='Ingrese monto en efectivo'
-													className='default-input'
-													onFocus={() => {
-														setOtherFocus(true)
-														setConfirmFocus(true)
-													}}
-													onBlur={() => {
-														setOtherFocus(false)
-														setConfirmFocus(false)
-													}}
-												/>
-											</div>
-											{cashAmount > 0 && (
-												<div className='mt-4 rounded-md bg-secondary p-2'>
-													<span className='font-semibold'>Vuelto:</span> $
-													{Math.max(
-														0,
-														cashAmount - calculateTotal()
-													).toLocaleString('es-CL')}
-												</div>
-											)}
-										</TabsContent>
-										<TabsContent value='card'>
-											<div className='space-y-2'>
-												<label
-													htmlFor='card-voucher'
-													className='block text-sm font-medium'>
-													Número de Comprobante
-												</label>
-												<Input
-													id='card-voucher'
-													value={cardVoucher}
-													onChange={(e) => {
-														setCardVoucher(e.target.value)
-														setPaymentMethod('card')
-													}}
-													placeholder='Ingrese número de comprobante'
-													className='default-input'
-													onFocus={() => {
-														setOtherFocus(true)
-														setConfirmFocus(true)
-													}}
-													onBlur={() => {
-														setOtherFocus(false)
-														setConfirmFocus(false)
-													}}
-												/>
-											</div>
-										</TabsContent>
-									</Tabs>
-									<Button
-										id='confirm-button'
-										className='mt-4 w-full bg-primary text-primary-foreground hover:bg-primary/90'
-										onClick={confirmOrder}>
-										Confirmar Orden
-									</Button>
-								</CardContent>
-							</Card>
-						</aside>
+						<PosSidebar
+							addToCart={addToCart}
+							addToCartByBarcode={addToCartByBarcode}
+							calculateTotal={calculateTotal}
+							cardVoucher={cardVoucher}
+							cashAmount={cashAmount}
+							confirmOrder={confirmOrder}
+							filteredProducts={filteredProducts}
+							paymentMethod={paymentMethod}
+							setCardVoucher={setCardVoucher}
+							setCashAmount={setCashAmount}
+							setPaymentMethod={setPaymentMethod}
+							productsLoading={productsLoading}
+							scannedCode={scannedCode}
+							setScannedCode={setScannedCode}
+							searchTerm={searchTerm}
+							setSearchTerm={setSearchTerm}
+							setConfirmFocus={setConfirmFocus}
+							setInputFocus={setInputFocus}
+							setOtherFocus={setOtherFocus}
+						/>
 					</main>
 
-					<footer className='col-span-2 flex items-center justify-between border-t bg-muted p-4'>
-						<div className='flex space-x-2'>
-							<Dialog
-								open={isPendingDialogOpen}
-								onOpenChange={setIsPendingDialogOpen}>
-								<DialogTrigger asChild>
-									<Button
-										id='dejar-pendiente-button'
-										variant='outline'
-										className='w-fit gap-2'>
-										<Bookmark className='h-4 w-4' />
-										Dejar Pendiente (Insertar)
-									</Button>
-								</DialogTrigger>
-								<DialogContent>
-									<DialogHeader>
-										<DialogTitle>Guardar Ticket Pendiente</DialogTitle>
-									</DialogHeader>
-									<div className='py-4'>
-										<label
-											htmlFor='pending-ticket-name'
-											className='mb-1 block text-sm font-medium'>
-											Nombre del Ticket
-										</label>
-										<DefInput
-											id='pending-ticket-name'
-											value={pendingTicketName}
-											onChange={(e) => setPendingTicketName(e.target.value)}
-											placeholder='Ingrese nombre para el ticket pendiente'
-											className='default-input'
-											onFocus={() => setOtherFocus(true)}
-											onBlur={() => setOtherFocus(false)}
-										/>
-									</div>
-									<Button
-										id='confirm-pending-button'
-										onClick={setPendingTicket}>
-										Guardar
-									</Button>
-								</DialogContent>
-							</Dialog>
-							{/* <Button
-							variant='outline'
-							className='w-fit gap-2'
-							onClick={() => toast.success('Imprimiendo ticket...')}>
-							<CreditCard className='h-4 w-4' />
-							Imprimir Ticket
-						</Button> */}
-							<Dialog
-								open={isDeleteDialogOpen}
-								onOpenChange={setIsDeleteDialogOpen}>
-								<DialogTrigger asChild>
-									<Button
-										id='cancelar-ticket-button'
-										variant='destructive'
-										className='w-fit gap-2'
-										onClick={() => setIsDeleteDialogOpen(true)}>
-										<Ban className='h-4 w-4' />
-										Cancelar Ticket (Suprimir)
-									</Button>
-								</DialogTrigger>
-								<DialogContent>
-									<DialogHeader>
-										<DialogTitle>¿Desea Cancelar el Ticket Actual?</DialogTitle>
-									</DialogHeader>
-									<Button variant='destructive' onClick={cancelCurrentTicket}>
-										Cancelar Ticket Actual
-									</Button>
-									<Button
-										variant='secondary'
-										onClick={() => setIsDeleteDialogOpen(false)}>
-										Volver
-									</Button>
-								</DialogContent>
-							</Dialog>
-							<RadioGroup defaultValue='boleta'>
-								<div className='flex items-center space-x-2'>
-									<RadioGroupItem
-										value='boleta'
-										id='r1'
-										onClick={() => setIsBoleta(true)}
-									/>
-									<Label htmlFor='r1'>Boleta</Label>
-								</div>
-								<div className='flex items-center space-x-2'>
-									<RadioGroupItem
-										value='factura'
-										id='r2'
-										onClick={() => setIsBoleta(false)}
-									/>
-									<Label htmlFor='r2'>Factura</Label>
-								</div>
-							</RadioGroup>
-							{!isBoleta && (
-								<Separator orientation='vertical' className='h-15' />
-							)}
-							{!isBoleta && (
-								<Dialog
-									open={isFacturaDialogOpen}
-									onOpenChange={setIsFacturaDialogOpen}>
-									<DialogTrigger asChild>
-										<Button
-											id='cancelar-ticket-button'
-											variant='outline'
-											className='w-fit gap-2'
-											onClick={() => setIsFacturaDialogOpen(true)}>
-											<Building2 />
-											Ingresar Datos
-										</Button>
-									</DialogTrigger>
-									<DialogContent>
-										<DialogHeader>
-											<DialogTitle>Datos de Facturación</DialogTitle>
-										</DialogHeader>
-										<Separator orientation='horizontal' />
-										<h3 className='text-nowrap'>Nombre o Razón social</h3>
-										<DefInput
-											type='text'
-											className='bg-background text-foreground'
-											onFocus={() => setOtherFocus(true)}
-											onBlur={() => setOtherFocus(false)}
-											value={nombreRazonSocial}
-											onChange={(e) => setNombreRazonSocial(e.target.value)}
-										/>
-										<h3 className='text-nowrap'>RUT o NIF</h3>
-										<DefInput
-											type='text'
-											className='bg-background text-foreground'
-											onFocus={() => setOtherFocus(true)}
-											onBlur={() => setOtherFocus(false)}
-											value={rutNif}
-											onChange={(e) => setRutNif(e.target.value)}
-										/>
-										<h3 className='text-nowrap'>Dirección de la Empresa</h3>
-										<DefInput
-											type='text'
-											className='bg-background text-foreground'
-											onFocus={() => setOtherFocus(true)}
-											onBlur={() => setOtherFocus(false)}
-											value={direccionEmpresa}
-											onChange={(e) => setDireccionEmpresa(e.target.value)}
-										/>
-										<h3 className='text-nowrap'>Giro o Actividad Económica</h3>
-										<DefInput
-											type='text'
-											className='bg-background text-foreground'
-											onFocus={() => setOtherFocus(true)}
-											onBlur={() => setOtherFocus(false)}
-											value={giro}
-											onChange={(e) => setGiro(e.target.value)}
-										/>
-										<h3 className='text-nowrap'>Nombre Contacto</h3>
-										<DefInput
-											type='text'
-											className='bg-background text-foreground'
-											onFocus={() => setOtherFocus(true)}
-											onBlur={() => setOtherFocus(false)}
-											value={nombreContacto}
-											onChange={(e) => setNombreContacto(e.target.value)}
-										/>
-										<h3 className='text-nowrap'>Dato de Contacto</h3>
-										<DefInput
-											type='text'
-											className='bg-background text-foreground'
-											onFocus={() => setOtherFocus(true)}
-											onBlur={() => setOtherFocus(false)}
-											value={contacto}
-											onChange={(e) => setContacto(e.target.value)}
-										/>
-										<Button
-											variant='default'
-											onClick={() => setIsDeleteDialogOpen(false)}>
-											Guardar
-										</Button>
-										<Button variant='outline' onClick={() => handleBackFactura}>
-											Volver
-										</Button>
-									</DialogContent>
-								</Dialog>
-							)}
-						</div>
-					</footer>
+					<PosFooter
+						isPendingDialogOpen={isPendingDialogOpen}
+						setIsPendingDialogOpen={setIsPendingDialogOpen}
+						setPendingTicketName={setPendingTicketName}
+						setOtherFocus={setOtherFocus}
+						pendingTicketName={pendingTicketName}
+						setPendingTicket={setPendingTicket}
+						setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+						isDeleteDialogOpen={isDeleteDialogOpen}
+						cancelCurrentTicket={cancelCurrentTicket}
+						isBoleta={isBoleta}
+						setIsBoleta={setIsBoleta}
+						isFacturaDialogOpen={isFacturaDialogOpen}
+						setIsFacturaDialogOpen={setIsFacturaDialogOpen}
+						nombreRazonSocial={nombreRazonSocial}
+						setNombreRazonSocial={setNombreRazonSocial}
+						giro={giro}
+						setGiro={setGiro}
+						direccionEmpresa={direccionEmpresa}
+						setDireccionEmpresa={setDireccionEmpresa}
+						contacto={contacto}
+						setContacto={setContacto}
+						nombreContacto={nombreContacto}
+						setNombreContacto={setNombreContacto}
+						rutNif={rutNif}
+						setRutNif={setRutNif}
+						handleBackFactura={handleBackFactura}
+					/>
 					<Footer />
 				</div>
 			)}

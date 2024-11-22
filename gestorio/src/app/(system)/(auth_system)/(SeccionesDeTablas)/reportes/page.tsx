@@ -1,245 +1,175 @@
 'use client'
 
-import { Monitor } from 'lucide-react'
-import {
-	Bar,
-	BarChart,
-	CartesianGrid,
-	XAxis,
-	PieChart,
-	Pie,
-	Cell,
-	LineChart,
-	Line,
-	LabelList,
-	Tooltip as RechartsTooltip,
-	Legend
-} from 'recharts'
-import {
-	ChartConfig,
-	ChartContainer,
-	ChartTooltip,
-	ChartTooltipContent,
-	ChartLegend,
-	ChartLegendContent
-} from '@/components/ui/chart'
-import { useState } from 'react'
+import { useMenu } from '@/hooks'
+import React, { useState } from 'react'
+import BarChart from '@/components/bar-chart'
+import PieChart from '@/components/pie-chart'
+import { useDataVentas } from '@/hooks/useSalesData'
+import { Footer, ToggleMenu } from '@/components'
+import { Toaster } from 'react-hot-toast'
+import { SystemHeader } from '@/components/systemHeader.component'
 
-const chartConfig = {
-	desktop: {
-		label: 'Desktop',
-		icon: Monitor,
-		color: 'hsl(var(--chart-1))'
-	},
-	mobile: {
-		label: 'Mobile',
-		color: 'hsl(var(--chart-2))'
-	},
-	otro: {
-		label: 'Otro',
-		color: 'hsl(var(--chart-3))'
-	},
-	otra: {
-		label: 'Otra',
-		color: 'hsl(var(--chart-4))'
-	}
-} satisfies ChartConfig
-
-const chartData = [
-	{ month: 'January', desktop: 186, mobile: 80, otro: 100, otra: 140 },
-	{ month: 'February', desktop: 305, mobile: 200, otro: 100, otra: 140 },
-	{ month: 'March', desktop: 237, mobile: 120, otro: 100, otra: 140 },
-	{ month: 'April', desktop: 73, mobile: 190, otro: 100, otra: 140 },
-	{ month: 'May', desktop: 209, mobile: 130, otro: 150, otra: 140 },
-	{ month: 'June', desktop: 214, mobile: 140, otro: 100, otra: 140 },
-	{ month: 'July', desktop: 214, mobile: 140, otro: 214, otra: 140 }
-]
-
-const combinedData = {
-	monthlyData: chartData,
-	pieData: [
-		{
-			name: 'Desktop',
-			value: chartData.reduce((acc, curr) => acc + curr.desktop, 0)
-		},
-		{
-			name: 'Mobile',
-			value: chartData.reduce((acc, curr) => acc + curr.mobile, 0)
-		},
-		{
-			name: 'Otro',
-			value: chartData.reduce((acc, curr) => acc + curr.otro, 0)
-		},
-		{
-			name: 'Otra',
-			value: chartData.reduce((acc, curr) => acc + curr.otra, 0)
-		}
-	]
+// Definimos el tipo para los gráficos
+type ChartOption = {
+	id: string
+	label: string
+	component: JSX.Element
 }
 
-const totalValue = combinedData.pieData.reduce(
-	(acc, item) => acc + item.value,
-	0
-)
+export default function ReportesPage() {
+	const {
+		ingresosMensuales,
+		transaccionesMensuales,
+		topProductos,
+		promedioVentasDiarias
+	} = useDataVentas()
+	const { isMenuOpen, toggleMenu } = useMenu()
 
-export default function GestionDeReportes() {
-	const [selectedChart, setSelectedChart] = useState<
-		'bar' | 'pie' | 'line' | null
-	>(null)
-	const { monthlyData, pieData } = combinedData
-
-	const renderChart = () => {
-		switch (selectedChart) {
-			case 'bar':
-				return (
-					<ChartContainer config={chartConfig} className='h-[50rem] w-[100rem]'>
-						<BarChart data={monthlyData}>
-							<CartesianGrid vertical={false} />
-							<XAxis
-								dataKey='month'
-								tickLine={false}
-								tickMargin={10}
-								axisLine={false}
-								tickFormatter={(value) => value.slice(0, 3)}
-							/>
-							<ChartTooltip content={<ChartTooltipContent />} />
-							<ChartLegend content={<ChartLegendContent />} />
-							<Bar
-								dataKey='desktop'
-								fill={chartConfig.desktop.color}
-								radius={4}
-							/>
-							<Bar
-								dataKey='mobile'
-								fill={chartConfig.mobile.color}
-								radius={4}
-							/>
-							<Bar dataKey='otro' fill={chartConfig.otro.color} radius={4} />
-							<Bar dataKey='otra' fill={chartConfig.otra.color} radius={4} />
-						</BarChart>
-					</ChartContainer>
-				)
-			case 'pie':
-				return (
-					<ChartContainer config={chartConfig} className='h-[50rem] w-[100rem]'>
-						<PieChart>
-							<Pie
-								data={pieData}
-								dataKey='value'
-								nameKey='name'
-								innerRadius={80}
-								outerRadius={120}
-								paddingAngle={5}
-								label={({ name, percent }) =>
-									`${name}: ${(percent * 100).toFixed(0)}%`
-								}>
-								{pieData.map((entry, index) => (
-									<Cell
-										key={`cell-${index}`}
-										fill={
-											chartConfig[
-												entry.name.toLowerCase() as keyof typeof chartConfig
-											].color
-										}
-									/>
-								))}
-							</Pie>
-							<text
-								x='50%'
-								y='50%'
-								dominantBaseline='middle'
-								textAnchor='middle'
-								className='fill-foreground text-2xl font-bold'>
-								{totalValue}
-							</text>
-							<RechartsTooltip />
-							<Legend />
-						</PieChart>
-					</ChartContainer>
-				)
-			case 'line':
-				return (
-					<ChartContainer config={chartConfig} className='h-[50rem] w-[100rem]'>
-						<LineChart
-							accessibilityLayer
-							data={monthlyData}
-							margin={{ top: 20, left: 12, right: 12 }}>
-							<CartesianGrid vertical={false} />
-							<XAxis
-								dataKey='month'
-								tickLine={false}
-								axisLine={false}
-								tickMargin={8}
-								tickFormatter={(value) => value.slice(0, 3)}
-							/>
-							<ChartTooltip
-								cursor={false}
-								content={<ChartTooltipContent indicator='line' />}
-							/>
-							<Line
-								dataKey='desktop'
-								type='natural'
-								stroke={chartConfig.desktop.color}
-								strokeWidth={2}
-								dot={{ fill: chartConfig.desktop.color }}
-								activeDot={{ r: 6 }}>
-								<LabelList
-									position='top'
-									offset={12}
-									className='fill-foreground'
-									fontSize={12}
-								/>
-							</Line>
-							<Line
-								dataKey='mobile'
-								type='natural'
-								stroke={chartConfig.mobile.color}
-								strokeWidth={2}
-								dot={{ fill: chartConfig.mobile.color }}
-								activeDot={{ r: 6 }}>
-								<LabelList
-									position='top'
-									offset={12}
-									className='fill-foreground'
-									fontSize={12}
-								/>
-							</Line>
-						</LineChart>
-					</ChartContainer>
-				)
-			default:
-				return (
-					<div className='text-center text-gray-500'>
-						Seleccione un gráfico y variables para visualizar reportes.
-					</div>
-				)
+	// Lista de opciones de gráficos con su tipado
+	const chartOptions: ChartOption[] = [
+		{
+			id: 'ingresos',
+			label: 'Ingresos Mensuales',
+			component: (
+				<BarChart
+					data={ingresosMensuales}
+					keys={['ventas']}
+					indexBy='mes'
+					axisBottomLegend='Mes'
+					axisLeftLegend='ingresos ($)'
+				/>
+			)
+		},
+		{
+			id: 'transacciones',
+			label: 'Transacciones Mensuales',
+			component: (
+				<BarChart
+					data={transaccionesMensuales}
+					keys={['transacciones']}
+					indexBy='mes'
+					axisBottomLegend='Mes'
+					axisLeftLegend='Transacciones'
+				/>
+			)
+		},
+		{
+			id: 'productos',
+			label: 'Producto más vendido',
+			component: (
+				<PieChart
+					data={topProductos.map((producto) => ({
+						id: producto.label,
+						label: producto.label,
+						value: producto.value,
+						color: producto.color
+					}))}
+				/>
+			)
 		}
-	}
+	]
+
+	// Estado para el gráfico seleccionado
+	const [selectedChart, setSelectedChart] = useState<ChartOption | null>(null)
 
 	return (
-		<div className='relative transition-all'>
-			<div className='flex justify-between p-4'>
-				<div className='w-[80%] flex items-center justify-center border border-gray-300 p-4 rounded-lg h-[50rem]'>
-					{renderChart()}
-				</div>
-				<div className='flex flex-col justify-center space-y-2 ml-4'>
-					<button
-						className='bg-blue-500 text-white px-4 py-2 rounded'
-						onClick={() => setSelectedChart('bar')}>
-						Gráfico de Barras
-					</button>
-					<button
-						className='bg-green-500 text-white px-4 py-2 rounded'
-						onClick={() => setSelectedChart('pie')}>
-						Gráfico de Pastel
-					</button>
-					<button
-						className='bg-red-500 text-white px-4 py-2 rounded'
-						onClick={() => setSelectedChart('line')}>
-						Gráfico de Líneas
-					</button>
+		<div className='flex h-screen flex-col overflow-hidden overflow-y-auto'>
+			<Toaster />
+			{/* Overlay translucido (transparencia oscura del menú) */}
+			{isMenuOpen && (
+				<div
+					className='fixed inset-0 z-40 bg-black bg-opacity-50'
+					onClick={toggleMenu}
+					aria-hidden='true'
+				/>
+			)}
+
+			<ToggleMenu isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
+			<SystemHeader toggleMenu={toggleMenu} />
+			<div className='flex-1'>
+				<div className='flex h-auto'>
+					{/* Área de gráficos */}
+					<div className='flex-1 p-6'>
+						{selectedChart ? (
+							<div>
+								<h2 className='mb-5 text-2xl font-semibold'>
+									{selectedChart.label}
+								</h2>
+								<div className='rounded-md border bg-white p-4 shadow'>
+									{selectedChart.component}
+								</div>
+							</div>
+						) : (
+							<div className='flex h-full items-center justify-center text-gray-500'>
+								<p>Seleccione un gráfico para visualizar los reportes</p>
+							</div>
+						)}
+					</div>
+
+					{/* Panel lateral (cards de gráficos) */}
+					<div className='w-1/5 bg-white p-4 dark:bg-background'>
+						<h2 className='mb-4 text-4xl font-bold text-foreground'>
+							Gráficos
+						</h2>
+						<div className='space-y-4'>
+							{chartOptions.map((chart) => (
+								<div
+									key={chart.id}
+									onClick={() => setSelectedChart(chart)}
+									className={`group relative cursor-pointer rounded-md transition-shadow hover:shadow-xl hover:shadow-black/30 ${
+										selectedChart?.id === chart.id
+											? 'border border-accent bg-accent/20'
+											: 'border border-secondary bg-secondary/10'
+									}`}>
+									{/* Imagen de fondo o placeholder */}
+									<div className='relative h-40 w-full overflow-hidden rounded-t-md'>
+										{/* Fondo dinámico según el ID de la carta */}
+										<div
+											className={`relative h-40 w-full overflow-hidden rounded-t-md ${
+												chart.id === 'ingresos'
+													? 'bg-cian-100'
+													: chart.id === 'transacciones'
+														? 'bg-violet-200'
+														: 'bg-lime-200'
+											}`}>
+											{/* Imagen dinámica con enlace */}
+											<img
+												src={
+													chart.id === 'ingresos'
+														? 'https://tudashboard.com/wp-content/uploads/2021/03/grafica-de-barras.png'
+														: chart.id === 'transacciones'
+															? 'https://images.vexels.com/content/129159/preview/2d-colorful-bar-chart-infographic-9e35d8.png'
+															: 'https://cdn-icons-png.flaticon.com/512/3349/3349622.png'
+												}
+												alt={chart.label}
+												className='h-full w-full object-cover opacity-50 group-hover:opacity-100'
+											/>
+										</div>
+									</div>
+
+									{/* Fondo del hover */}
+									<div className='absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70 group-hover:from-black/70 group-hover:via-black/60'></div>
+
+									{/* Contenedor del título */}
+									<div className='absolute inset-0 flex translate-y-0 items-center justify-center text-center transition-all duration-500 group-hover:-translate-y-8'>
+										<h1 className='z-10 text-2xl font-bold text-primary'>
+											{chart.label}
+										</h1>
+									</div>
+
+									{/* Descripción opcional al hacer hover */}
+									<div className='absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-4 transform px-4 text-center opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100'>
+										<p className='text-sm text-white'>
+											Haga clic para visualizar {chart.label.toLowerCase()}.
+										</p>
+									</div>
+								</div>
+							))}
+						</div>
+					</div>
 				</div>
 			</div>
+			<Footer />
 		</div>
 	)
 }
