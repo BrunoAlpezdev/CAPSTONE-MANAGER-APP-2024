@@ -16,6 +16,8 @@ export const HomeUltVentas = () => {
 		const fetchData = async () => {
 			const data = await LeerVentas()
 
+			if (!data) return
+
 			const sortedData = data.sort(
 				(a: any, b: any) =>
 					new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
@@ -29,7 +31,7 @@ export const HomeUltVentas = () => {
 					const responsable: Usuario = JSON.parse(JSON.stringify(data)).find(
 						(usuario: Usuario) => usuario.id === venta.id_responsable
 					)
-					return { ...venta, responsable: responsable.nombre }
+					return { ...venta, responsable: responsable.nombre || 'Desconocido' }
 				})
 			)
 

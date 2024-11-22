@@ -117,7 +117,7 @@ export const columns: ColumnDef<Usuario>[] = [
 				if (body) {
 					body.style.pointerEvents = isOpen ? 'all' : 'all'
 				}
-			}, [isOpen])
+			}, [isOpen, isDeleteDialogOpen])
 
 			return (
 				<>

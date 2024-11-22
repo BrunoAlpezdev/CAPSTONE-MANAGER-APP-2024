@@ -53,13 +53,12 @@ async function setupDatabase() {
 		})
 	}) */
 
-	/* 	const detalleVentasDocs = await getDocs(
-		collection(firestore, 'detalle_ventas')
-	)
+	/* const detalleVentasDocs = await getDocs(collection(firestore, 'ventas'))
+
 	detalleVentasDocs.forEach(async (doc) => {
 		await deleteDoc(doc.ref)
-	}) */
-
+	})
+ */
 	await db.addCollections(
 		Object.fromEntries(
 			Object.entries(schemas).map(([name, schema]) => [name, { schema }])
