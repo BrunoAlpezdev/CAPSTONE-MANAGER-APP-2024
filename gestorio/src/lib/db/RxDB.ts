@@ -5,6 +5,7 @@ import { disableWarnings, RxDBDevModePlugin } from 'rxdb/plugins/dev-mode'
 import { firestore } from '@/firebase' // archivo de configuración de Firebase
 import {
 	collection,
+	deleteDoc,
 	deleteField,
 	getDocs,
 	query,
@@ -50,6 +51,13 @@ async function setupDatabase() {
 			email: deleteField(),
 			id_negocio: 'qlIc5gWngrVdqbN49Y439IFc8g02'
 		})
+	}) */
+
+	/* 	const detalleVentasDocs = await getDocs(
+		collection(firestore, 'detalle_ventas')
+	)
+	detalleVentasDocs.forEach(async (doc) => {
+		await deleteDoc(doc.ref)
 	}) */
 
 	await db.addCollections(

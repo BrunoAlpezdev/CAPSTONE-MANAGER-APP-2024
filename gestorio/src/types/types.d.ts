@@ -151,6 +151,12 @@ interface DetalleVentaProducto extends DetalleVenta {
 	variante: string
 }
 
+interface LastProfits {
+	Fecha: string
+	Cantidad_Total_Productos: number
+	Ganancias_Totales: number
+}
+
 export {
 	Tienda,
 	Producto,
@@ -169,5 +175,7 @@ export {
 	TransaccionesMensualesData,
 	TopProductosData,
 	VentasConDetalle,
-	DetalleVentaProducto
+	DetalleVentaProducto,
+	LastSales,
+	LastProfits
 }

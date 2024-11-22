@@ -283,11 +283,14 @@ export default function POS() {
 		const localId = localStorage.getItem('userUuid')
 		const Id_negocio = localId?.replaceAll('"', '') ?? 'indefinido'
 
+		const fecha = new Date()
+		const fechaString = fecha.toISOString().slice(0, 19).replace('T', ' ')
+
 		const VentaArmada: Venta = {
 			cliente_id: 'indefinido',
 			id_negocio: Id_negocio,
 			id_responsable: selectedUser?.id || 'indefinido',
-			fecha: Date.now().toString(),
+			fecha: fechaString,
 			id: uuidv7(),
 			metodoPago: paymentMethod === 'cash' ? 'efectivo' : 'tarjeta',
 			total: total,
