@@ -115,14 +115,10 @@ const calcularPromedioVentasDiarias = (ventas: Venta[]): number => {
 	return uniqueDates.size > 0 ? ventasTotales / uniqueDates.size : 0
 }
 
-const uuid = localStorage.getItem('uuid')
-
 const calcularTopProductos = async (db: any): Promise<TopProductosData[]> => {
 	try {
 		// Obtener detalles de ventas y productos
-		const detallesData = await db.detalle_ventas
-			.find({ id_negocio: uuid })
-			.exec()
+		const detallesData = await db.detalle_ventas.find().exec()
 		const productosData = await db.productos.find().exec()
 
 		const detalles: DetalleVenta[] = detallesData.map((detalle: any) =>
@@ -179,8 +175,8 @@ const calcularMejoresResponsables = async (
 ): Promise<TopResponsablesData[]> => {
 	try {
 		// Obtener detalles de ventas y productos
-		const ventasData = await db.ventas.find({ id_negocio: uuid }).exec()
-		const responsablesData = await db.usuarios.find({ id_negocio: uuid }).exec()
+		const ventasData = await db.ventas.find().exec()
+		const responsablesData = await db.usuarios.find().exec()
 
 		const ventas: Venta[] = ventasData.map((venta: any) => venta.toJSON())
 
