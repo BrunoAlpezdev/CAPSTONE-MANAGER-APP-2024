@@ -17,17 +17,33 @@ const BarChart: React.FC<BarChartProps> = ({
 	axisBottomLegend,
 	axisLeftLegend
 }) => {
+	// Asignar un color único por producto
+	const getColor = (bar: any) => {
+		// Aquí puedes personalizar la lógica de colores, por ejemplo, usando un hash del producto
+		// o generando colores de manera dinámica con la librería d3
+		const colors = [
+			'#3c73a7',
+			'#893391',
+			'#3357FF',
+			'#a269d1',
+			'#c73b71',
+			'#9c3333'
+		]
+		const index = bar.index % colors.length
+		return colors[index]
+	}
+
 	return (
 		<div style={{ height: 400 }}>
 			<ResponsiveBar
 				data={data}
 				keys={keys}
 				indexBy={indexBy}
-				margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+				margin={{ top: 60, right: 100, bottom: 40, left: 65 }} // Márgenes modificados
 				padding={0.3}
 				valueScale={{ type: 'linear' }}
 				indexScale={{ type: 'band', round: true }}
-				colors={{ scheme: 'nivo' }}
+				colors={getColor} // Aplicar la función para colores personalizados
 				borderColor={{
 					from: 'color',
 					modifiers: [['darker', 1.6]]
@@ -48,7 +64,7 @@ const BarChart: React.FC<BarChartProps> = ({
 					tickRotation: 0,
 					legend: axisLeftLegend,
 					legendPosition: 'middle',
-					legendOffset: -40
+					legendOffset: -55 // Desplazamiento de la leyenda izquierda modificado
 				}}
 				labelSkipWidth={12}
 				labelSkipHeight={12}
