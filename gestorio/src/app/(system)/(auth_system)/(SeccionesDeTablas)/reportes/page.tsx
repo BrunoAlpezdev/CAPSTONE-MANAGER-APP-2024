@@ -122,8 +122,7 @@ export default function ReportesPage() {
 											: 'border border-secondary bg-secondary/10'
 									}`}>
 									{/* Imagen de fondo o placeholder */}
-									<div
-										className={`relative h-40 w-full overflow-hidden rounded-t-md`}>
+									<div className='relative h-40 w-full overflow-hidden rounded-t-md'>
 										{/* Fondo dinámico según el ID de la carta */}
 										<div
 											className={`relative h-40 w-full overflow-hidden rounded-t-md ${
@@ -157,8 +156,9 @@ export default function ReportesPage() {
 											{chart.label}
 										</h1>
 									</div>
+
 									{/* Descripción opcional al hacer hover */}
-									<div className='absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-12 px-4 text-center opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100'>
+									<div className='absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-4 transform px-4 text-center opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100'>
 										<p className='text-sm text-white'>
 											Haga clic para visualizar {chart.label.toLowerCase()}.
 										</p>
