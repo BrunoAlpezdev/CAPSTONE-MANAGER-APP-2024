@@ -1,66 +1,88 @@
 'use client'
 
-import { DashboardItem, Menu } from '@/components'
+import { Calendar } from '@/components/ui/calendar'
+import { Menu } from '@/components'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createSwapy } from 'swapy'
+import { HomeTopProductos } from '@/components/home/home-top-productos'
+import { HomeUltVentas } from '@/components/home/home-ultimas-ventas'
+import { HomeTopResponsables } from '@/components/home/home-top-resp'
 
 const DEFAULT = {
-	'1': 'a',
-	'2': 'b',
-	'3': 'c',
-	'4': 'd'
+	'1': 'topProductos',
+	'2': 'ultimasVentas',
+	'3': 'calendario',
+	'4': 'topResponsables'
 }
 
-function A() {
+function Calendario() {
+	const [date, setDate] = useState<Date | undefined>(new Date())
+
 	return (
-		<div className='item a' data-swapy-item='a'>
-			<DashboardItem title='Ultimas Ventas' />
+		<div
+			className='item calendario justify-self-center'
+			data-swapy-item='calendario'>
+			<Calendar
+				mode='single'
+				selected={date}
+				onSelect={setDate}
+				className='rounded-md border bg-background'
+			/>
 		</div>
 	)
 }
 
-function B() {
+function TopProductos() {
 	return (
-		<div className='item b' data-swapy-item='b'>
-			<DashboardItem title='Calendario' />
+		<div className='item topProductos' data-swapy-item='topProductos'>
+			<HomeTopProductos />
 		</div>
 	)
 }
 
-function C() {
+function UltimasVentas() {
 	return (
-		<div className='item c' data-swapy-item='c'>
-			<DashboardItem title='Ultimas Compras' />
+		<div className='item ultimasVentas' data-swapy-item='ultimasVentas'>
+			<HomeUltVentas />
 		</div>
 	)
 }
-function D() {
+function TopResponsables() {
 	return (
-		<div className='item d' data-swapy-item='d'>
-			<DashboardItem title='Ganancias Mensuales' />
+		<div className='item topResponsables' data-swapy-item='topResponsables'>
+			<HomeTopResponsables />
 		</div>
 	)
 }
-function getItemById(itemId: 'a' | 'b' | 'c' | 'd' | null) {
+function getItemById(
+	itemId:
+		| 'topProductos'
+		| 'ultimasVentas'
+		| 'calendario'
+		| 'topResponsables'
+		| null
+) {
 	switch (itemId) {
-		case 'a':
-			return <A />
-		case 'b':
-			return <B />
-		case 'c':
-			return <C />
-		case 'd':
-			return <D />
+		case 'topProductos':
+			return <TopProductos />
+		case 'ultimasVentas':
+			return <UltimasVentas />
+		case 'calendario':
+			return <Calendario />
+		case 'topResponsables':
+			return <TopResponsables />
 	}
 }
 
 export default function HomePage() {
 	const containerRef = useRef<HTMLDivElement | null>(null)
-	const slotItems: Record<string, 'a' | 'b' | 'c' | 'd' | null> =
-		localStorage.getItem('slotItem')
-			? JSON.parse(localStorage.getItem('slotItem')!)
-			: DEFAULT
+	const slotItems: Record<
+		string,
+		'topProductos' | 'ultimasVentas' | 'calendario' | 'topResponsables' | null
+	> = localStorage.getItem('slotItem')
+		? JSON.parse(localStorage.getItem('slotItem')!)
+		: DEFAULT
 
 	useEffect(() => {
 		const container = containerRef.current
@@ -85,43 +107,29 @@ export default function HomePage() {
 		}
 	}, [])
 	return (
-		<main className='dashboard-fondo flex h-[calc(100dvh-83px)] w-full flex-row overflow-hidden font-semibold'>
+		<main className='flex h-[calc(100dvh-83px)] w-full flex-row overflow-hidden font-semibold'>
 			<Menu />
-			<ScrollArea className='w-full'>
+			<ScrollArea className='dashboard-fondo w-full'>
 				<section className='flex h-full w-full select-none flex-col gap-8 p-6 text-center text-foreground shadow-inner'>
-					<header>
-						<h1>Dashboard</h1>
-					</header>
 					<section
 						ref={containerRef}
 						className='flex w-full flex-wrap justify-center gap-6'>
-						<div className='slot a' data-swapy-slot='1'>
+						<div className='slot topProductos w-1/3' data-swapy-slot='1'>
 							{getItemById(slotItems['1'])}
 						</div>
 
-						<div className='slot b' data-swapy-slot='2'>
+						<div className='slot ultimasVentas w-1/3' data-swapy-slot='2'>
 							{getItemById(slotItems['2'])}
 						</div>
 
-						<div className='slot c' data-swapy-slot='3'>
+						<div className='slot calendario w-1/3' data-swapy-slot='3'>
 							{getItemById(slotItems['3'])}
 						</div>
 
-						<div className='slot d' data-swapy-slot='4'>
-							{getItemById(slotItems['4'])}
-						</div>
-
-						<div className='slot d' data-swapy-slot='4'>
+						<div className='slot topResponsables w-1/3' data-swapy-slot='4'>
 							{getItemById(slotItems['4'])}
 						</div>
 					</section>
-
-					{/* <section className='flex flex-wrap gap-6'>
-						<DashboardItem title='Ultimas Ventas' />
-						<DashboardItem title='Ultimas Compras' />
-						<DashboardItem title='Ganancias Mensuales' />
-						<DashboardItem title='Calendario' />
-					</section> */}
 				</section>
 			</ScrollArea>
 		</main>

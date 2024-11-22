@@ -123,7 +123,7 @@ interface Notificacion {
 	id: string
 	mensaje: string
 }
-export interface VentasMensualesData {
+export interface IngresosMensualesData {
 	mes: string
 	ventas: number
 }
@@ -134,8 +134,17 @@ export interface TransaccionesMensualesData {
 }
 
 export interface TopProductosData {
-	nombre: string
-	cantidad: number
+	id: string
+	label: string
+	value: number
+	color: string
+}
+
+export interface TopResponsablesData {
+	id: string
+	label: string
+	value: number
+	color: string
 }
 interface VentasConDetalle {
 	id: string
@@ -149,6 +158,12 @@ interface VentasConDetalle {
 interface DetalleVentaProducto extends DetalleVenta {
 	nombre: string
 	variante: string
+}
+
+interface LastProfits {
+	Fecha: string
+	Cantidad_Total_Productos: number
+	Ganancias_Totales: number
 }
 
 export {
@@ -165,9 +180,11 @@ export {
 	DetallePedido,
 	Notificacion,
 	Historial,
-	VentasMensualesData,
+	IngresosMensualesData,
 	TransaccionesMensualesData,
 	TopProductosData,
 	VentasConDetalle,
-	DetalleVentaProducto
+	DetalleVentaProducto,
+	LastSales,
+	LastProfits
 }

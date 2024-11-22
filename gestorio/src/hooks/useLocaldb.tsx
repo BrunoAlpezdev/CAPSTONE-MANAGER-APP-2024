@@ -1,21 +1,26 @@
 import useDatabaseStore from '@/store/dbStore'
 import { Producto, Usuario } from '@/types'
 import { useState } from 'react'
+import { sortDocumentsByLastWriteTime } from 'rxdb'
 
 export const useLocalDb = () => {
 	const { db } = useDatabaseStore()
 	//Leer
+	const uuid = localStorage.getItem('uuid')
 	const LeerProductos = async () => {
 		try {
 			const productos = db?.productos
 			if (productos) {
-				const productosData = await productos.find().exec()
+				const productosData = await productos
+					.find({ selector: { id_negocio: uuid } })
+					.exec()
 				return productosData
 			}
 		} catch (error) {
 			console.error('Error al leer los productos:', error)
 		}
 	}
+
 	const LeerVentas = async () => {
 		try {
 			const ventas = db?.ventas
@@ -39,6 +44,7 @@ export const useLocalDb = () => {
 			console.error('Error al leer los usuarios:', error)
 		}
 	}
+
 	// Modificar
 	const ModificarProductos = async (id: string, producto: Producto) => {
 		try {
