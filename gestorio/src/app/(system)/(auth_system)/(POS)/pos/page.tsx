@@ -361,8 +361,6 @@ export default function POS() {
 		}
 		const localId = localStorage.getItem('userUuid')
 		const Id_negocio = localId?.replaceAll('"', '') ?? 'indefinido'
-		const fecha = new Date()
-		const fechaString = fecha.toISOString().slice(0, 19).replace('T', ' ')
 
 		const fecha = new Date()
 		const fechaString = fecha.toISOString().slice(0, 19).replace('T', ' ')
