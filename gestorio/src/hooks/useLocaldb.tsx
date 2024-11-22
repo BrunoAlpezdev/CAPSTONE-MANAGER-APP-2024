@@ -1,3 +1,4 @@
+'use client'
 import useDatabaseStore from '@/store/dbStore'
 import { Producto, Usuario } from '@/types'
 import { useState } from 'react'
