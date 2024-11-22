@@ -142,7 +142,7 @@ export default function ReportesPage() {
 															: 'https://cdn-icons-png.flaticon.com/512/3349/3349622.png'
 												}
 												alt={chart.label}
-												className='h-full w-full object-cover opacity-50 group-hover:translate-y-0 group-hover:opacity-100'
+												className='h-full w-full object-cover opacity-50 group-hover:opacity-100'
 											/>
 										</div>
 									</div>
@@ -156,8 +156,9 @@ export default function ReportesPage() {
 											{chart.label}
 										</h1>
 									</div>
+
 									{/* Descripción opcional al hacer hover */}
-									<div className='absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-12 transform px-4 text-center opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100'>
+									<div className='absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-4 transform px-4 text-center opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100'>
 										<p className='text-sm text-white'>
 											Haga clic para visualizar {chart.label.toLowerCase()}.
 										</p>
