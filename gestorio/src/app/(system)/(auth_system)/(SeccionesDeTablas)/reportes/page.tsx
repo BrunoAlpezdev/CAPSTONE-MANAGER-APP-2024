@@ -4,13 +4,10 @@ import { useMenu } from '@/hooks'
 import React, { useState } from 'react'
 import BarChart from '@/components/bar-chart'
 import PieChart from '@/components/pie-chart'
-import LineChart from '@/components/line-chart'
 import { useDataVentas } from '@/hooks/useSalesData'
-import { Footer, FullLogo, ToggleMenu } from '@/components'
-import toast, { Toaster } from 'react-hot-toast'
+import { Footer, ToggleMenu } from '@/components'
+import { Toaster } from 'react-hot-toast'
 import { SystemHeader } from '@/components/systemHeader.component'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import SunburstVentas from '@/components/sunburst'
 
 // Definimos el tipo para los gráficos
 type ChartOption = {
