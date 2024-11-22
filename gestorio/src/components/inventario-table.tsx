@@ -111,7 +111,6 @@ export function DataTable<TData, TValue>({
 		variante: '',
 		stock: 0
 	})
-	console.log(productToAdd)
 
 	return (
 		<>

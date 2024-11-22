@@ -92,16 +92,10 @@ export default function HomePage() {
 			swapMode: 'hover'
 		})
 		swapy.onSwap(({ data }) => {
-			console.log('swap', data)
 			localStorage.setItem('slotItem', JSON.stringify(data.object))
 		})
-		swapy.onSwapEnd(({ data, hasChanged }) => {
-			console.log(hasChanged)
-			console.log('end', data)
-		})
-		swapy.onSwapStart(() => {
-			console.log('start')
-		})
+		swapy.onSwapEnd(({ data, hasChanged }) => {})
+		swapy.onSwapStart(() => {})
 		return () => {
 			swapy.destroy()
 		}
