@@ -25,12 +25,57 @@ export function Header() {
 	const [db, setDb] = useState<RxDatabase | null>(null)
 	const [error, setError] = useState<string | null>(null)
 	const [isNotificationOpen, setIsNotificationOpen] = useState(false)
+	const [negocioName, setNegocioName] = useState<string | null>(null)
+	const [loading, setLoading] = useState(true)
 
 	const [notificaciones, setNotificacion] = useState<Notificacion[]>(() => {
 		// Cargar los tickets desde localStorage al iniciar la aplicación
 		const savedNotificacion = localStorage.getItem('notificaciones')
 		return savedNotificacion ? JSON.parse(savedNotificacion) : []
 	})
+
+	const fetchNegocio = async () => {
+		if (db) {
+			try {
+				const localId = localStorage.getItem('userUuid')
+				const Id_negocio = localId?.replaceAll('"', '')
+				// Obtén los datos de los usuarios desde la base de datos local (RxDB)
+				const negocioData = await db.negocios
+					.find({
+						selector: { usuario_id: Id_negocio }
+					})
+					.exec()
+
+				// Actualizar el estado del negocio
+				console.log(negocioData)
+				const negocio = negocioData.map((negocio: any) => negocio.toJSON())
+				setNegocioName(negocio[0].nombreNegocio)
+			} catch (error) {
+				console.log('Error al obtener los usuarios:', '✖️')
+			} finally {
+				setLoading(false)
+			}
+		}
+	}
+
+	useEffect(() => {
+		const localId = localStorage.getItem('userUuid')
+		const Id_negocio = localId?.replaceAll('"', '')
+		if (db?.productos) {
+			const subscription = db.negocios
+				.find({
+					selector: { usuario_id: Id_negocio }
+				})
+				.$ // '$' provides an observable that emits every time the query result changes
+				.subscribe((negocioData: any) => {
+					const negocio = negocioData.map((negocio: any) => negocio.toJSON())
+					setNegocioName(negocio.nombreNegocio)
+				})
+
+			// Clean up the subscription on component unmount
+			return () => subscription.unsubscribe()
+		}
+	}, [db])
 
 	const handlerEliminarNotificacion = (id: string) => {
 		const notificacionFiltrada = notificaciones.filter(
@@ -55,6 +100,11 @@ export function Header() {
 			setError('Failed to setup database')
 		}
 	}
+
+	useEffect(() => {
+		initDatabase()
+		fetchNegocio()
+	}, [db])
 
 	return (
 		<header
@@ -146,7 +196,11 @@ export function Header() {
 								height={30}
 								className='pointer-events-none aspect-square cursor-pointer select-none rounded-full'
 							/>
-							<p className='select-none text-foreground'>Negocio</p>
+							{loading ? (
+								<p className='animate-spin'>@</p>
+							) : (
+								<p>{negocioName}</p>
+							)}
 						</button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent className='w-fit'>

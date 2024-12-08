@@ -136,6 +136,10 @@ export const columns: ColumnDef<Producto>[] = [
 				}
 			}, [isOpen, isDeleteDialogOpen])
 
+			useEffect(() => {
+				setProductoModificado(product)
+			}, [product])
+
 			return (
 				<>
 					<DropdownMenu>
@@ -178,7 +182,7 @@ export const columns: ColumnDef<Producto>[] = [
 										name='username'
 										id='username'
 										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
-										defaultValue={product.nombre}
+										value={productoModificado.nombre}
 										onChange={(e) => {
 											setProductoModificado({
 												...productoModificado,
@@ -198,7 +202,7 @@ export const columns: ColumnDef<Producto>[] = [
 										name='type'
 										id='type'
 										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
-										defaultValue={product.barcode} // Usa value para controlar el input
+										value={productoModificado.barcode} // Usa value para controlar el input
 										onChange={(e) => {
 											setProductoModificado({
 												...productoModificado,
@@ -218,7 +222,7 @@ export const columns: ColumnDef<Producto>[] = [
 										name='type'
 										id='type'
 										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
-										defaultValue={product.marca} // Usa value para controlar el input
+										value={productoModificado.marca} // Usa value para controlar el input
 										onChange={(e) => {
 											setProductoModificado({
 												...productoModificado,
@@ -238,7 +242,7 @@ export const columns: ColumnDef<Producto>[] = [
 										name='type'
 										id='type'
 										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
-										defaultValue={product.precio} // Usa value para controlar el input
+										value={productoModificado.precio} // Usa value para controlar el input
 										onChange={(e) => {
 											setProductoModificado({
 												...productoModificado,
@@ -258,7 +262,7 @@ export const columns: ColumnDef<Producto>[] = [
 										name='type'
 										id='type'
 										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
-										defaultValue={product.stock} // Usa value para controlar el input
+										value={productoModificado.stock} // Usa value para controlar el input
 										onChange={(e) => {
 											setProductoModificado({
 												...productoModificado,

@@ -85,8 +85,27 @@ export function DataTable<TData, TValue>({
 
 	const handleAgregar = () => {
 		const id = GenerateNewId()
-		setProductToAdd({ ...productToAdd, id })
-		AgregarProducto(productToAdd)
+
+		const newProduct = { ...productToAdd, id }
+
+		// Validación básica
+		if (!newProduct.nombre || !newProduct.precio || !newProduct.stock) {
+			alert('Por favor, completa todos los campos obligatorios.')
+			return
+		}
+
+		AgregarProducto(newProduct)
+
+		setProductToAdd({
+			id: '',
+			nombre: '',
+			barcode: '',
+			marca: '',
+			precio: 0,
+			id_negocio: Id_negocio ?? '',
+			variante: '',
+			stock: 0
+		})
 		setIsOpen(false)
 	}
 
@@ -96,11 +115,13 @@ export function DataTable<TData, TValue>({
 			body.style.pointerEvents = isOpen ? 'all' : 'all'
 		}
 	}, [isOpen])
+
 	const GenerateNewId = () => {
 		return uuidv7()
 	}
 
 	const Id_negocio = localStorage.getItem('userUuid')
+
 	const [productToAdd, setProductToAdd] = useState<Producto>({
 		id: '',
 		nombre: '',
@@ -248,7 +269,7 @@ export function DataTable<TData, TValue>({
 									</label>
 									<input
 										type='number'
-										name='type'
+										name='stock'
 										id='type'
 										className='mt-1 block w-full rounded-md border border-border bg-background px-4 py-2 text-foreground shadow-sm focus:border-primary focus:ring-ring sm:text-sm'
 										onChange={(e) => {
