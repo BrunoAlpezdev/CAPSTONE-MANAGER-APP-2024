@@ -34,49 +34,6 @@ export function Header() {
 		return savedNotificacion ? JSON.parse(savedNotificacion) : []
 	})
 
-	const fetchNegocio = async () => {
-		if (db) {
-			try {
-				const localId = localStorage.getItem('userUuid')
-				const Id_negocio = localId?.replaceAll('"', '')
-				// Obtén los datos de los usuarios desde la base de datos local (RxDB)
-				const negocioData = await db.negocios
-					.find({
-						selector: { usuario_id: Id_negocio }
-					})
-					.exec()
-
-				// Actualizar el estado del negocio
-				console.log(negocioData)
-				const negocio = negocioData.map((negocio: any) => negocio.toJSON())
-				setNegocioName(negocio[0].nombreNegocio)
-			} catch (error) {
-				console.log('Error al obtener los usuarios:', '✖️')
-			} finally {
-				setLoading(false)
-			}
-		}
-	}
-
-	useEffect(() => {
-		const localId = localStorage.getItem('userUuid')
-		const Id_negocio = localId?.replaceAll('"', '')
-		if (db?.productos) {
-			const subscription = db.negocios
-				.find({
-					selector: { usuario_id: Id_negocio }
-				})
-				.$ // '$' provides an observable that emits every time the query result changes
-				.subscribe((negocioData: any) => {
-					const negocio = negocioData.map((negocio: any) => negocio.toJSON())
-					setNegocioName(negocio.nombreNegocio)
-				})
-
-			// Clean up the subscription on component unmount
-			return () => subscription.unsubscribe()
-		}
-	}, [db])
-
 	const handlerEliminarNotificacion = (id: string) => {
 		const notificacionFiltrada = notificaciones.filter(
 			(notificacion) => notificacion.id !== id
@@ -87,24 +44,61 @@ export function Header() {
 
 	const isNotificacionesEmpty = notificaciones.length === 0
 
-	async function initDatabase() {
-		try {
-			const database = await setupDatabase() // Invoca la función de setup
-			if (database) {
-				setDb(database) // Almacena la referencia de la base de datos en el estado
-			} else {
+	useEffect(() => {
+		async function init() {
+			try {
+				const database = await setupDatabase() // Configura la base de datos
+				if (database) {
+					setDb(database) // Almacena la referencia en el estado
+				} else {
+					setError('Failed to setup database')
+				}
+			} catch (err) {
+				console.error('Error setting up the database:', err)
 				setError('Failed to setup database')
 			}
-		} catch (err) {
-			console.error('Error setting up the database:', err)
-			setError('Failed to setup database')
 		}
-	}
+
+		init() // Solo se ejecuta una vez
+	}, []) // Sin dependencias, se ejecuta solo al montar el componente
 
 	useEffect(() => {
-		initDatabase()
+		if (!db) return // Espera a que la base de datos esté lista
+		const fetchNegocio = async () => {
+			try {
+				const localId = localStorage.getItem('userUuid')
+				const Id_negocio = localId?.replaceAll('"', '')
+				const negocioData = await db.negocios
+					.find({
+						selector: { usuario_id: Id_negocio }
+					})
+					.exec()
+
+				const negocio = negocioData.map((negocio: any) => negocio.toJSON())
+				setNegocioName(negocio[0]?.nombreNegocio || 'Desconocido')
+			} catch (error) {
+				console.log('Error al obtener los negocios:', error)
+			} finally {
+				setLoading(false)
+			}
+		}
+
 		fetchNegocio()
-	}, [db])
+
+		const subscription = db.negocios
+			.find({
+				selector: {
+					usuario_id: localStorage.getItem('userUuid')?.replaceAll('"', '')
+				}
+			})
+			.$ // Observa cambios
+			.subscribe((negocioData: any) => {
+				const negocio = negocioData.map((negocio: any) => negocio.toJSON())
+				setNegocioName(negocio[0]?.nombreNegocio || 'Desconocido')
+			})
+
+		return () => subscription.unsubscribe() // Limpia la suscripción
+	}, [db]) // Solo depende de db, evitando ciclos infinitos
 
 	return (
 		<header
@@ -214,13 +208,6 @@ export function Header() {
 								localStorage.removeItem('tickets')
 							}}>
 							Log out
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem
-							onClick={async () => {
-								await initDatabase()
-							}}>
-							Initialize Database
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

@@ -3,6 +3,7 @@ import { Usuario, Venta } from '@/types'
 import { Package } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 interface VentaConResponsable extends Venta {
 	responsable: string
@@ -54,44 +55,46 @@ export const HomeUltVentas = () => {
 			<hr className='solid my-2' />
 			{/* Tabla */}
 			<div className='w-full flex-grow p-4'>
-				<table className='min-w-full overflow-hidden rounded-lg border border-border bg-background text-left shadow-md'>
-					<thead className='bg-border text-foreground/90'>
-						<tr>
-							<th className='px-6 py-3 text-xs font-medium uppercase tracking-wider'>
-								Fecha
-							</th>
-							<th className='px-6 py-3 text-xs font-medium uppercase tracking-wider'>
-								Metodo Pago
-							</th>
-							<th className='px-6 py-3 text-xs font-medium uppercase tracking-wider'>
-								Responsable
-							</th>
-							<th className='px-6 py-3 text-xs font-medium uppercase tracking-wider'>
-								Total
-							</th>
-						</tr>
-					</thead>
-					<tbody className='divide-y divide-border text-foreground'>
-						{ventasData.map((venta) => (
-							<tr key={venta.id}>
-								<td className='whitespace-nowrap px-6 py-4 text-sm font-medium'>
-									{venta.fecha
-										? new Date(venta.fecha).toLocaleDateString()
-										: 'Invalid Date'}
-								</td>
-								<td className='whitespace-nowrap px-6 py-4 text-sm'>
-									{venta.metodoPago}
-								</td>
-								<td className='whitespace-nowrap px-6 py-4 text-sm'>
-									{venta.responsable}
-								</td>
-								<td className='whitespace-nowrap px-6 py-4 text-sm'>
-									{venta.total}
-								</td>
+				<div className='scrollbar-modifier max-h-full max-w-full overflow-x-scroll'>
+					<table className='min-w-full overflow-hidden rounded-lg border border-border bg-background text-left shadow-md'>
+						<thead className='bg-border text-foreground/90'>
+							<tr>
+								<th className='px-6 py-3 text-xs font-medium uppercase tracking-wider'>
+									Fecha
+								</th>
+								<th className='px-6 py-3 text-xs font-medium uppercase tracking-wider'>
+									Metodo Pago
+								</th>
+								<th className='px-6 py-3 text-xs font-medium uppercase tracking-wider'>
+									Responsable
+								</th>
+								<th className='px-6 py-3 text-xs font-medium uppercase tracking-wider'>
+									Total
+								</th>
 							</tr>
-						))}
-					</tbody>
-				</table>
+						</thead>
+						<tbody className='divide-y divide-border text-foreground'>
+							{ventasData.map((venta) => (
+								<tr key={venta.id}>
+									<td className='whitespace-nowrap px-6 py-4 text-sm font-medium'>
+										{venta.fecha
+											? new Date(venta.fecha).toLocaleDateString()
+											: 'Invalid Date'}
+									</td>
+									<td className='whitespace-nowrap px-6 py-4 text-sm'>
+										{venta.metodoPago}
+									</td>
+									<td className='whitespace-nowrap px-6 py-4 text-sm'>
+										{venta.responsable}
+									</td>
+									<td className='whitespace-nowrap px-6 py-4 text-sm'>
+										{venta.total}
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 	)
