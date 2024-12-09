@@ -193,7 +193,7 @@ export function Header() {
 							{loading ? (
 								<p className='animate-spin'>@</p>
 							) : (
-								<p>{negocioName}</p>
+								<p className='text-secondary-foreground'>{negocioName}</p>
 							)}
 						</button>
 					</DropdownMenuTrigger>

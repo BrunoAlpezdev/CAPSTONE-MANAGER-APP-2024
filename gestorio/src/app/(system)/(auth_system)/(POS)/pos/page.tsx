@@ -242,9 +242,16 @@ export default function POS() {
 		const product = products.find((product) => product.barcode === barcode)
 
 		if (!product || product === undefined) {
-			makeToast('Producto No Encontrado', '✖️') // Mostrar un toast de confirmación
+			makeToast('Producto No Encontrado o Sin Stock', '✖️') // Mostrar un toast de confirmación
 			return
 		}
+
+		// Comprobar stock del producto antes de agregar al carrito
+		if (product.stock < 1) {
+			makeToast('Producto sin Stock', '✖️') // Mostrar un toast de confirmación
+			return
+		}
+
 		makeToast('Producto Escaneado', '🛒') // Mostrar un toast de confirmación
 		addToCart(product)
 	}
