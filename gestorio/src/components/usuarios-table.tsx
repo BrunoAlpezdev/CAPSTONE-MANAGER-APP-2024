@@ -85,7 +85,26 @@ export function DataTable<TData, TValue>({
 	}
 
 	const handleAgregar = () => {
-		AgregarUsuario(userToAdd)
+		const id = GenerateNewId()
+
+		const newUser = { ...userToAdd, id }
+
+		// Validación básica
+		if (!newUser.nombre || !newUser.passwordHash) {
+			alert('Por favor, completa todos los campos obligatorios.')
+			return
+		}
+
+		AgregarUsuario(newUser)
+
+		setUserToAdd({
+			id: '',
+			nombre: '',
+			email: '',
+			rol: '',
+			id_negocio: Id_negocio ?? '',
+			passwordHash: ''
+		})
 		setIsOpen(false)
 	}
 
@@ -95,6 +114,7 @@ export function DataTable<TData, TValue>({
 			body.style.pointerEvents = isOpen ? 'all' : 'all'
 		}
 	}, [isOpen])
+
 	const GenerateNewId = () => {
 		return uuidv7()
 	}
