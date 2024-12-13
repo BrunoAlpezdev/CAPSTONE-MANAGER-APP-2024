@@ -15,10 +15,15 @@ import { signOut } from '@/firebase'
 import setupDatabase from '@/lib/db/RxDB'
 import { useEffect, useState } from 'react'
 import { RxDatabase } from 'rxdb'
-import { Bell, BellRing, BellRingIcon, Moon, Sun } from 'lucide-react'
-import { useNotificationStore } from '@/store/notificationStore'
+import { Bell, BellRing, BellRingIcon, Moon, Sun, Trash2 } from 'lucide-react'
 import { Notificacion } from '@/types'
-import { Switch } from './ui/switch'
+import toast from 'react-hot-toast'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger
+} from '@/components/ui/tooltip'
 
 export function Header() {
 	// Estado para manejar la bd
@@ -104,7 +109,21 @@ export function Header() {
 		<header
 			className={`flex h-fit items-center justify-between bg-background px-6 py-2 text-foreground`}>
 			<FullLogo size='large' />
-			<section className='flex cursor-pointer flex-row gap-6 text-accent-foreground'>
+			<section className='flex cursor-pointer flex-row items-center gap-6 text-accent-foreground'>
+				<TooltipProvider>
+					<Tooltip>
+						<TooltipTrigger>
+							<button
+								className='flex h-full w-full justify-center'
+								onClick={() => toast.remove()}>
+								<Trash2 />
+							</button>
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>Descartar notificaciones emergentes</p>
+						</TooltipContent>
+					</Tooltip>
+				</TooltipProvider>
 				<ThemeSwitch />
 				<div className='relative'>
 					{isNotificacionesEmpty ? (

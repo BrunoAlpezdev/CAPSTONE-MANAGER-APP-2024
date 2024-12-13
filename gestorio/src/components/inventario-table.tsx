@@ -121,7 +121,6 @@ export function DataTable<TData, TValue>({
 	}
 
 	const Id_negocio = localStorage.getItem('userUuid')
-
 	const [productToAdd, setProductToAdd] = useState<Producto>({
 		id: '',
 		nombre: '',

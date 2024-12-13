@@ -62,11 +62,20 @@ export const columns: ColumnDef<VentasConDetalle>[] = [
 		)
 	},
 	{
-		accessorKey: 'id',
-		header: 'CÓDIGO',
+		accessorKey: 'fecha',
+		header: ({ column }) => {
+			return (
+				<Button
+					variant='ghost'
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+					className='text-foreground'>
+					FECHA
+				</Button>
+			)
+		},
 		cell: ({ row }) => {
 			const VentaConDetalles: VentasConDetalle = row.original
-			return <div className='text-foreground'>{VentaConDetalles.id}</div>
+			return <div className='text-foreground'>{VentaConDetalles.fecha}</div>
 		}
 	},
 	{

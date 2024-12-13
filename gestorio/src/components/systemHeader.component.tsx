@@ -2,8 +2,8 @@ import { BellOff, MenuIcon, Moon, Sun, Trash2 } from 'lucide-react'
 import { FullLogo } from './FullLogo.component'
 import { useEffect, useState } from 'react'
 import { Switch } from './ui/switch'
-import toast from 'react-hot-toast'
 import { ThemeSwitch } from './ThemeSwitch'
+import toast from 'react-hot-toast'
 import {
 	Tooltip,
 	TooltipContent,

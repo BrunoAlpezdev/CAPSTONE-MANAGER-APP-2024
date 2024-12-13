@@ -148,6 +148,7 @@ export interface TopResponsablesData {
 }
 interface VentasConDetalle {
 	id: string
+	fecha: string
 	responsable: string
 	totalVenta: number
 	montoTotal: number

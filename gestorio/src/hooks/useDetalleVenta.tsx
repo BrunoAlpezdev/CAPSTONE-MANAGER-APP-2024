@@ -71,7 +71,7 @@ export const useVentasConDetalles = () => {
 						...venta,
 						detalles: DetalleVentaProducto,
 						responsable: responsable?.nombre,
-						fecha: fechaString,
+						fecha: venta.fecha,
 						totalVenta: venta.total,
 						montoTotal: venta.total,
 						metodoDePago: venta.metodoPago
