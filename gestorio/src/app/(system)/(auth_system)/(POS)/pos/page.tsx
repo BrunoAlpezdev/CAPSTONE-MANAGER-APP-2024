@@ -6,7 +6,7 @@ import { ThemeSwitch } from '@/components'
 import { Button } from '@/components/ui/button'
 import useDatabaseStore from '@/store/dbStore'
 import { v7 as uuidv7 } from 'uuid'
-import { ShoppingCart, MenuIcon } from 'lucide-react'
+import { ShoppingCart, MenuIcon, Trash2 } from 'lucide-react'
 import { toast, Toaster } from 'react-hot-toast'
 import { useMenu } from '@/hooks'
 import { Footer, FullLogo, ToggleMenu } from '@/components'
@@ -17,6 +17,12 @@ import { PosSidebar } from '@/components/newPos/pos-sidebar'
 import { PosMainSection } from '@/components/newPos/pos-main-section'
 import { PosResponsibleGuard } from '@/components/newPos/pos-responsible-guard.component'
 import { jsPDF } from 'jspdf'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger
+} from '@/components/ui/tooltip'
 import printJS from 'print-js'
 import {
 	Dialog,
@@ -236,15 +242,46 @@ export default function POS() {
 		)
 	}
 
+	const handleAddingByList = (product: Producto) => {
+		const productoAAñadir = product
+		// Comprobar stock del producto antes de agregar al carrito
+		const existingItem = currentTicket.items.find(
+			(item) => item.id === productoAAñadir.id
+		)
+		if (existingItem && existingItem.cantidad >= productoAAñadir.stock) {
+			makeToast(
+				'No se puede agregar más de este producto, stock insuficiente',
+				'✖️'
+			)
+			return
+		}
+
+		makeToast('Producto Añadido', '🛒') // Mostrar un toast de confirmación
+		addToCart(productoAAñadir)
+	}
+
 	const addToCartByBarcode = (barcode: string) => {
 		// Aquí se debería hacer una petición a la API para obtener el producto
 		// con el código de barras especificado
 		const product = products.find((product) => product.barcode === barcode)
 
 		if (!product || product === undefined) {
-			makeToast('Producto No Encontrado', '✖️') // Mostrar un toast de confirmación
+			makeToast('Producto No Encontrado o Sin Stock', '✖️') // Mostrar un toast de confirmación
 			return
 		}
+
+		// Comprobar stock del producto antes de agregar al carrito
+		const existingItem = currentTicket.items.find(
+			(item) => item.id === product.id
+		)
+		if (existingItem && existingItem.cantidad >= product.stock) {
+			makeToast(
+				'No se puede agregar más de este producto, stock insuficiente',
+				'✖️'
+			)
+			return
+		}
+
 		makeToast('Producto Escaneado', '🛒') // Mostrar un toast de confirmación
 		addToCart(product)
 	}
@@ -965,6 +1002,20 @@ export default function POS() {
 							<MenuIcon className='fill-foreground' />
 						</button>
 						<div className='flex items-center space-x-4'>
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger>
+										<button
+											className='flex h-full w-full justify-center'
+											onClick={() => toast.remove()}>
+											<Trash2 />
+										</button>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p>Descartar notificaciones</p>
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
 							<ThemeSwitch />
 							<Button variant='outline' size='sm'>
 								<ShoppingCart className='mr-2 h-4 w-4' />
@@ -1013,6 +1064,7 @@ export default function POS() {
 							setConfirmFocus={setConfirmFocus}
 							setInputFocus={setInputFocus}
 							setOtherFocus={setOtherFocus}
+							handleAddingByList={handleAddingByList}
 						/>
 					</main>
 

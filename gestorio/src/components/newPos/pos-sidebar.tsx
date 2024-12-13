@@ -7,6 +7,7 @@ import { ShoppingBasket } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { CSSProperties } from 'react'
+import { Product } from '../POS/product.component'
 
 const cssOverride: CSSProperties = {
 	display: 'block',
@@ -34,6 +35,7 @@ interface PosSidebarProps {
 	setCardVoucher: (voucher: string) => void
 	cardVoucher: string
 	confirmOrder: () => void
+	handleAddingByList: (product: Producto) => void
 }
 
 export const PosSidebar: React.FC<PosSidebarProps> = ({
@@ -55,7 +57,8 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
 	setConfirmFocus,
 	cardVoucher,
 	setCardVoucher,
-	confirmOrder
+	confirmOrder,
+	handleAddingByList
 }) => {
 	return (
 		<aside className='flex w-1/3 flex-col gap-2 bg-background/90 p-4 text-foreground'>
@@ -112,7 +115,7 @@ export const PosSidebar: React.FC<PosSidebarProps> = ({
 						key={product.id}
 						variant='outline'
 						className='mb-2 w-full justify-start px-3 py-7'
-						onClick={() => addToCart(product)}>
+						onClick={() => handleAddingByList(product)}>
 						<ShoppingBasket className='mr-2 h-8 w-8 rounded-md' />
 
 						<div className='flex-grow text-left'>

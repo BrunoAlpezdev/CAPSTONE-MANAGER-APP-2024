@@ -15,16 +15,23 @@ import { signOut } from '@/firebase'
 import setupDatabase from '@/lib/db/RxDB'
 import { useEffect, useState } from 'react'
 import { RxDatabase } from 'rxdb'
-import { Bell, BellRing, BellRingIcon, Moon, Sun } from 'lucide-react'
-import { useNotificationStore } from '@/store/notificationStore'
+import { Bell, BellRing, BellRingIcon, Moon, Sun, Trash2 } from 'lucide-react'
 import { Notificacion } from '@/types'
-import { Switch } from './ui/switch'
+import toast from 'react-hot-toast'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger
+} from '@/components/ui/tooltip'
 
 export function Header() {
 	// Estado para manejar la bd
 	const [db, setDb] = useState<RxDatabase | null>(null)
 	const [error, setError] = useState<string | null>(null)
 	const [isNotificationOpen, setIsNotificationOpen] = useState(false)
+	const [negocioName, setNegocioName] = useState<string | null>(null)
+	const [loading, setLoading] = useState(true)
 
 	const [notificaciones, setNotificacion] = useState<Notificacion[]>(() => {
 		// Cargar los tickets desde localStorage al iniciar la aplicación
@@ -42,25 +49,81 @@ export function Header() {
 
 	const isNotificacionesEmpty = notificaciones.length === 0
 
-	async function initDatabase() {
-		try {
-			const database = await setupDatabase() // Invoca la función de setup
-			if (database) {
-				setDb(database) // Almacena la referencia de la base de datos en el estado
-			} else {
+	useEffect(() => {
+		async function init() {
+			try {
+				const database = await setupDatabase() // Configura la base de datos
+				if (database) {
+					setDb(database) // Almacena la referencia en el estado
+				} else {
+					setError('Failed to setup database')
+				}
+			} catch (err) {
+				console.error('Error setting up the database:', err)
 				setError('Failed to setup database')
 			}
-		} catch (err) {
-			console.error('Error setting up the database:', err)
-			setError('Failed to setup database')
 		}
-	}
+
+		init() // Solo se ejecuta una vez
+	}, []) // Sin dependencias, se ejecuta solo al montar el componente
+
+	useEffect(() => {
+		if (!db) return // Espera a que la base de datos esté lista
+		const fetchNegocio = async () => {
+			try {
+				const localId = localStorage.getItem('userUuid')
+				const Id_negocio = localId?.replaceAll('"', '')
+				const negocioData = await db.negocios
+					.find({
+						selector: { usuario_id: Id_negocio }
+					})
+					.exec()
+
+				const negocio = negocioData.map((negocio: any) => negocio.toJSON())
+				setNegocioName(negocio[0]?.nombreNegocio || 'Desconocido')
+			} catch (error) {
+				console.log('Error al obtener los negocios:', error)
+			} finally {
+				setLoading(false)
+			}
+		}
+
+		fetchNegocio()
+
+		const subscription = db.negocios
+			.find({
+				selector: {
+					usuario_id: localStorage.getItem('userUuid')?.replaceAll('"', '')
+				}
+			})
+			.$ // Observa cambios
+			.subscribe((negocioData: any) => {
+				const negocio = negocioData.map((negocio: any) => negocio.toJSON())
+				setNegocioName(negocio[0]?.nombreNegocio || 'Desconocido')
+			})
+
+		return () => subscription.unsubscribe() // Limpia la suscripción
+	}, [db]) // Solo depende de db, evitando ciclos infinitos
 
 	return (
 		<header
 			className={`flex h-fit items-center justify-between bg-background px-6 py-2 text-foreground`}>
 			<FullLogo size='large' />
-			<section className='flex cursor-pointer flex-row gap-6 text-accent-foreground'>
+			<section className='flex cursor-pointer flex-row items-center gap-6 text-accent-foreground'>
+				<TooltipProvider>
+					<Tooltip>
+						<TooltipTrigger>
+							<button
+								className='flex h-full w-full justify-center'
+								onClick={() => toast.remove()}>
+								<Trash2 />
+							</button>
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>Descartar notificaciones emergentes</p>
+						</TooltipContent>
+					</Tooltip>
+				</TooltipProvider>
 				<ThemeSwitch />
 				<div className='relative'>
 					{isNotificacionesEmpty ? (
@@ -146,7 +209,11 @@ export function Header() {
 								height={30}
 								className='pointer-events-none aspect-square cursor-pointer select-none rounded-full'
 							/>
-							<p className='select-none text-foreground'>Negocio</p>
+							{loading ? (
+								<p className='animate-spin'>@</p>
+							) : (
+								<p className='text-secondary-foreground'>{negocioName}</p>
+							)}
 						</button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent className='w-fit'>
@@ -160,13 +227,6 @@ export function Header() {
 								localStorage.removeItem('tickets')
 							}}>
 							Log out
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem
-							onClick={async () => {
-								await initDatabase()
-							}}>
-							Initialize Database
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

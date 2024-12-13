@@ -119,6 +119,10 @@ export const columns: ColumnDef<Usuario>[] = [
 				}
 			}, [isOpen, isDeleteDialogOpen])
 
+			useEffect(() => {
+				setUsuarioModificado(user)
+			}, [user])
+
 			return (
 				<>
 					<DropdownMenu>

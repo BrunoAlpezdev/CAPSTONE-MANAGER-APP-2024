@@ -104,23 +104,31 @@ export default function HomePage() {
 		<main className='flex h-[calc(100dvh-83px)] w-full flex-row overflow-hidden font-semibold'>
 			<Menu />
 			<ScrollArea className='dashboard-fondo w-full'>
-				<section className='flex h-full w-full select-none flex-col gap-8 p-6 text-center text-foreground shadow-inner'>
+				<section className='flex h-full w-full select-none flex-col gap-8 p-8 text-center text-foreground shadow-inner'>
 					<section
 						ref={containerRef}
 						className='flex w-full flex-wrap justify-center gap-6'>
-						<div className='slot topProductos w-1/3' data-swapy-slot='1'>
+						<div
+							className='slot topProductos w-1/2 2xl:w-1/3'
+							data-swapy-slot='1'>
 							{getItemById(slotItems['1'])}
 						</div>
 
-						<div className='slot ultimasVentas w-1/3' data-swapy-slot='2'>
+						<div
+							className='slot ultimasVentas w-1/2 2xl:w-1/3'
+							data-swapy-slot='2'>
 							{getItemById(slotItems['2'])}
 						</div>
 
-						<div className='slot calendario w-1/3' data-swapy-slot='3'>
+						<div
+							className='slot calendario w-1/2 2xl:w-1/3'
+							data-swapy-slot='3'>
 							{getItemById(slotItems['3'])}
 						</div>
 
-						<div className='slot topResponsables w-1/3' data-swapy-slot='4'>
+						<div
+							className='slot topResponsables w-1/2 2xl:w-1/3'
+							data-swapy-slot='4'>
 							{getItemById(slotItems['4'])}
 						</div>
 					</section>
