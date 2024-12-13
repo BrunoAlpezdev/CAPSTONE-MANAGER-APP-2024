@@ -332,14 +332,16 @@ export default function POS() {
 	}
 	const { AgregarVenta, AgregarDetalleVenta } = useLocalDb()
 
-	// Función para generar el pdf de la boleta
+	// Función para generar el PDF de la boleta o factura
 	const generateBoleta = () => {
 		const doc = new jsPDF()
 
-		// Centrar el título "Boleta"
+		// Determinar el título dinámicamente según isBoleta
+		const title = 'Boleta'
+
+		// Centrar el título dinámicamente
 		const pageWidth = doc.internal.pageSize.getWidth()
 		doc.setFontSize(18)
-		const title = 'Boleta'
 		const titleWidth = doc.getTextWidth(title)
 		doc.text(title, (pageWidth - titleWidth) / 2, 20)
 
@@ -352,7 +354,7 @@ export default function POS() {
 		doc.text('Fecha:', 10, 35)
 		doc.text(new Date().toLocaleDateString(), 50, 35)
 		doc.text('Método de Pago:', 10, 45)
-		doc.text('Efectivo', 50, 45)
+		doc.text(paymentMethod === 'cash' ? 'Efectivo' : 'Tarjeta', 50, 45)
 
 		// Encabezado para la tabla de productos
 		doc.setFontSize(14)
@@ -384,7 +386,96 @@ export default function POS() {
 		const pdfUrl = doc.output('datauristring')
 		return pdfUrl
 	}
-	//fin de la boleta
+	// Fin de la boleta o factura
+
+	//factura
+	const generateFactura = () => {
+		const doc = new jsPDF()
+
+		// Determinar el título dinámicamente
+		const title = 'Factura'
+
+		// Centrar el título dinámicamente
+		const pageWidth = doc.internal.pageSize.getWidth()
+		doc.setFontSize(18)
+		const titleWidth = doc.getTextWidth(title)
+		doc.text(title, (pageWidth - titleWidth) / 2, 20)
+
+		// Separar con una línea horizontal debajo del título
+		doc.setLineWidth(0.5)
+		doc.line(10, 25, pageWidth - 10, 25)
+
+		// Información del cliente (más cerca del título)
+		doc.setFontSize(12)
+		doc.text('Datos del Cliente:', 10, 35) // Reubicar la etiqueta de "Datos del Cliente"
+		doc.text(`Razón Social: ${nombreRazonSocial}`, 10, 40)
+		doc.text(`RUT/NIF: ${rutNif}`, 10, 45)
+		doc.text(`Giro: ${giro}`, 10, 50)
+		doc.text(`Dirección: ${direccionEmpresa}`, 10, 55)
+		doc.text(`Contacto: ${nombreContacto} - ${contacto}`, 10, 60)
+
+		// Línea separadora
+		doc.setLineWidth(0.5)
+		doc.line(10, 65, pageWidth - 10, 65) // Colocar la línea separadora más cerca
+
+		// Información de la factura
+		doc.setFontSize(12)
+		doc.text('Información de la Factura:', 10, 75)
+		doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 10, 80)
+		doc.text('Número de Factura: 2024-0001', 10, 85)
+		doc.text(
+			`Método de Pago: ${paymentMethod === 'cash' ? 'Efectivo' : 'Tarjeta'}`,
+			10,
+			90
+		)
+
+		// Línea separadora
+		doc.setLineWidth(0.5)
+		doc.line(10, 95, pageWidth - 10, 95) // Colocar la línea separadora más cerca
+
+		// Encabezado de la tabla de productos
+		doc.setFontSize(12)
+		doc.text('Productos:', 10, 105)
+
+		// Línea separadora para la tabla
+		doc.setLineWidth(0.5)
+		doc.line(10, 110, pageWidth - 10, 110)
+
+		// Tabla de productos
+		let currentY = 120
+		doc.setFontSize(12)
+		let total = 0 // Variable para almacenar el total calculado
+		replicatedTicket?.items.forEach((item, index) => {
+			doc.text(`${index + 1}. ${item.nombre}`, 10, currentY)
+			doc.text(`Cantidad: ${item.cantidad}`, 80, currentY)
+			doc.text(`Precio: $${item.precio}`, 140, currentY)
+			let subtotal = item.cantidad * item.precio
+			// No mostrar el subtotal después de cada producto, lo vamos a calcular solo al final
+			currentY += 10
+		})
+
+		// Línea separadora después de la tabla de productos
+		doc.setLineWidth(0.5)
+		doc.line(10, currentY, pageWidth - 10, currentY)
+		currentY += 10
+
+		// Calcular el total de todos los productos
+		replicatedTicket?.items.forEach((item) => {
+			total += item.cantidad * item.precio
+		})
+
+		// Mostrar el total calculado
+		doc.setFontSize(14)
+		doc.text('Total:', 10, currentY)
+		doc.setFontSize(16)
+		doc.text(`$${total.toFixed(2)}`, 50, currentY)
+
+		// Generar la URL del PDF como cadena
+		const pdfUrl = doc.output('datauristring')
+		return pdfUrl
+	}
+
+	//fin factura
 
 	// Función para confirmar la orden actual
 	const confirmOrder = () => {
@@ -454,6 +545,8 @@ export default function POS() {
 				setIsBoletaOpen(true)
 				if (isBoleta) {
 					generateBoleta()
+				} else {
+					generateFactura()
 				}
 			})
 
@@ -959,7 +1052,7 @@ export default function POS() {
 						<DialogDescription>
 							{isBoletaOpen && (
 								<iframe
-									src={generateBoleta()} // Ahora generamos correctamente la URL del PDF
+									src={isBoleta ? generateBoleta() : generateFactura()} // Ahora generamos correctamente la URL del PDF
 									width='100%'
 									height='500px'
 									style={{ border: 'none' }}
