@@ -16,7 +16,7 @@ export function LandingCard(props: LandingCardProps) {
 			{/* Contenedor de logo y título que se mueve hacia arriba con hover */}
 			<div className='absolute inset-0 mb-4 flex flex-col items-center justify-center text-center transition-all duration-500 group-hover:-translate-y-8'>
 				{props.icon}
-				<h1 className='text-2xl font-bold text-primary'>{props.title}</h1>
+				<h1 className='text-2xl font-bold text-black'>{props.title}</h1>
 			</div>
 
 			{/* Descripción que aparece con el hover */}
