@@ -1,4 +1,5 @@
 'use client'
+
 import { Moon, Sun } from 'lucide-react'
 import { Switch } from './ui/switch'
 import { useEffect, useState } from 'react'

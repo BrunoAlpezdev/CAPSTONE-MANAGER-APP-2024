@@ -13,7 +13,7 @@ import { LandingCard } from '@/components/Landing/landing-card'
 
 const features = [
 	{
-		icon: <BarChart3 className='h-12 w-12 text-primary' />,
+		icon: <BarChart3 className='h-12 w-12 text-black' />,
 		title: 'POS Avanzado',
 		description:
 			'Sistema de punto de venta intuitivo y rápido para agilizar tus transacciones.',
@@ -21,7 +21,7 @@ const features = [
 			'https://d13kjxnqnhcmn2.cloudfront.net/AcuCustom/Sitename/DAM/056/Bespoke_reports_-_Main.png'
 	},
 	{
-		icon: <BarChart3 className='h-12 w-12 text-primary' />,
+		icon: <BarChart3 className='h-12 w-12 text-black' />,
 		title: 'Reportes Detallados',
 		description:
 			'Obtén insights valiosos con nuestros informes personalizables y en tiempo real.',
@@ -29,14 +29,14 @@ const features = [
 			'https://d13kjxnqnhcmn2.cloudfront.net/AcuCustom/Sitename/DAM/056/Bespoke_reports_-_Main.png'
 	},
 	{
-		icon: <Users className='h-12 w-12 text-primary' />,
+		icon: <Users className='h-12 w-12 text-black' />,
 		title: 'Gestión de Usuarios',
 		description: 'Administra fácilmente los roles y permisos de tu equipo.',
 		image:
 			'https://d13kjxnqnhcmn2.cloudfront.net/AcuCustom/Sitename/DAM/056/Bespoke_reports_-_Main.png'
 	},
 	{
-		icon: <Package className='h-12 w-12 text-primary' />,
+		icon: <Package className='h-12 w-12 text-black' />,
 		title: 'Control de Inventario',
 		description:
 			'Mantén un seguimiento preciso de tu stock y optimiza tus pedidos.',
