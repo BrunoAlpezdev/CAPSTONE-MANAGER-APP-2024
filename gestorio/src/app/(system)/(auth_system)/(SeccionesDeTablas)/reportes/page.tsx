@@ -1,12 +1,12 @@
 'use client'
 
 import { useMenu } from '@/hooks'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import BarChart from '@/components/bar-chart'
 import PieChart from '@/components/pie-chart'
 import { useDataVentas } from '@/hooks/useSalesData'
 import { Footer, ToggleMenu } from '@/components'
-import { Toaster } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 import { SystemHeader } from '@/components/systemHeader.component'
 
 // Definimos el tipo para los gráficos
@@ -71,6 +71,12 @@ export default function ReportesPage() {
 
 	// Estado para el gráfico seleccionado
 	const [selectedChart, setSelectedChart] = useState<ChartOption | null>(null)
+
+	useEffect(() => {
+		toast.success('Trabajo en progreso...', {
+			duration: 3000
+		})
+	}, [])
 
 	return (
 		<div className='flex h-screen flex-col overflow-hidden overflow-y-auto'>
